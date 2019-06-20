@@ -1,0 +1,13 @@
+#saves {
+    border: 1px solid black;
+    border-collapse: collapse;
+    
+}
+tr.fifaTable {
+    border-bottom: 1px solid black;
+    cursor: default;
+}
+tr.fifaTable:last-child {
+    border-bottom: none;
+    text-align: center;
+}
