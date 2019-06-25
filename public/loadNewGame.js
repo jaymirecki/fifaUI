@@ -22,10 +22,10 @@ function showForm(user) {
             </select><br>\
             For player positions please list each of their positions, separated by commas, in the order of preference.\
             <table id='players'><tr><th>Name</th>\
-                    <th>Position</th>\
+                    <th onclick='sort(\"position\")'>Position</th>\
                     <th>Age</th>\
                     <th>Wage</th>\
-                    <th>Contract</th>\
+                    <th>Contract Years Remaining</th>\
                     <th>Value</th>\
                     <th>Nationality</th>\
                     <th>Overall</th>\
@@ -37,11 +37,13 @@ function showForm(user) {
             <button type='button' onclick='exportPlayers()'>Export Current Roster</button>\
             <button type='button' onclick='importPlayers()'>Import to Current Roster</button>\
             <textarea id='rosterJson'></textarea>\
-            <input type='submit' value='New Game' disabled>\
+            <input type='submit' value='New Game'>\
         </form>";
     $("#fifaContent").html(formText);
     $("select").change(user, formChange);
     $(".removePlayer").attr("disabled", true);
+    // $("input").attr("required", true);
+    // $("select").attr("required", true);
     showGames(user);
 }
 
@@ -153,25 +155,33 @@ function getPlayers() {
 function setPlayers(players) {
     var playerTable = document.getElementById("players");
     var playerRows = playerTable.children[0].children;
-    for (let i = 0; i < players.length - playerRows.length + 3; i++)
+    for (let i = playerRows.length; i < players.length + 2; i++)
         addPlayer(document.getElementById("players").children[0].children[4].children[0].children[0]);
     var playerTable = document.getElementById("players");
     var playerRows = playerTable.children[0].children;
-    for (let i = 0; i < players.length; i++)
+    for (let i = 0; i < players.length; i++) {
         setPlayer(playerRows[i + 1], players[i]);
+    }
 }
 
 function getPlayer(playerRow) {
     var player = new Object();
     player.name = playerRow.children[0].children[0].value;
     player.position = $(playerRow.children[1].children[0]).val().replace(/ /g, '').toUpperCase().split(',');
-    player.age = parseInt(playerRow.children[2].children[0].value, 10);
-    player.wage = parseInt(playerRow.children[3].children[0].value, 10);
-    player.contract = new Date(playerRow.children[4].children[0].value);
-    player.value = parseInt(playerRow.children[5].children[0].value, 10);
+    player.age = getInt(playerRow.children[2].children[0].value);
+    player.wage = getInt(playerRow.children[3].children[0].value);
+    player.contract = getInt(playerRow.children[4].children[0].value);
+    player.value = getInt(playerRow.children[5].children[0].value);
     player.nationality = playerRow.children[6].children[0].value;
-    player.overall = parseInt(playerRow.children[7].children[0].value, 10);
+    player.overall = getInt(playerRow.children[7].children[0].value);
     return player;
+}
+
+function getInt(strRep) {
+    var intRep = parseInt(strRep, 10);
+    if (isNaN(intRep) || intRep == null)
+        intRep = 0;
+    return intRep;
 }
 
 function setPlayer(playerRow, player) {
@@ -197,20 +207,31 @@ function importPlayers() {
 }
 
 var nationalities = 
-    ['American', 'Argentinian', 'Bosnian', 'Brazilian', 'Cameroonian', 'Canadian', 'Congolese', 'Dutch', 'English', 'French', 'German', 'Jamaican', 'Mexican', 'Polish', 'Scottish', 'Spanish']
+    ['American', 'Argentinian', 'Bosnian', 'Brazilian', 'Cameroonian', 'Canadian', 'Cape Verdean', 'Congolese', 'Dutch', 'English', 'French', 'German', 'Guyanese', 'Jamaican', 'Mexican', 'Polish', 'Scottish', 'Spanish']
 var playerInfo = 
-    "<tr><td><input type='text'></td>\
-        <td><input type='text'></td>\
-        <td><input type='number'></td>\
-        <td><input type='number'></td>\
-        <td><input type='number'></td>\
-        <td><input type='number'></td>\
-        <td><select><option value='' disabled selected>---</option>";
+    "<tr><td><input type='text' class='fifaRoster'></td>\
+        <td><input type='text' class='fifaRoster'></td>\
+        <td><input type='number' class='fifaRoster'></td>\
+        <td><input type='number' class='fifaRoster'></td>\
+        <td><input type='number' class='fifaRoster'></td>\
+        <td><input type='number' class='fifaRoster'></td>\
+        <td><select class='fifaRoster'><option value='' disabled selected>---</option>";
 nationalities.forEach(function(n) {
     playerInfo = playerInfo + "<option value='" + n + "'>" + n + "</option>";
 });
 playerInfo = playerInfo + "</select></td>\
-        <td><input type='number'></td>\
-        <td><button onclick='resetPlayer(this)'>Reset</button></td>\
-        <td><button class='removePlayer' onclick='removePlayer(this)'>Remove</button></td>\
+        <td><input type='number' class='fifaRoster'></td>\
+        <td><button onclick='resetPlayer(this)' class='fifaRoster'>Reset</button></td>\
+        <td><button class='removePlayer' onclick='removePlayer(this)' class='fifaRoster'>Remove</button></td>\
     </tr>";
+function sort(field) {
+    if (field == 'position') {
+        var players = getPlayers();
+        players.sort(function(a, b) {
+            return positions.indexOf(a.position[0]) - positions.indexOf(b.position[0]);
+        });
+        setPlayers(players);
+    }
+}
+
+var positions = ['GK', 'RB', 'CB', 'LB', 'CDM', 'RM', 'CM', 'LM', 'CAM', 'RW', 'CF', 'LW', 'ST'];

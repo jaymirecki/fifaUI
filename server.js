@@ -99,6 +99,11 @@ app.get('/game', function(request, response) {
     sendGame(request, response);
 });
 
+app.get('/play', function(request, response) {
+    response = cors(response);
+    response.sendFile(__dirname + '/public/choose_save.html');
+})
+
 app.get('/league', function(request, response) {
     response = cors(response);
     sendLeague(request, response);

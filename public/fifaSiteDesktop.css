@@ -3,6 +3,11 @@
     border-collapse: collapse;
     
 }
+table.fifaTable {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
 tr.fifaTable {
     border-bottom: 1px solid black;
     cursor: default;
@@ -10,4 +15,31 @@ tr.fifaTable {
 tr.fifaTable:last-child {
     border-bottom: none;
     text-align: center;
+}
+/* tr.fifaTable:nth-child(even) {
+    background-color: rgba(50, 173, 255, 0.37);
+    background: linear-gradient(white, rgba(50, 173, 255, 0.37));
+}
+tr.fifaTable:nth-child(odd) {
+    background-color: white;
+    background: linear-gradient(rgba(50, 173, 255, 0.37), white);
+} */
+tr.fifaTable {
+    background: linear-gradient(white, rgba(50, 173, 255, 0.37), white);
+}
+tr.fifaTable:hover {
+    background-color: rgba(24, 126, 194, 0.37);
+}
+tr.fifaTable:first-child {
+    background: white;
+}
+
+#fifaContent {
+    font-family: 'Arial Narrow Bold',Arial,sans-serif;
+}
+input.fifaRoster, select.fifaRoster, button.fifaRoster {
+    height: auto;
+    padding: 2px;
+    margin: 2px;
+    width: auto;
 }
