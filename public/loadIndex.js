@@ -27,10 +27,16 @@ function showSaves(user) {
                 + save.name + "</td><td class='fifaTable'>" + save.mod 
                 + "</td></tr>"
         saveTable = 
-            saveTable + "<tr class='fifaTable' onclick='selectGame(this)' id='newgame'><td class='fifaTable' colspan='2'>New Game</td></tr></table>"
+            saveTable + "<tr class='fifaTable' onclick='selectGame(this)' id='newgame'><td class='fifaTable' colspan='2'>New Game</td></tr></table><button type='button' onclick='logout()'>Logout</button>"
         $("#fifaContent").html(saveTable);
     }
     request.send();
+}
+
+function logout() {
+    var auth = new MAuth(function() {
+        auth.logout('/');
+    });
 }
 
 function selectGame(game) {

@@ -19,7 +19,8 @@ function showForm(user) {
             <label for='teamSelect'>Choose a team:</label>\
             <select id='teamSelect' required disabled>\
                 <option value='' disabled selected>---</option>\
-            </select>\
+            </select><br>\
+            For player positions please list each of their positions, separated by commas, in the order of preference.\
             <table id='players'><tr><th>Name</th>\
                     <th>Position</th>\
                     <th>Age</th>\
@@ -163,7 +164,7 @@ function setPlayers(players) {
 function getPlayer(playerRow) {
     var player = new Object();
     player.name = playerRow.children[0].children[0].value;
-    player.position = $(playerRow.children[1].children[0]).val();
+    player.position = $(playerRow.children[1].children[0]).val().replace(/ /g, '').toUpperCase().split(',');
     player.age = parseInt(playerRow.children[2].children[0].value, 10);
     player.wage = parseInt(playerRow.children[3].children[0].value, 10);
     player.contract = new Date(playerRow.children[4].children[0].value);
@@ -199,27 +200,7 @@ var nationalities =
     ['American', 'Argentinian', 'Bosnian', 'Brazilian', 'Cameroonian', 'Canadian', 'Congolese', 'Dutch', 'English', 'French', 'German', 'Jamaican', 'Mexican', 'Polish', 'Scottish', 'Spanish']
 var playerInfo = 
     "<tr><td><input type='text'></td>\
-        <td><select multiple>\
-                <option value='GK'>GK</option>\
-                <optgroup label='Defenders'>\
-                    <option value='RB'>RB</option>\
-                    <option value='CB'>CB</option>\
-                    <option value='LB'>LB</option>\
-                </optgroup>\
-                <optgroup label='Midfielders'>\
-                    <option value='CDM'>CDM</option>\
-                    <option value='LM'>LM</option>\
-                    <option value='CM'>CM</option>\
-                    <option value='RM'>RM</option>\
-                    <option value='CAM'>CAM</option>\
-                </optgroup>\
-                <optgroup label='Attackers'>\
-                    <option value='CF'>CF</option>\
-                    <option value='LW'>LW</option>\
-                    <option value='ST'>ST</option>\
-                    <option value='RW'>RW</option>\
-                </optgroup>\
-            </select></td>\
+        <td><input type='text'></td>\
         <td><input type='number'></td>\
         <td><input type='number'></td>\
         <td><input type='number'></td>\
