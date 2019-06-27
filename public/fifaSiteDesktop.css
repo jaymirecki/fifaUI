@@ -3,18 +3,26 @@
     border-collapse: collapse;
     
 }
-table.fifaTable {
+.centered {
     position: absolute;
     top: 50%;
     left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+table.fifaTable {
+    border: 1px solid black;
+    border-collapse: collapse;
 }
 tr.fifaTable {
-    border-bottom: 1px solid black;
+    /* border-bottom: 1px solid black; */
     cursor: default;
+    /* border: 1px solid black; */
 }
 tr.fifaTable:last-child {
     border-bottom: none;
-    text-align: center;
+    /* text-align: center; */
 }
 /* tr.fifaTable:nth-child(even) {
     background-color: rgba(50, 173, 255, 0.37);
@@ -42,4 +50,24 @@ input.fifaRoster, select.fifaRoster, button.fifaRoster {
     padding: 2px;
     margin: 2px;
     width: auto;
+}
+
+#fifaPlayContent {
+    clear: left;
+    max-height: 100px;
+}
+
+#fifaPlayTables {
+    display: block;
+    /* background-color: black; */
+}
+
+#fifaPlayRoster {
+    float: left;
+}
+#fifaPlayTable, #fifaPlayPower {
+    display: inline-block;
+}
+#fifaPlayTable, #fifaPlayPower, #fifaPlayRoster {
+    margin: 7px;
 }

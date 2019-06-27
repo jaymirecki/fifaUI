@@ -20,6 +20,22 @@ function cors(response) {
     return response;
 }
 
+function addOrUpdate(collection, query, doc, callback) {
+    db.collection(collection, function (error, coll) {
+        if (error) {
+            callback(error);
+            return;
+        }
+        coll.update(query, doc, { upsert: true }, function(error, results) {
+            if (error) {
+                callback(error);
+                return;
+            }
+            callback(false, collection, query, doc, results);
+        });
+    });
+}
+
 function search(collection, query, callback) {
     db.collection(collection, function(error, coll) {
         if (error) {
@@ -80,6 +96,25 @@ function sendLeague(request, response) {
     response.send({ error: "Could not find league " + request.query.league + "in game " + request.query.game });
 }
 
+function save(request, response) {
+    if (request.body.u && request.body.s) {
+        var newSave = JSON.parse(request.body.s);
+        newSave.doc = new Date(newSave.doc);
+        var user = request.body.u;
+        var query = { name: newSave.name };
+        // callback(false, collection, query, doc, results);
+
+        addOrUpdate(user + " - saves", query, newSave, function(error, coll, query, doc, results) {
+            if (error)
+                response.send(error);
+            else
+                response.send(results);
+        });
+    }
+    else
+        response.send({ success: false, error: "Need a user and save" });
+}
+
 
 
 /******************************************************************************/
@@ -88,6 +123,11 @@ function sendLeague(request, response) {
 app.get("/saves", function(request, response) {
     response = cors(response);
     sendSaves(request, response);
+});
+
+app.post("/save", function(request, response) {
+    response = cors(response);
+    save(request, response);
 });
 
 app.get('/new_game', function(request, response) {
@@ -102,7 +142,11 @@ app.get('/game', function(request, response) {
 app.get('/play', function(request, response) {
     response = cors(response);
     response.sendFile(__dirname + '/public/choose_save.html');
-})
+});
+
+app.get('/play/*', function(request, response) {
+    response.sendFile(__dirname + '/public/play.html');
+});
 
 app.get('/league', function(request, response) {
     response = cors(response);

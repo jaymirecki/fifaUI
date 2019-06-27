@@ -1,13 +1,19 @@
+var newSave;
+
 function loadFifaContent() {
-    var auth = new MAuth();
-    auth.login(function(user) {
-        showForm(user);
+    var auth = new MAuth(function() {
+        auth.login(function(user) {
+            loadScript("loadFifaCommon.js", showForm(user._id));
+        });
     });
 }
 
 function showForm(user) {
+    console.log(user);
     var formText = 
-        "<form id='newGame'>\
+        "<form id='newGame' action='javascript:void(0)' onsubmit='saveGame(\"" + user + "\")'>\
+            <label for='saveName'>Name your new save file:</label>\
+            <input id='saveName' type='text' required>\
             <label for='gameSelect'>Choose a game:</label>\
             <select id='gameSelect' required>\
                 <option value='' disabled selected>---</option>\
@@ -165,15 +171,15 @@ function setPlayers(players) {
 }
 
 function getPlayer(playerRow) {
-    var player = new Object();
+    var player = newPlayerObject();
     player.name = playerRow.children[0].children[0].value;
-    player.position = $(playerRow.children[1].children[0]).val().replace(/ /g, '').toUpperCase().split(',');
-    player.age = getInt(playerRow.children[2].children[0].value);
-    player.wage = getInt(playerRow.children[3].children[0].value);
-    player.contract = getInt(playerRow.children[4].children[0].value);
-    player.value = getInt(playerRow.children[5].children[0].value);
-    player.nationality = playerRow.children[6].children[0].value;
-    player.overall = getInt(playerRow.children[7].children[0].value);
+    player.position = $(playerRow.children[1].children[0]).val().replace(/ /g, '').toUpperCase().split(',').filter(p => positionList().indexOf(p) > -1);
+    player.attr.age = getInt(playerRow.children[2].children[0].value);
+    player.attr.wage = getInt(playerRow.children[3].children[0].value);
+    player.attr.contract = getInt(playerRow.children[4].children[0].value);
+    player.attr.value = getInt(playerRow.children[5].children[0].value);
+    player.attr.nationality = playerRow.children[6].children[0].value;
+    player.attr.overall = getInt(playerRow.children[7].children[0].value);
     return player;
 }
 
@@ -187,12 +193,12 @@ function getInt(strRep) {
 function setPlayer(playerRow, player) {
     playerRow.children[0].children[0].value = player.name;
     playerRow.children[1].children[0].value = player.position;
-    playerRow.children[2].children[0].value = player.age;
-    playerRow.children[3].children[0].value = player.wage;
-    playerRow.children[4].children[0].value = player.contract;
-    playerRow.children[5].children[0].value = player.value;
-    playerRow.children[6].children[0].value = player.nationality;
-    playerRow.children[7].children[0].value = player.overall;
+    playerRow.children[2].children[0].value = player.attr.age;
+    playerRow.children[3].children[0].value = player.attr.wage;
+    playerRow.children[4].children[0].value = player.attr.contract;
+    playerRow.children[5].children[0].value = player.attr.value;
+    playerRow.children[6].children[0].value = player.attr.nationality;
+    playerRow.children[7].children[0].value = player.attr.overall;
 }
 
 function exportPlayers() {
@@ -224,14 +230,40 @@ playerInfo = playerInfo + "</select></td>\
         <td><button onclick='resetPlayer(this)' class='fifaRoster'>Reset</button></td>\
         <td><button class='removePlayer' onclick='removePlayer(this)' class='fifaRoster'>Remove</button></td>\
     </tr>";
+
 function sort(field) {
     if (field == 'position') {
         var players = getPlayers();
         players.sort(function(a, b) {
-            return positions.indexOf(a.position[0]) - positions.indexOf(b.position[0]);
+            if (!a.position[0])
+                return 1;
+            return positionList().indexOf(a.position[0]) - positionList().indexOf(b.position[0]);
         });
         setPlayers(players);
     }
 }
 
-var positions = ['GK', 'RB', 'CB', 'LB', 'CDM', 'RM', 'CM', 'LM', 'CAM', 'RW', 'CF', 'LW', 'ST'];
+function saveGame(user) {
+    var newSave = newSaveObject();
+    newSave.name = $("#saveName").val();
+    newSave.doc = new Date();
+    newSave.dom = new Date();
+    newSave.team = $("#teamSelect").val();
+    newSave.game = $("#gameSelect").val();
+    newSave.league = $("#leagueSelect").val();
+
+    newSave.roster = getPlayers();
+
+    var request = new XMLHttpRequest();
+    var posturl = baseUrl + "save";
+    var postString = "u=" + user + "&s=" + JSON.stringify(newSave);
+    console.log(postString);
+    request.open("POST", posturl, true);
+    request.onreadystatechange = function() {
+        if (request.readyState != 4)
+            return;
+        console.log(request.responseText);
+    }
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.send(postString);
+}
