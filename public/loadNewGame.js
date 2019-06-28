@@ -1,4 +1,5 @@
 var newSave;
+var competitions;
 
 function loadFifaContent() {
     var auth = new MAuth(function() {
@@ -123,6 +124,7 @@ function showTeams(user) {
         results.teams.forEach(function (t) {
             teams = teams + "<option value='" + t + "'>" + t + "</option>"; 
         });
+        competitions = results.competitions;
         $("#teamSelect").html(teams);
         $("#teamSelect").attr('disabled', false);
     }
@@ -251,6 +253,8 @@ function saveGame(user) {
     newSave.team = $("#teamSelect").val();
     newSave.game = $("#gameSelect").val();
     newSave.league = $("#leagueSelect").val();
+    console.log(competitions);
+    newSave.competitions = competitions;
 
     newSave.roster = getPlayers();
 

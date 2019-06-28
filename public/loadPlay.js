@@ -1,8 +1,48 @@
 var saveObject;
+var numTeams = 8;
+var numPlayers = 18;
 
 function loadFifaContent() {
+    showHeader();
+    var auth = new MAuth(function() {
+        auth.login(function(user) {
+            var path =  window.location.pathname.split("/");
+            var gameId = path[path.length - 1]
+            var getString = baseUrl + "save?u=" + user._id + "&s=" + gameId;
+            var request = new XMLHttpRequest();
+            request.open("GET", getString);
+            request.onreadystatechange = function() {
+                if (request.readyState != 4)
+                    return;
+                var result = JSON.parse(request.responseText);
+                if (result.success)
+                    saveObject = result;
+                console.log(saveObject);
+                insertSaveInfo();
+            };
+            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            request.send();
+        });
+    });
+}
+
+function insertSaveInfo() {
+    $("#saveInfo").html(saveObject.name + ", " + saveObject.game);
+    $("#teamInfo").html(saveObject.team + ", " + saveObject.league);
+    $("#managerInfo").html(saveObject.manager);
+    $("#comp1Label").html(saveObject.competitions[0]);
+    $("#comp2Label").html(saveObject.competitions[1]);
+    var roster = "<tr class='fifaTable'><th>Position</th><th>Name</th></tr>";
+    for (let i = 0; i < 18 && i < saveObject.roster.length; i++)
+        roster = roster + 
+            "<tr class='fifaTable'><td>" + saveObject.roster[i].position + "</td><td>" + saveObject.roster[i].name + "</td></tr>";
+    roster = roster + "</table>";
+    $("#fifaPlayRoster").html(roster);
+}
+
+function showHeader() {
     var header =
-        "<div id=fifaPlayHeaderInfo>\
+        "<div id='fifaPlayHeaderInfo'>\
             <p id='saveInfo'>[Save Name], [Game]</p>\
             <p id='teamInfo'>[Team Name], [League Name]</p>\
             <p id='managerInfo'>[Manager Name]</p>\
@@ -10,15 +50,13 @@ function loadFifaContent() {
 
     var competition = 
         "<div id='fifaPlayCompetition'>\
-            <label for='comp1'>[COMPETITION 1]</label>\
+            <label for='comp1' id='comp1Label'>[COMPETITION 1]</label>\
             <input type='radio' name='competition' id='comp1' value='comp1' checked>\
-            <label for='comp2'>[COMPETITION 2]</label>\
+            <label for='comp2' id='comp2Label'>[COMPETITION 2]</label>\
             <input type='radio' name='competition' id='comp2' value='comp2'>\
         </div>";
 
     var playContent = "<div id='fifaPlayContent'></div>";
-
-    
 
     var htmlText = "<div id='fifaPlayHeader'>" + header + competition + "</div>" + playContent;
     $("#fifaContent").html(htmlText);
@@ -26,7 +64,6 @@ function loadFifaContent() {
 }
 
 function showDashboard() {
-    var numTeams = 8;
     var roster = 
         "<p id='teamAvg'>Team Rating: [70]</p>\
         <table class='fifaTable' id='fifaPlayRoster'>\

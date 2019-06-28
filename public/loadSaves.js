@@ -1,8 +1,10 @@
 function loadFifaContent(user) {
-    var auth = new MAuth();
-    auth.login(function(user) {
-        showSaves(user);
+    var auth = new MAuth(function() {
+        auth.login(function(user) {
+            showSaves(user);
+        });
     });
+    
 }
 
 function showSaves(user) {

@@ -20,6 +20,15 @@ function cors(response) {
     return response;
 }
 
+function objectWithoutKeys(object, keys) {
+    var returnObject = new Object();
+    for (var k in object) {
+        if (keys.indexOf(k) == -1)
+            returnObject[k] = object[k];
+    }
+    return returnObject;
+}
+
 function addOrUpdate(collection, query, doc, callback) {
     db.collection(collection, function (error, coll) {
         if (error) {
@@ -115,6 +124,24 @@ function save(request, response) {
         response.send({ success: false, error: "Need a user and save" });
 }
 
+function getSave(request, response) {
+    if (request.query.u && request.query.s) {
+        var user = request.query.u;
+        var saveId = request.query.s;
+        var query = { _id: ObjectID(saveId) };
+        search(user + " - saves", query, function(error, coll, query, results) {
+            if (error)
+                response.send({ success: false, error: error });
+            else if (results.length < 0)
+                response.send({ success: false, error: "could not find the request save" });
+            else {
+                results[0].success = true
+                response.send(results[0]);
+            }
+        });
+    }
+}
+
 
 
 /******************************************************************************/
@@ -129,6 +156,10 @@ app.post("/save", function(request, response) {
     response = cors(response);
     save(request, response);
 });
+app.get("/save", function(request, response) {
+    response = cors(response);
+    getSave(request, response);
+})
 
 app.get('/new_game', function(request, response) {
     response.sendFile(__dirname + '/public/newGame.html');
@@ -169,5 +200,5 @@ games["FIFA 19"] = { leagues: ['MLS'] };
 games["FIFA 18"] = { leagues: ['MLS'] };
 
 var leagues = new Object();
-leagues["MLSFIFA 19"] = { seasonEnd: new Date(), teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LAFC', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'] };
-leagues["MLSFIFA 18"] = { seasonEnd: new Date(), teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'] };
+leagues["MLSFIFA 19"] = { name: "MLS", seasonEnd: new Date(), teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LAFC', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'], competitions: ['MLS', 'U.S. Open Cup'] };
+leagues["MLSFIFA 18"] = { name: 'MLS', seasonEnd: new Date(), teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'], competitions: ['MLS', 'U.S. Open Cup'] };
