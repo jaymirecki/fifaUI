@@ -223,7 +223,7 @@ function importPlayers() {
 var nationalities = 
     ['American', 'Argentinian', 'Bosnian', 'Brazilian', 'Cameroonian', 'Canadian', 'Cape Verdean', 'Congolese', 'Dutch', 'English', 'French', 'German', 'Guyanese', 'Jamaican', 'Mexican', 'Polish', 'Scottish', 'Spanish']
 var playerInfo = 
-    "<tr><td><input type='text' class='fifaRoster'></td>\
+    "<tr class='fifaTable'><td><input type='text' class='fifaRoster'></td>\
         <td><input type='text' class='fifaRoster'></td>\
         <td><input type='number' class='fifaRoster'></td>\
         <td><input type='number' class='fifaRoster'></td>\

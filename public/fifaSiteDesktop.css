@@ -46,6 +46,7 @@ tr.fifaTable:first-child {
     font-family: 'Arial Narrow Bold',Arial,sans-serif;
 }
 input.fifaRoster, select.fifaRoster, button.fifaRoster {
+    background-color: rgba(255, 255, 255, 0.308);
     height: auto;
     padding: 2px;
     margin: 2px;
