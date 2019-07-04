@@ -7,16 +7,14 @@ function newSaveObject() {
             team: { 
                 name: "name of team",
                 roster: [],
-                lineups: []
+                lineups: [],
+                league: {
+                    name: "name of league",
+                    competitions: []
+                }
             },
             game: "name of game",
-            league: {
-                name: "name of league",
-                competitions: []
-            },
             date: new Date(),
-            roster: [],
-            lineups: [],
             settings: { 
                 stats: { 
                     rating:     { display: "Rating", on: true },
@@ -25,6 +23,10 @@ function newSaveObject() {
                     goals:      { display: "Goals", on: true },
                     assists:    { display: "Assists", on: true },
                     clean:      { display: "Clean Sheets", on: true },
+                    yellows:    { display: "Yellow Cards", on: true },
+                    reds:       { display: "Red Cards", on: true } 
+                }, 
+                deepStats: {
                     shots:      { display: "Shots", on: true },
                     sot:        { display: "Shots on Target", on: true }, 
                     passes:     { display: "Passes", on: true },
@@ -36,9 +38,7 @@ function newSaveObject() {
                     tackles:    { display: "Tackles", on: true },
                     tot:        { display: "Successful Tackles", on: true },
                     saves:      { display: "Saves", on: true },
-                    yellows:    { display: "Yellow Cards", on: true },
-                    reds:       { display: "Red Cards", on: true } 
-                }, 
+                },
                 attr: { 
                     ovr:        { display: "Overall", on: true },
                     age:        { display: "Age", on: true },
@@ -47,7 +47,12 @@ function newSaveObject() {
                     value:      { display: "Value", on: true },
                     nat:        { display: "Nationality", on: true }
                 },
-                halftime: { display: "Log Halftime Stats", on: false }
+                halftime: { display: "Log Halftime Stats", on: false },
+                currentSelections: {
+                    team: "name of current team",
+                    competition: "name of current competition",
+                    division: "name of current division"
+                }
             }
         };
 
@@ -55,9 +60,13 @@ function newSaveObject() {
 }
 
 function newStatsObject() {
-    var statsObject = newSaveObject().settings.stats;
-    for (key in statsObject)
-        statsObject[key] = 0;
+    var statsObject = new Object();
+    statsObject.stats = newSaveObject().settings.stats;
+    statsObject.deepStats = newSaveObject().settings.deepStats;
+    for (key in statsObject.stats)
+        statsObject.stats[key] = 0;
+    for (key in statsObject.deepStats)
+        statsObject.deepStats[key] = 0;
     return statsObject;
 }
 

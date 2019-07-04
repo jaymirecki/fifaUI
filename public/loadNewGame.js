@@ -259,11 +259,13 @@ function saveThisGame(user) {
     newSave.manager = $("#manName").val();
     newSave.doc = new Date();
     newSave.dom = new Date();
-    newSave.team.name = team;
-    newSave.game = game;
 
-    newSave.league = templates[game].leagues[league];
-    newSave.league.competitions.forEach(function(c) {
+    newSave.team[team] = new Object();
+    newSave.team[team].name = team;
+    newSave.team[team].roster = [];
+    newSave.team[team].lineups = [];
+    newSave.team[team].league = templates[game].leagues[league];
+    newSave.team[team].league.competitions.forEach(function(c) {
         var totalTeams = [];
         c.divisions.forEach(function(d) {
             d.table = newTable(d.teams);
@@ -273,7 +275,16 @@ function saveThisGame(user) {
         c.fixtures = [];
     });
 
-    newSave.date = newSave.league.seasonStart;
+    newSave.settings.currentSelections.team = 
+        newSave.team[team].name;
+    newSave.settings.currentSelections.competition = 
+        newSave.team[team].league.competitions[0].name;
+        newSave.settings.currentSelections.division = 
+            newSave.team[team].league.competitions[0].divisions[0].name;
+
+    newSave.game = game;
+
+    newSave.date = newSave.team[team].league.seasonStart;
 
     newSave.team.roster = getPlayers();
 

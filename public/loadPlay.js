@@ -17,7 +17,7 @@ function loadFifaContent() {
                 var result = JSON.parse(request.responseText);
                 if (result.success)
                     saveObject = result;
-                insertSaveInfo();
+                // insertSaveInfo();
             };
             request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             request.send();
@@ -26,6 +26,7 @@ function loadFifaContent() {
 }
 
 function insertSaveInfo() {
+    teamSele
     console.log(saveObject);
     // saveObject.team.roster.sort(function(a, b) {
     //     if (a.attr.ovr > b.attr.ovr)
@@ -36,8 +37,8 @@ function insertSaveInfo() {
     //         return 1;
     // });
     $("#saveInfo").html(saveObject.name + ", " + saveObject.game);
-    $("#teamInfo").html(saveObject.team.name + ", " + saveObject.league.name);
     $("#managerInfo").html(saveObject.manager);
+    $("#teamInfo").html(saveObject.team.name + ", " + saveObject.league.name);
     $("#comp1Label").html(saveObject.league.competitions[0].name);
     $("#comp2Label").html(saveObject.league.competitions[1].name);
 
@@ -86,6 +87,13 @@ function insertSaveInfo() {
     $("#fifaPlayPower").html(power);
 }
 
+function teamSelectBar() {
+    var html = 
+        "<div id='fifaPlayTeamBar'>";
+    for (key in saveObject.team)
+        console.log(key);
+}
+
 function showHeader() {
     var header =
         "<div id='fifaPlayHeaderInfo'>\
@@ -94,6 +102,10 @@ function showHeader() {
             <p id='managerInfo'>[Manager Name]</p>\
         </div>";
 
+    var teams = 
+        "<div id='fifaPlayTeamBar'>\
+            <div class='fifaPlayTab'>Team 1</div>\
+            <div class='fifaPlayTab'>Team 2</div></div>";
     var competition = 
         "<div id='fifaPlayCompetition'>\
             <label for='comp1' id='comp1Label'>[COMPETITION 1]</label>\
@@ -105,6 +117,7 @@ function showHeader() {
     var playContent = "<div id='fifaPlayContent'></div>";
 
     var htmlText = "<div id='fifaPlayHeader'>" + header + competition + "</div>" + playContent;
+    htmlText = "div id='fifaPlayHeader'>" + header + teams + "</div>" + playContent;
     $("#fifaContent").html(htmlText);
     showDashboard();
 }
