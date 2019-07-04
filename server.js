@@ -142,6 +142,28 @@ function getSave(request, response) {
             }
         });
     }
+    else
+        response.send({ success: false, error: "Need a user and save" });
+}
+
+function deleteSave(request, response) {
+    if (request.body.u && request.body.s) {
+        var user = request.body.u;
+        var saveId = request.body.s;
+        var query = { _id: ObjectID(saveId) };
+
+        db.collection(user + " - saves", function(error, coll) {
+            if (error) {
+                response.send({ success: false, error: error });
+                return;
+            }
+            coll.deleteOne(query, function(error) {
+                response.send({ success: true });
+            });
+        });
+    }
+    else
+        response.send({ success: false, error: "Need a user and save" });
 }
 
 
@@ -153,6 +175,11 @@ app.get("/saves", function(request, response) {
     response = cors(response);
     sendSaves(request, response);
 });
+
+app.post("/delete", function(request, response) {
+    response = cors(response);
+    deleteSave(request, response);
+})
 
 app.post("/save", function(request, response) {
     response = cors(response);
