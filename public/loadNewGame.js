@@ -1,5 +1,5 @@
+var templates;
 var newSave;
-var competitions;
 
 function loadFifaContent() {
     var auth = new MAuth(function() {
@@ -10,11 +10,10 @@ function loadFifaContent() {
 }
 
 function showForm(user) {
-    console.log(user);
     var formText = 
-        "<form id='newGame' action='javascript:void(0)' onsubmit='saveGame(\"" + user + "\")'>\
-            <label for='saveName'>Name your new save file:</label>\
-            <input id='saveName' type='text' required>\
+        "<form id='newGame' action='javascript:void(0)' onsubmit='saveThisGame(\"" + user + "\")'>\
+            <label for='manName'>Manager name:</label>\
+            <input id='manName' type='text' required>\
             <label for='gameSelect'>Choose a game:</label>\
             <select id='gameSelect' required>\
                 <option value='' disabled selected>---</option>\
@@ -56,19 +55,20 @@ function showForm(user) {
 
 function formChange(user) {
     if ($(this).attr('id') == "gameSelect")
-        showLeagues(user);
+        chooseGame(user);
     else if ($(this).attr('id') == "leagueSelect")
-        showTeams(user);
+        chooseLeague(user);
 }
 
 function showGames(user) {
     var request = new XMLHttpRequest();
-    var getUrl = baseUrl + "game";
+    var getUrl = baseUrl + "setup";
     request.open("GET", getUrl, true);
     request.onreadystatechange = function() {
         if (request.readyState != 4)
             return;
         var results = JSON.parse(request.responseText);
+        templates = results;
         if (results.error) {
             fifaError(results.error);
             return;
@@ -82,28 +82,28 @@ function showGames(user) {
     request.send();
 }
 
-function showLeagues(user) {
+function chooseGame(user) {
     var game = $("#gameSelect").val();
-    var getUrl = baseUrl + "game?game=" + game;
-    var request = new XMLHttpRequest();
-    request.open("GET", getUrl, true);
-    request.onreadystatechange = function() {
-        if (request.readyState != 4)
-            return;
-        var results = JSON.parse(request.responseText);
-        if (results.error) {
-            fifaError(results.error);
-            return;
-        }
-        var leagues = "<option value='' disabled selected>---</option>";
-        results.leagues.forEach(function (l) {
-            leagues = leagues + "<option value='" + l + "'>" + l + "</option>"; 
-        });
-        $("#leagueSelect").html(leagues);
-        $("#leagueSelect").attr('disabled', false);
-        $("#teamSelect").attr('disabled', true);
-    }
-    request.send();
+    var leagues = "<option value='' disabled selected>---</option>";
+    for (key in templates[game].leagues) {
+        leagues = leagues + "<option value='" + key + "'>" + key + "</option>"; 
+    };
+    $("#leagueSelect").html(leagues);
+    $("#leagueSelect").attr('disabled', false);
+    $("#teamSelect").attr('disabled', true);
+}
+
+function chooseLeague(user) {
+    var game = $("#gameSelect").val();
+    var league = $("#leagueSelect").val();
+    
+    var teams = "<option value='' disabled selected>---</option>";
+    templates[game].leagues[league].teams.forEach(function (t) {
+        teams = teams + "<option value='" + t + "'>" + t + "</option>"; 
+    });
+    competitions = results.competitions;
+    $("#teamSelect").html(teams);
+    $("#teamSelect").attr('disabled', false);
 }
 
 function showTeams(user) {
@@ -120,6 +120,16 @@ function showTeams(user) {
             fifaError(results.error);
             return;
         }
+        newSave.league = results;
+        newSave.date = results.seasonStart;
+        for (let i = 0; i < results.competitions.length; i++) {
+            for (let j = 0; j < results.competitions[i].divisions.length; j++) {
+                results.competitions[i].divisions[j].table = 
+                    newTable(results.competitions[i].divisions[j].teams);
+                results.competitions[i].divisions[j].power = 
+                    newPower(results.competitions[i].divisions[j].teams);
+            }
+        }
         var teams = "<option value='' disabled selected>---</option>";
         results.teams.forEach(function (t) {
             teams = teams + "<option value='" + t + "'>" + t + "</option>"; 
@@ -129,10 +139,6 @@ function showTeams(user) {
         $("#teamSelect").attr('disabled', false);
     }
     request.send();
-}
-
-function useTeam(user) {
-
 }
 
 function addPlayer(player) {
@@ -181,7 +187,7 @@ function getPlayer(playerRow) {
     player.attr.contract = getInt(playerRow.children[4].children[0].value);
     player.attr.value = getInt(playerRow.children[5].children[0].value);
     player.attr.nationality = playerRow.children[6].children[0].value;
-    player.attr.overall = getInt(playerRow.children[7].children[0].value);
+    player.attr.ovr = getInt(playerRow.children[7].children[0].value);
     return player;
 }
 
@@ -200,7 +206,7 @@ function setPlayer(playerRow, player) {
     playerRow.children[4].children[0].value = player.attr.contract;
     playerRow.children[5].children[0].value = player.attr.value;
     playerRow.children[6].children[0].value = player.attr.nationality;
-    playerRow.children[7].children[0].value = player.attr.overall;
+    playerRow.children[7].children[0].value = player.attr.ovr;
 }
 
 function exportPlayers() {
@@ -245,29 +251,36 @@ function sort(field) {
     }
 }
 
-function saveGame(user) {
+function saveThisGame(user) {
+    var game = $("#gameSelect").val();
+    var league = $("#leagueSelect").val();
+    var team = $("#teamSelect").val();
     var newSave = newSaveObject();
-    newSave.name = $("#saveName").val();
+    newSave.manager = $("#manName").val();
     newSave.doc = new Date();
     newSave.dom = new Date();
-    newSave.team = $("#teamSelect").val();
-    newSave.game = $("#gameSelect").val();
-    newSave.league = $("#leagueSelect").val();
-    console.log(competitions);
-    newSave.competitions = competitions;
+    newSave.team.name = team;
+    newSave.game = game;
 
-    newSave.roster = getPlayers();
+    newSave.league = templates[game].leagues[league];
+    newSave.league.competitions.forEach(function(c) {
+        var totalTeams = [];
+        c.divisions.forEach(function(d) {
+            d.table = newTable(d.teams);
+            totalTeams = totalTeams.concat(d.teams);
+        });
+        c.power = newPower(totalTeams);
+        c.fixtures = [];
+    });
 
-    var request = new XMLHttpRequest();
-    var posturl = baseUrl + "save";
-    var postString = "u=" + user + "&s=" + JSON.stringify(newSave);
-    console.log(postString);
-    request.open("POST", posturl, true);
-    request.onreadystatechange = function() {
-        if (request.readyState != 4)
-            return;
-        console.log(request.responseText);
-    }
-    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    request.send(postString);
+    newSave.date = newSave.league.seasonStart;
+
+    newSave.team.roster = getPlayers();
+
+    // console.log(newSave);
+
+    saveGame(user, newSave, 
+        function(results) {
+            location.href = baseUrl + "play/" + results.save._id}, 
+        function(results) {console.log(results); fifaError(results);});
 }

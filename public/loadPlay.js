@@ -17,7 +17,6 @@ function loadFifaContent() {
                 var result = JSON.parse(request.responseText);
                 if (result.success)
                     saveObject = result;
-                console.log(saveObject);
                 insertSaveInfo();
             };
             request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -27,17 +26,64 @@ function loadFifaContent() {
 }
 
 function insertSaveInfo() {
+    console.log(saveObject);
+    // saveObject.team.roster.sort(function(a, b) {
+    //     if (a.attr.ovr > b.attr.ovr)
+    //         return -1;
+    //     else if (a.attr.ovr == b.attr.ovr)
+    //         return 0;
+    //     else
+    //         return 1;
+    // });
     $("#saveInfo").html(saveObject.name + ", " + saveObject.game);
-    $("#teamInfo").html(saveObject.team + ", " + saveObject.league);
+    $("#teamInfo").html(saveObject.team.name + ", " + saveObject.league.name);
     $("#managerInfo").html(saveObject.manager);
-    $("#comp1Label").html(saveObject.competitions[0]);
-    $("#comp2Label").html(saveObject.competitions[1]);
+    $("#comp1Label").html(saveObject.league.competitions[0].name);
+    $("#comp2Label").html(saveObject.league.competitions[1].name);
+
     var roster = "<tr class='fifaTable'><th>Position</th><th>Name</th></tr>";
-    for (let i = 0; i < 18 && i < saveObject.roster.length; i++)
+    for (let i = 0; i < 18 && i < saveObject.team.roster.length; i++)
         roster = roster + 
-            "<tr class='fifaTable'><td>" + saveObject.roster[i].position + "</td><td>" + saveObject.roster[i].name + "</td></tr>";
-    roster = roster + "</table>";
+            "<tr class='fifaTable'><td>" + saveObject.team.roster[i].position + "</td><td>" + saveObject.team.roster[i].name + "</td></tr>";
     $("#fifaPlayRoster").html(roster);
+
+    saveObject.league.competitions[0].divisions[0].table.sort(function(a, b) {
+        var ap = a.w * 3 + a.d;
+        var bp = b.w * 3 + b.d;
+        if (ap > bp)
+            return -1;
+        else if (bp > ap)
+            return 1;
+        else
+            return 0;
+    });
+    var table = 
+        "<tr class='fifaTable'><th></th><th></th><th>GP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>PTS</th></tr>";
+    for (let i = 0; i < numTeams; i++) {
+        var row = saveObject.league.competitions[0].divisions[0].table[i];
+        table = table + 
+            "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + (row.w + row.l + row.d) + "</td><td>" + row.w + "</td><td>" + row.d + "</td><td>" + row.l + "</td><td>" + row.gf + "</td><td>" + row.ga + "</td><td>" + (row.w * 3 + row.d) + "</td></tr>";
+    }
+    $("#fifaPlayTable").html(table);
+
+    saveObject.league.competitions[0].power.sort(function(a, b) {
+        var ap = a.w * 3 + a.d;
+        var bp = b.w * 3 + b.d;
+        if (ap > bp)
+            return -1;
+        else if (bp > ap)
+            return 1;
+        else
+            return 0;
+    });
+    var power = 
+        "<tr class='fifaTable'><th></th><th></th><th>PTS</th><th>STR</th><th>SCR</th><th>MOV</th></tr>";
+    for (let i = 0; i < numTeams; i++) {
+        var row = saveObject.league.competitions[0].power[i];
+        power = power + 
+            "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + row.p + "</td><td>" + row.str + "</td><td>" + row.scr + "</td><td>[+0]</td></tr>";
+        }
+    $("#fifaPlayPower").html(power);
 }
 
 function showHeader() {
