@@ -265,28 +265,30 @@ function saveThisGame(user) {
     newSave.team[team].roster = [];
     newSave.team[team].lineups = [];
     newSave.team[team].league = templates[game].leagues[league];
-    newSave.team[team].league.competitions.forEach(function(c) {
+
+    for (c in newSave.team[team].league.competitions) {
         var totalTeams = [];
-        c.divisions.forEach(function(d) {
-            d.table = newTable(d.teams);
-            totalTeams = totalTeams.concat(d.teams);
-        });
-        c.power = newPower(totalTeams);
-        c.fixtures = [];
-    });
+        for (d in newSave.team[team].league.competitions[c].divisions) {
+            newSave.team[team].league.competitions[c].divisions[d].table = 
+                newTable(newSave.team[team].league.competitions[c].divisions[d].teams);
+            totalTeams = totalTeams.concat(newSave.team[team].league.competitions[c].divisions[d].teams);
+        };
+        newSave.team[team].league.competitions[c].power = newPower(totalTeams);
+        newSave.team[team].league.competitions[c].fixtures = [];
+    }
 
     newSave.settings.currentSelections.team = 
         newSave.team[team].name;
-    newSave.settings.currentSelections.competition = 
-        newSave.team[team].league.competitions[0].name;
-        newSave.settings.currentSelections.division = 
-            newSave.team[team].league.competitions[0].divisions[0].name;
+    var comp = Object.keys(newSave.team[team].league.competitions)[0];
+    newSave.settings.currentSelections.competition = comp;
+    newSave.settings.currentSelections.division = 
+        Object.keys(newSave.team[team].league.competitions[comp].divisions)[0];
 
     newSave.game = game;
 
     newSave.date = newSave.team[team].league.seasonStart;
 
-    newSave.team.roster = getPlayers();
+    newSave.team[team].roster = getPlayers();
 
     // console.log(newSave);
 

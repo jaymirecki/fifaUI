@@ -4,15 +4,7 @@ function newSaveObject() {
             doc: "date created",
             dom: "date modified",
             manager: "manager name",
-            team: { 
-                name: "name of team",
-                roster: [],
-                lineups: [],
-                league: {
-                    name: "name of league",
-                    competitions: []
-                }
-            },
+            team: {},
             game: "name of game",
             date: new Date(),
             settings: { 
@@ -211,8 +203,6 @@ function openModal(innerHTML) {
 }
 
 function closeModal() {
-    console.log(modalLoaded);
     if (modalLoaded)
-        // $("#fifaModalBackground").hide();
-        $("#fifaModalBackground").css("display", "none");
+        $("#fifaModalBackground").hide();
 }

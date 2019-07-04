@@ -10,7 +10,9 @@ function loadMireckiContent() {
 
     loadScript(mauthUrl, function() {
         $("#mireckiContent").html("<div id='fifaContent'></div>");
-        loadFifaContent();
+        loadScript("/loadFifaCommon.js", function() {
+            loadFifaContent();
+        });
     });
 }
 

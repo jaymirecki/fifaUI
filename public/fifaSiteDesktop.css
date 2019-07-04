@@ -72,6 +72,44 @@ input.fifaRoster, select.fifaRoster, button.fifaRoster {
     margin: 7px;
 }
 
+#fifaPlayBars {
+    border: 1px solid black;
+    height: 600px;
+}
+
+.fifaPlayBarSpacer {
+    clear: both;
+}
+
+.fifaPlayBar {
+    clear: left;
+    margin-bottom: 5px;
+    height: 20px;
+}
+.fifaPlayTab, .fifaPlayTabSelected {
+    float: left;
+    border: 1px solid black;
+    border-right: none;
+    /* width: 200px; */
+    overflow: hidden;
+    height: 100%;
+    text-align: center;
+    padding: 0px 10px;
+    cursor: default;
+}
+.fifaPlayTab:first-child, .fifaPlayTabSelected:first-child {
+    border-left: none;
+}
+.fifaPlayTabEnd {
+    overflow: hidden;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    height: 100%;
+}
+.fifaPlayTabSelected {
+    border-bottom: none;
+}
+
 /******************************************************************************/
 /*********************************** MODAL ************************************/
 /******************************************************************************/
@@ -79,7 +117,7 @@ input.fifaRoster, select.fifaRoster, button.fifaRoster {
     display: block;
     background: white;
     border: 1px solid black;
-    width: 300px;
+    /* width: 300px; */
     padding: 20px;
     font-size: 15px;
     margin: 0;
@@ -90,6 +128,7 @@ input.fifaRoster, select.fifaRoster, button.fifaRoster {
     transform: translate(-50%, -50%);
     padding-right: 20px;
     box-shadow: 2px 2px;
+    font-family: 'Arial Narrow Bold',Arial,sans-serif;
 }
 
 #fifaModalBackground {

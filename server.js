@@ -208,9 +208,18 @@ var mlsfifa19 = {
     seasonStart: new Date(2018, 1, 1), 
     seasonEnd: new Date(2018, 12, 31), 
     teams: mlsEast.concat(mlsWest), 
-    competitions: [
-        { name: 'MLS', divisions: [{ name: "Eastern Conference",  teams: mlsEast }, { name: "Western Conference", teams: mlsWest }]}, 
-        { name: 'U.S. Open Cup', divisions: [{ name: "U.S. Open Cup", teams: mlsEast.concat(mlsWest) }]}] };
+    competitions: {
+        MLS: { name: 'MLS', divisions: {
+                "Eastern Conference": { name: "Eastern Conference", teams: mlsEast }, 
+                "Western Conference": { name: "Western Conference", teams: mlsWest }
+            }
+        }, 
+        "U.S. Open Cup": { name: 'U.S. Open Cup', divisions: {
+                "U.S. Open Cup": { name: "U.S. Open Cup", teams: mlsEast.concat(mlsWest) }
+            }
+        }
+    }
+};
 var mlsfifa18 = { name: 'MLS', seasonEnd: new Date(), teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'], competitions: ['MLS', 'U.S. Open Cup'] };
 
 games["FIFA 19"] = { leagues: { MLS: mlsfifa19 } };
