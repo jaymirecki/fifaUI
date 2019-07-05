@@ -118,6 +118,10 @@ function showDashboard() {
 //                        CUSTOM SAVE CONTENT LOADING                         //
 ////////////////////////////////////////////////////////////////////////////////
 function insertSaveInfo(user) {
+    // window.onbeforeunload = function() {
+    //     return "Leaving this page will result in the loss of any unsaved changes!";
+    // };
+
     teamSelectBar();
     divisionSelectBar(competitionSelectBar());
     $("#saveInfo").html(saveObject.name + ", " + saveObject.game);
@@ -396,7 +400,7 @@ function addFixtures(user) {
         "<button type='button' onclick='closeModal()'>Done</button>\
         <form action='javascript:void(0)' onsubmit='addThisFixture(\"" + user + "\")'>\
         <table><tr>\
-        <td>Date<input type='date' value='" + saveObject.date.substring(0, 10) + "' id='fixtureDate'>\
+        <td>Date<input type='date' value='" + saveObject.date.toISOString().substring(0, 10) + "' id='fixtureDate'>\
         <td>Away Team<br><select id='awayTeam' required>\
             <option value='' disabled selected>---</option>";
     for (let i = 0; i < teams.length; i++)
@@ -420,4 +424,14 @@ function addThisFixture(user) {
     console.log(newFixture);
     saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures.push(newFixture);
     fixtures(user);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                              TIME ADVANCEMENT                              //
+////////////////////////////////////////////////////////////////////////////////
+function advanceDate() {
+    openModal("<button type='button' onclick='closeModal()'>Cancel</button>\
+    Please enter the date you are simming to:\
+    <input type='date' value='" + saveObject.date + "'>\
+    <button type='button' onclick='advanceToThisDate()'>Advance Date</button>");
 }
