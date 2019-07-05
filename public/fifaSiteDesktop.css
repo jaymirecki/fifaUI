@@ -38,6 +38,9 @@ tr.fifaTable:nth-child(odd) {
 tr.fifaTable {
     background: linear-gradient(white, rgba(50, 173, 255, 0.37), white);
 }
+td {
+    padding: 0px 5px;
+}
 tr.fifaTable:hover {
     background-color: rgba(24, 126, 194, 0.37);
 }

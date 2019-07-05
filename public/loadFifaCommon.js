@@ -133,6 +133,7 @@ function saveGame(user, save, success, failure) {
                 <label>Name your save:</label>\
                 <input type='text' id='saveGameName' />\
                 <input type='submit' value='Save Game' />\
+                <button type='button' onclick='closeModal()'>Cancel</button>\
             </form>";
         openModal(html);
         $("#saveGameForm").submit(function() {

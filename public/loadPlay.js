@@ -16,8 +16,12 @@ function loadFifaContent() {
                 if (request.readyState != 4)
                     return;
                 var result = JSON.parse(request.responseText);
-                if (result.success)
-                    saveObject = result;
+                if (!result.success) {
+                    fifaError(result.error);
+                    return;
+                }
+                saveObject = result;
+                saveObject.date = new Date(new Date(saveObject.date).setUTCHours(0,0,0,0));
                 insertSaveInfo(user._id);
             };
             request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -31,6 +35,8 @@ function showHeader() {
         "<div id='fifaPlayHeaderInfo'>\
             <p id='saveInfo'>[Save Name], [Game]</p>\
             <p id='managerInfo'>[Manager Name]</p>\
+            <p id='gameDate'>[1/1/2019]</p>\
+            <button type='button' id='saveGameButton'>Save Game</button>\
         </div>";
 
 
@@ -116,6 +122,16 @@ function insertSaveInfo(user) {
     divisionSelectBar(competitionSelectBar());
     $("#saveInfo").html(saveObject.name + ", " + saveObject.game);
     $("#managerInfo").html(saveObject.manager);
+    $("#gameDate").html(new Date(saveObject.date).toLocaleDateString("default", { timeZone: "UTC" }) + "<button type='button' onclick='advanceDate()'>Advance Date</button>");
+    $("#saveGameButton").click(function() {
+        console.log("save");
+        saveGame(user, saveObject, function(results) {
+            console.log(results);
+            openModal("<p>Game saved succesfully.</p><button type='button' onclick='closeModal(); insertSaveInfo(\"" + user + "\")'>Okay</button>")
+        }, function() {
+            openModal("<p>Failed to save game. Please try again.</p><button type='button' onclick='closeModal()'>Okay</button>")
+        });
+    });
 
     roster();
 
@@ -264,10 +280,10 @@ function power() {
 
 function fixtures(user) {
     var team = saveObject.settings.currentSelections.team;
-    var fixtures = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures;
+    var fixtures = 
+        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures.filter(f => new Date(f.date) >= saveObject.date);
     fixtures.sort(function(a, b) {
-        console.log(a.date - b.date);
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
     });
     var teamFixtureList = fixtures.filter(f => f.away == team || f.home == team);
 
@@ -275,14 +291,14 @@ function fixtures(user) {
         "<tr class='fifaTable'><th colspan='4'>Competition Fixtures</th></tr>";
     for (let i = 0; i < fixtures.length && i < numFixtures; i++)
         compFixtures = compFixtures + 
-            "<tr class='fifaTable'><td>" + fixtures[i].date.toLocaleDateString("default", { timeZone: "UTC" }) + "</td><td>" + fixtures[i].away + "</td><td>vs.</td><td>" + fixtures[i].home + "</td></tr>";
+            "<tr class='fifaTable'><td>" + new Date(fixtures[i].date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td><td>" + fixtures[i].away + "</td><td>vs.</td><td>" + fixtures[i].home + "</td></tr>";
     $("#fifaPlayCompFixtures").html(compFixtures);
 
     var teamFixtures = 
         "<tr class='fifaTable'><th colspan='4'>Team Fixtures</th></tr>";
     for (let i = 0; i < teamFixtureList.length && i < numFixtures; i++)
         teamFixtures = teamFixtures + 
-        "<tr class='fifaTable'><td>" + teamFixtureList[i].date.toLocaleDateString("default", { timeZone: "UTC" }) + "</td><td>" + teamFixtureList[i].away + "</td><td>vs.</td><td>" + teamFixtureList[i].home + "</td></tr>";
+        "<tr class='fifaTable'><td>" + new Date(teamFixtureList[i].date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td><td>" + teamFixtureList[i].away + "</td><td>vs.</td><td>" + teamFixtureList[i].home + "</td></tr>";
     $("#fifaPlayTeamFixtures").html(teamFixtures);
 
     $("#addFixturesButton").click(function() { addFixtures(user); });

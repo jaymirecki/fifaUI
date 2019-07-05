@@ -107,8 +107,10 @@ function sendLeague(request, response) {
 
 function save(request, response) {
     if (request.body.u && request.body.s) {
-        var newSave = JSON.parse(request.body.s);
+        var newSave = objectWithoutKeys(JSON.parse(request.body.s), ["_id"]);
         newSave.doc = new Date(newSave.doc);
+        newSave.dom = new Date();
+        newSave.date = new Date(newSave.date);
         var user = request.body.u;
         var query = { name: newSave.name };
         // callback(false, collection, query, doc, results);
