@@ -1,5 +1,5 @@
 var saveObject;
-var numTeams = 8;
+var numTeams = 50;
 var numPlayers = 18;
 var numFixtures = 5;
 
@@ -245,13 +245,14 @@ function table() {
             return -1;
         else if (bp > ap)
             return 1;
-        else
-            return 0;
+        else {
+            return a.w + a .d + a.l - b.w - b.d - b.l;
+        }
     });
     var table = 
         "<tr><th colspan='9'>Table</th></tr>\
         <tr><th colspan='2'></th><th>GP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>PTS</th></tr>";
-    for (let i = 0; i < numTeams; i++) {
+    for (let i = 0; i < numTeams && i < currentTable.length; i++) {
         var row = currentTable[i];
         table = table + 
             "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + (row.w + row.l + row.d) + "</td><td>" + row.w + "</td><td>" + row.d + "</td><td>" + row.l + "</td><td>" + row.gf + "</td><td>" + row.ga + "</td><td>" + (row.w * 3 + row.d) + "</td></tr>";
@@ -275,7 +276,7 @@ function power() {
     var power = 
         "<tr><th colspan='9'>Power Rankings</th></tr>\
         <tr><th colspan='2'></th><th>PTS</th><th>STR</th><th>SCR</th><th>MOV</th></tr>";
-    for (let i = 0; i < numTeams; i++) {
+    for (let i = 0; i < numTeams && i < currentPower.length; i++) {
         var row = currentPower[i];
         power = power + 
             "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + row.p + "</td><td>" + row.str + "</td><td>" + row.scr + "</td><td>" + row.m + "</td></tr>";
@@ -462,8 +463,28 @@ function completeFixtures(newDate, user) {
                     <tr><td>" + fixtures[i].away + "<input type='number' id='away'></td>\
                     <td>vs.</td><td>" + fixtures[i].home + "<input type='number' id='home'></td></tr></table>\
                     <button type='button' onclick='completeFixtures(\"" + newDate + "\", \"" + user + "\")'>Submit Score</button>";
-                if ($("#away").val() >= 0 && $("#home").val()) {
+                if ($("#away").val() && $("#home").val()) {
                     f.score = { away: $("#away").val(), home: $("#home").val() };
+                    var awayResult, homeResult;
+                    if (f.score.away > f.score.home) {
+                        awayResult = "w";
+                        homeResult = "l";
+                    } else if (f.score.away < f.score.home) {
+                        awayResult = "l";
+                        homeResult = "w";
+                    } else
+                        awayResult = homeResult = "d";
+                    for (d in competitions[key].divisions) {
+                        var division = competitions[key].divisions[d];
+                        if (division.teams.indexOf(f.away) > -1)
+                            for (let i = 0; i < division.table.length; i++)
+                                if (division.table[i].t == f.away)
+                                    division.table[i][awayResult]++;
+                        if (division.teams.indexOf(f.home) > -1)
+                            for (let i = 0; i < division.table.length; i++)
+                                if (division.table[i].t == f.home)
+                                    division.table[i][homeResult]++;
+                    }
                     $("#away, #home").val("");
                     closeModal();
                     completeFixtures(newDate);
