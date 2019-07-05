@@ -11,6 +11,9 @@
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
+td {
+    vertical-align: top;
+}
 table.fifaTable {
     border: 1px solid black;
     border-collapse: collapse;
