@@ -122,13 +122,14 @@ function insertSaveInfo(user) {
     //     return "Leaving this page will result in the loss of any unsaved changes!";
     // };
 
-    teamSelectBar();
-    divisionSelectBar(competitionSelectBar());
+    teamSelectBar(user);
+    competitionSelectBar(user);
+    divisionSelectBar(user);
     $("#saveInfo").html(saveObject.name + ", " + saveObject.game);
     $("#managerInfo").html(saveObject.manager);
-    $("#gameDate").html(new Date(saveObject.date).toLocaleDateString("default", { timeZone: "UTC" }) + "<button type='button' onclick='advanceDate()'>Advance Date</button>");
+    $("#gameDate").html(new Date(saveObject.date).toLocaleDateString("default", { timeZone: "UTC" }) + "<button type='button' onclick='advanceDate(\"" + user + "\")'>Advance Date</button>");
     $("#saveGameButton").click(function() {
-        console.log("save");
+        console.log(user);
         saveGame(user, saveObject, function(results) {
             console.log(results);
             openModal("<p>Game saved succesfully.</p><button type='button' onclick='closeModal(); insertSaveInfo(\"" + user + "\")'>Okay</button>")
@@ -146,7 +147,7 @@ function insertSaveInfo(user) {
     fixtures(user);
 }
 
-function teamSelectBar() {
+function teamSelectBar(user) {
     var html = "";
     for (key in saveObject.team) {
         if (key == saveObject.settings.currentSelections.team)
@@ -161,12 +162,12 @@ function teamSelectBar() {
             saveObject.settings.currentSelections.team = $(this).html();
             saveObject.settings.currentSelections.competition = 
                 Object.keys(saveObject.team[saveObject.settings.currentSelections.team].league.competitions)[0];
-            insertSaveInfo();
+            insertSaveInfo(user);
         }
     });
 }
 
-function competitionSelectBar() {
+function competitionSelectBar(user) {
     var html = "";
 
     var competitions = 
@@ -185,12 +186,12 @@ function competitionSelectBar() {
             saveObject.settings.currentSelections.competition = $(this).html();
             saveObject.settings.currentSelections.division = 
                 Object.keys(saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions)[0];
-            insertSaveInfo();
+            insertSaveInfo(user);
         }
     });
 }
 
-function divisionSelectBar() {
+function divisionSelectBar(user) {
     var html = "";
 
     var divisions = 
@@ -205,7 +206,7 @@ function divisionSelectBar() {
     $("#fifaPlayDivBar").html(html);
     $("#fifaPlayDivBar").find(".fifaPlayTab, .fifaPlayTabSelected").click(function() {
         saveObject.settings.currentSelections.division = $(this).html();
-        insertSaveInfo();
+        insertSaveInfo(user);
     });
 }
 
@@ -429,9 +430,68 @@ function addThisFixture(user) {
 ////////////////////////////////////////////////////////////////////////////////
 //                              TIME ADVANCEMENT                              //
 ////////////////////////////////////////////////////////////////////////////////
-function advanceDate() {
+function advanceDate(user) {
     openModal("<button type='button' onclick='closeModal()'>Cancel</button>\
-    Please enter the date you are simming to:\
-    <input type='date' value='" + saveObject.date + "'>\
-    <button type='button' onclick='advanceToThisDate()'>Advance Date</button>");
+    <br>Please enter the date you are simming to:\
+    <p id='hiddenError'></p>\
+    <input type='date' id='newDate' value='" + saveObject.date.toISOString().substring(0, 10) + "'>\
+    <button type='button' onclick='advanceToThisDate(\"" + user + "\")'>Advance Date</button>");
+    $("#hiddenError").show();
+}
+
+function advanceToThisDate(user) {
+    var newDate = new Date($("#newDate").val());
+    if (newDate <= saveObject.date)
+        $("#hiddenError").html("That date is invalid.");
+    else
+        completeFixtures(newDate, user);
+}
+
+function completeFixtures(newDate, user) {
+    newDate = new Date(newDate);
+    var competitions =
+        saveObject.team[saveObject.settings.currentSelections.team].league.competitions;
+    for (key in competitions) {
+        var fixtures = competitions[key].fixtures;
+        for (let i = 0; i < fixtures.length; i++) {
+            var f = fixtures[i];
+            if (!f.score && new Date(f.date) < newDate) {
+                var html = 
+                    "Please enter the score for this game:\
+                    <table><tr><td colspan='3'>"+ key + "</td></tr>\
+                    <tr><td>" + fixtures[i].away + "<input type='number' id='away'></td>\
+                    <td>vs.</td><td>" + fixtures[i].home + "<input type='number' id='home'></td></tr></table>\
+                    <button type='button' onclick='completeFixtures(\"" + newDate + "\", \"" + user + "\")'>Submit Score</button>";
+                if ($("#away").val() >= 0 && $("#home").val()) {
+                    f.score = { away: $("#away").val(), home: $("#home").val() };
+                    $("#away, #home").val("");
+                    closeModal();
+                    completeFixtures(newDate);
+                } else
+                    openModal(html);
+                return;
+            }
+        }
+    }
+    saveObject.date = newDate;
+    insertSaveInfo(user);
+}
+
+function updateThisFixture() {
+
+}
+
+var fifaGlobalModalInputList;
+
+function openModalFromList(input, complete) {
+    if (fifaGlobalModalInputList && input < fifaGlobalModalInputList.length)
+        openModal(fifaGlobalModalInputList[input]);
+    else {
+        closeModal();
+        complete();
+    }
+}
+
+function donezo() {
+    console.log(saveObject);
 }

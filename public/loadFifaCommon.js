@@ -160,7 +160,6 @@ function saveGame(user, save, success, failure) {
 
 function sendSaveRequest(user, save, success, failure) {
     startLoading();
-    console.log(user, save);
     var request = new XMLHttpRequest();
     var posturl = baseUrl + "save";
     var postString = "u=" + user + "&s=" + JSON.stringify(save);
@@ -169,7 +168,6 @@ function sendSaveRequest(user, save, success, failure) {
         if (request.readyState != 4)
             return;
         var results = JSON.parse(request.responseText);
-        console.log(results);
         if (results.success) {
             stopLoading();
             success(results);
