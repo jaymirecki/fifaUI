@@ -205,3 +205,59 @@ function closeModal() {
     if (modalLoaded)
         $("#fifaModalBackground").hide();
 }
+
+function calculatePowerRankings(teams, fixtures) {
+    fixtures.sort(function(a, b) {
+        return new Date(a.date) - new Date(b.date);
+    });
+    teams = teams.map(p => p.t);
+    console.log(teams);
+    var currPower = newPower(teams);
+    var oldPower = newPower(teams);
+    for (let i = 0; i < currPower.length; i++) {
+        var team = currPower[i].t
+        var tFix = fixtures.filter(f => (f.home == team || f.away == team) && f.score).sort(function(a, b) {
+            return new Date(b.date) - new Date(a.date);
+        });
+        var awayPoints = { away: 3, draw: 1, home: 0 };
+        var homePoints = { home: 3, draw: 1, away: 0 };
+        for (let j = 0; j < 10 && j < tFix.length; j++) {
+            var power;
+            if (j < 5)
+                power = currPower;
+            else
+                power = oldPower;
+            if (tFix[j].away == team)
+                power[i].p = power[i].p + awayPoints[tFix[j].score.result];
+            else
+                power[i].p = power[i].p + homePoints[tFix[j].score.result];
+        }
+        currPower[i].scr = currPower[i].p;
+        oldPower[i].scr = oldPower[i].p;
+
+    }
+    currPower.sort(sortPowerRankings);
+    oldPower.sort(sortPowerRankings);
+    for (let i = 0; i < currPower.length; i++) {
+        var oldIndex;
+        for (let j = 0; j < oldPower.length; j++) {
+            if (oldPower[j].t == currPower[i].t)
+                oldIndex = j;
+        }
+        currPower[i].m = oldIndex - i;
+    }
+    console.log(currPower);
+    console.log(oldPower);
+    return power;
+}
+
+function sortPowerRankings(a, b) {
+    var ap = a.scr;
+    var bp = b.scr;
+    if (ap > bp)
+        return -1;
+    else if (bp > ap)
+        return 1;
+    else
+        return 0;
+}

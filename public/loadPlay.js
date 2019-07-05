@@ -129,9 +129,7 @@ function insertSaveInfo(user) {
     $("#managerInfo").html(saveObject.manager);
     $("#gameDate").html(new Date(saveObject.date).toLocaleDateString("default", { timeZone: "UTC" }) + "<button type='button' onclick='advanceDate(\"" + user + "\")'>Advance Date</button>");
     $("#saveGameButton").click(function() {
-        console.log(user);
         saveGame(user, saveObject, function(results) {
-            console.log(results);
             openModal("<p>Game saved succesfully.</p><button type='button' onclick='closeModal(); insertSaveInfo(\"" + user + "\")'>Okay</button>")
         }, function() {
             openModal("<p>Failed to save game. Please try again.</p><button type='button' onclick='closeModal()'>Okay</button>")
@@ -263,15 +261,17 @@ function table() {
 function power() {
     var currentPower = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].power;
 
+    currentPower = calculatePowerRankings(currentPower, saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures);
+
     currentPower.sort(function(a, b) {
-        var ap = a.w * 3 + a.d;
-        var bp = b.w * 3 + b.d;
+        var ap = a.scr;
+        var bp = b.scr;
         if (ap > bp)
             return -1;
         else if (bp > ap)
             return 1;
         else
-            return 0;
+            return b.m - a.m;
     });
     var power = 
         "<tr><th colspan='9'>Power Rankings</th></tr>\
@@ -423,7 +423,6 @@ function addThisFixture(user) {
     newFixture.date = new Date($("#fixtureDate").val());
     newFixture.away = $("#awayTeam").val();
     newFixture.home = $("#homeTeam").val();
-    console.log(newFixture);
     saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures.push(newFixture);
     fixtures(user);
 }
@@ -469,11 +468,15 @@ function completeFixtures(newDate, user) {
                     if (f.score.away > f.score.home) {
                         awayResult = "w";
                         homeResult = "l";
+                        f.score.result = "away";
                     } else if (f.score.away < f.score.home) {
                         awayResult = "l";
                         homeResult = "w";
-                    } else
+                        f.score.result = "home";
+                    } else {
                         awayResult = homeResult = "d";
+                        f.score.result = "draw";
+                    }
                     for (d in competitions[key].divisions) {
                         var division = competitions[key].divisions[d];
                         if (division.teams.indexOf(f.away) > -1)
@@ -487,7 +490,7 @@ function completeFixtures(newDate, user) {
                     }
                     $("#away, #home").val("");
                     closeModal();
-                    completeFixtures(newDate);
+                    completeFixtures(newDate, user);
                 } else
                     openModal(html);
                 return;
