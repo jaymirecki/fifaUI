@@ -244,6 +244,8 @@ function calculatePowerRankings(teams, fixtures) {
                 oldIndex = j;
         }
         currPower[i].m = oldIndex - i;
+        if (currPower[i].m > 0)
+            currPower[i].m = "+" + currPower[i].m;
     }
     return currPower;
 }

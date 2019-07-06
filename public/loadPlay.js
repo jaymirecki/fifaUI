@@ -1,5 +1,5 @@
 var saveObject;
-var numTeams = 20;
+var numTeams = 8;
 var numPlayers = 18;
 var numFixtures = 5;
 
@@ -80,7 +80,7 @@ function showDashboard() {
     roster = roster + "</table>";
 
     var table = 
-        "<table class='fifaTable' id='fifaPlayTable'>\
+        "<table class='fifaTable' id='fifaPlayTable' onclick='showFullTable()'>\
             <tr class='fifaTable'><th colspand='2'>Table</th><th>GP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>PTS</th></tr>";
     for (let i = 0; i < numTeams; i++)
         table = table + 
@@ -88,7 +88,7 @@ function showDashboard() {
     table = table + "</table><br>";
 
     var power = 
-        "<table class='fifaTable' id='fifaPlayPower'>\
+        "<table class='fifaTable' id='fifaPlayPower' onclick='showFullPower()'>\
             <tr class='fifaTable'><th></th><th></th><th>PTS</th><th>STR</th><th>SCR</th><th>MOV</th></tr>";
     for (let i = 0; i < numTeams; i++)
         power = power + 
@@ -248,12 +248,12 @@ function table() {
         }
     });
     var table = 
-        "<tr><th colspan='9'>Table</th></tr>\
-        <tr><th colspan='2'></th><th>GP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>PTS</th></tr>";
+        "<tr><th colspan='4'>Table</th></tr>\
+        <tr><th colspan='2'></th><th>GP</th><th>PTS</th></tr>";
     for (let i = 0; i < numTeams && i < currentTable.length; i++) {
         var row = currentTable[i];
         table = table + 
-            "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + (row.w + row.l + row.d) + "</td><td>" + row.w + "</td><td>" + row.d + "</td><td>" + row.l + "</td><td>" + row.gf + "</td><td>" + row.ga + "</td><td>" + (row.w * 3 + row.d) + "</td></tr>";
+            "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + (row.w + row.l + row.d) + "</td><td>" + (row.w * 3 + row.d) + "</td></tr>";
     }
     $("#fifaPlayTable").html(table);
 }
@@ -262,6 +262,8 @@ function power() {
     var currentPower = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].power;
 
     currentPower = calculatePowerRankings(currentPower, saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures);
+
+    saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].power = currentPower;
 
     currentPower.sort(function(a, b) {
         var ap = a.scr;
@@ -275,11 +277,11 @@ function power() {
     });
     var power = 
         "<tr><th colspan='9'>Power Rankings</th></tr>\
-        <tr><th colspan='2'></th><th>PTS</th><th>STR</th><th>SCR</th><th>MOV</th></tr>";
+        <tr><th colspan='2'></th><th>SCR</th><th>MOV</th></tr>";
     for (let i = 0; i < numTeams && i < currentPower.length; i++) {
         var row = currentPower[i];
         power = power + 
-            "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + row.p + "</td><td>" + row.str + "</td><td>" + row.scr + "</td><td>" + row.m + "</td></tr>";
+            "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + row.scr + "</td><td>" + row.m + "</td></tr>";
         }
     $("#fifaPlayPower").html(power);
 }
@@ -374,17 +376,75 @@ function showFullRoster() {
     rosterHtml = rosterHtml + "</table><button type='button' onclick='closeModal()'>Close</button>";
     openModal(rosterHtml);
 }
+
+function showFullTable() {
+    var table = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions[saveObject.settings.currentSelections.division].table;
+    
+    table.sort(function(a, b) {
+        var ap = a.w * 3 + a.d;
+        var bp = b.w * 3 + b.d;
+        if (ap > bp)
+            return -1;
+        else if (bp > ap)
+            return 1;
+        else {
+            return a.w + a .d + a.l - b.w - b.d - b.l;
+        }
+    });
+    
+    var html = 
+        "<table class='fifaTable'><tr class='fifaTable'><th colspan='9'>Table</th></tr>\
+        <tr><th colspan='2'></th><th>GP</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>PTS</th></tr>";
+    for (let i = 0; i < table.length; i++) {
+        var row = table[i];
+        html = html + 
+            "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + (row.w + row.l + row.d) + "</td><td>" + row.w + "</td><td>" + row.d + "</td><td>" + row.l + "</td><td>" + row.gf + "</td><td>" + row.ga + "</td><td>" + (row.w * 3 + row.d) + "</td></tr>";
+    }
+    html = html + "</table><button type='button' onclick='closeModal()'>Close</button>"
+    openModal(html);
+}
+
+function showFullPower() {
+    var power = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].power;
+
+    power.sort(function(a, b) {
+        var ap = a.scr;
+        var bp = b.scr;
+        if (ap > bp)
+            return -1;
+        else if (bp > ap)
+            return 1;
+        else
+            return b.m - a.m;
+    });
+    var html = 
+        "<table class='fifaTable'><tr><th colspan='9'>Power Rankings</th></tr>\
+        <tr><th colspan='2'></th><th>PTS</th><th>STR</th><th>SCR</th><th>MOV</th></tr>";
+    for (let i = 0; i < power.length; i++) {
+        var row = power[i];
+        html = html + 
+            "<tr class='fifaTable'><td>" + (i + 1) + "</td><td>" + row.t + "</td><td>" + row.p + "</td><td>" + row.str + "</td><td>" + row.scr + "</td><td>" + row.m + "</td></tr>";
+        }
+    html = html + "</table><button type='button' onclick='closeModal()'>Close</button>"
+    openModal(html);
+}
+
 function showFullFixtures() {
     var fixtures = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures;
-    console.log(fixtures);
     var html = 
         "<table class='fifaTable'><tr class='fifaTable'><th colspan='4'></th></tr>";
     for (let i = 0; i < fixtures.length; i++) {
         var f = fixtures[i]
         html = html + 
-            "<tr class='fifaTable' onclick='editFixtureNumber(" + i + ")'><td>" + new Date(f.date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td>\
-            <td>" + f.away + "<br>" + f.score.away + "</td><td>vs.</td>\
+            "<tr class='fifaTable' onclick='editFixtureNumber(" + i + ")'><td>" + new Date(f.date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td>";
+        if (f.score)
+            html = html + 
+                "<td>" + f.away + "<br>" + f.score.away + "</td><td>vs.</td>\
                 <td>" + f.home + "<br>" + f.score.home + "</td></tr>";
+        else
+            html = html + 
+            "<td>" + f.away + "</td><td>vs.</td>\
+            <td>" + f.home + "</td></tr>";
     }
     html = html + "</table><button type='button' onclick='closeModal()'>Close</button>";
     openModal(html);
@@ -409,11 +469,11 @@ function editFixtureNumber(i) {
     });
 
     var html =
-        "<button type='button' onclick='closeModal()'>Cancel</button>\
-        <form action='javascript:void(0)' onsubmit='console.log(\"here\"); updateThisFixture(" + i + ")'>\
-        <table><tr>\
-        <td>Date<input type='date' value='" + new Date(f.date).toISOString().substring(0, 10) + "' id='fixtureDate' focus>\
-        <td>Away Team<br><select id='awayTeam' required>";
+        "<button type='button' onclick='showFullFixtures()'>Cancel</button>\
+        <form action='javascript:void(0)' onsubmit='updateThisFixture(" + i + ")'>\
+        <table><tr><th>Date</th><th>Away Team</th><th>Home Team</th></tr><tr>\
+        <td><input type='date' value='" + new Date(f.date).toISOString().substring(0, 10) + "' id='fixtureDate' focus>\
+        <td><select id='awayTeam' required>";
     for (let i = 0; i < teams.length; i++) {
         if (teams[i] == f.away)
             html = html + "<option value='" + teams[i] + "' selected>"+ teams[i] + "</option>";
@@ -421,22 +481,39 @@ function editFixtureNumber(i) {
             html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
     }
     html = html + "</select></td>\
-    <td>Home Team<br><select id='homeTeam'required>";
+    <td><select id='homeTeam'required>";
     for (let i = 0; i < teams.length; i++) {
         if (teams[i] == f.home)
             html = html + "<option value='" + teams[i] + "' selected>"+ teams[i] + "</option>";
         else
             html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
     }
-    html = html + "</select></td></tr></table>\
-        <input type='submit' value='Update'>\
-        </form>";
+    if (f.score)
+        html = html + "</select></td></tr>\
+            <tr><td></td><td><input type='number' id='awayScore' value='" + f.score.away + "'></td>\
+            <td><input type='number' id='homeScore' value='" + f.score.home + "'></td></tr>";
+    html = html + "</table><input type='submit' value='Update'></form>";
     openModal(html);
-    console.log(html);
+    // console.log(html);
 }
 
 function updateThisFixture(i) {
-    console.log(i);
+    var f = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures[i];
+
+    f.date = new Date($("#fixtureDate").val());
+    f.away = $("#awayTeam").val();
+    f.home = $("#homeTeam").val();
+    if (f.score) {
+        f.score.away = $("#awayScore").val();
+        f.score.home = $("#homeScore").val();
+        if (f.score.away > f.score.home)
+            f.score.result = "away";
+        else if (f.score.away < f.score.home)
+            f.score.result = "home";
+        else
+            f.score.result = "draw";
+    }
+    showFullFixtures();
 }
 
 function sortRosterBy(field) {
@@ -466,7 +543,7 @@ function addFixtures(user) {
         "<button type='button' onclick='closeModal()'>Done</button>\
         <form action='javascript:void(0)' onsubmit='addThisFixture(\"" + user + "\")'>\
         <table><tr>\
-        <td>Date<input type='date' value='" + saveObject.date.toISOString().substring(0, 10) + "' id='fixtureDate'>\
+        <td>Date<input type='date' value='" + saveObject.date.toISOString().substring(0, 10) + "' id='fixtureDate' autofocus>\
         <td>Away Team<br><select id='awayTeam' required>\
             <option value='' disabled selected>---</option>";
     for (let i = 0; i < teams.length; i++)
@@ -563,10 +640,6 @@ function completeFixtures(newDate, user) {
     }
     saveObject.date = newDate;
     insertSaveInfo(user);
-}
-
-function updateThisFixture() {
-
 }
 
 var fifaGlobalModalInputList;
