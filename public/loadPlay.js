@@ -4,9 +4,11 @@ var numPlayers = 18;
 var numFixtures = 5;
 
 function loadFifaContent() {
+    startLoading();
     showHeader();
     var auth = new MAuth(function() {
         auth.login(function(user) {
+            startLoading();
             var path =  window.location.pathname.split("/");
             var gameId = path[path.length - 1]
             var getString = baseUrl + "save?u=" + user._id + "&s=" + gameId;
@@ -130,7 +132,11 @@ function insertSaveInfo(user) {
     $("#gameDate").html(new Date(saveObject.date).toLocaleDateString("default", { timeZone: "UTC" }) + "<button type='button' onclick='advanceDate(\"" + user + "\")'>Advance Date</button>");
     $("#saveGameButton").click(function() {
         saveGame(user, saveObject, function(results) {
-            openModal("<p>Game saved succesfully.</p><button type='button' onclick='closeModal(); insertSaveInfo(\"" + user + "\")'>Okay</button>")
+            openModal("<p>Game saved succesfully.</p><button type='button' onclick='closeModal(); insertSaveInfo(\"" + user + "\")'>Okay</button>");
+            console.log(saveObject._id);
+            console.log(results.save._id);
+            if (saveObject._id != results.save._id)
+                window.history.replaceState({}, "Play - FIFA Career Companion", results.save._id);
         }, function() {
             openModal("<p>Failed to save game. Please try again.</p><button type='button' onclick='closeModal()'>Okay</button>")
         });
@@ -143,6 +149,7 @@ function insertSaveInfo(user) {
     power();
 
     fixtures(user);
+    stopLoading();
 }
 
 function teamSelectBar(user) {
@@ -234,7 +241,11 @@ function roster() {
 }
 
 function table() {
-    var currentTable = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions[saveObject.settings.currentSelections.division].table;
+    saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions[saveObject.settings.currentSelections.division].table = 
+        calculateTable(saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions[saveObject.settings.currentSelections.division].teams, saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures);
+    
+    var currentTable = 
+        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions[saveObject.settings.currentSelections.division].table
     
     currentTable.sort(function(a, b) {
         var ap = a.w * 3 + a.d;
@@ -449,6 +460,58 @@ function showFullFixtures() {
     html = html + "</table><button type='button' onclick='closeModal()'>Close</button>";
     openModal(html);
 }
+
+function sortRosterBy(field) {
+    console.log(field);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//                                 EDIT SAVES                                 //
+////////////////////////////////////////////////////////////////////////////////
+function addFixtures(user) {
+    var divisions = 
+        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions
+    var teams = [];
+    for (key in divisions)
+        teams = teams.concat(divisions[key].teams);
+    teams.sort(function(a, b) {
+        var a0 = a.charAt(0);
+        var b0 = b.charAt(0);
+        if (a0 < b0)
+            return -1;
+        else if (a0 > b0)
+            return 1;
+        else
+            return 0;
+    });
+    var html = 
+        "<button type='button' onclick='closeModal()'>Done</button>\
+        <form action='javascript:void(0)' onsubmit='addThisFixture(\"" + user + "\")'>\
+        <table><tr>\
+        <td>Date<input type='date' value='" + saveObject.date.toISOString().substring(0, 10) + "' id='fixtureDate' autofocus>\
+        <td>Away Team<br><select id='awayTeam' required>\
+            <option value='' disabled selected>---</option>";
+    for (let i = 0; i < teams.length; i++)
+        html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>"
+    html = html + "</select></td>\
+    <td>Home Team<br><select id='homeTeam'required>\
+    <option value='' disabled selected>---</option>";
+    for (let i = 0; i < teams.length; i++)
+        html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
+    html = html + "</select></td></tr></table>\
+        <input type='submit' value='Add Fixture'>\
+        </form>";
+    openModal(html);
+}
+
+function addThisFixture(user) {
+    var newFixture = new Object();
+    newFixture.date = new Date($("#fixtureDate").val());
+    newFixture.away = $("#awayTeam").val();
+    newFixture.home = $("#homeTeam").val();
+    saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures.push(newFixture);
+    fixtures(user);
+}
 function editFixtureNumber(i) {
     var f = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures[i];
 
@@ -513,59 +576,9 @@ function updateThisFixture(i) {
         else
             f.score.result = "draw";
     }
+    table();
+    power();
     showFullFixtures();
-}
-
-function sortRosterBy(field) {
-    console.log(field);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-//                                 EDIT SAVES                                 //
-////////////////////////////////////////////////////////////////////////////////
-function addFixtures(user) {
-    var divisions = 
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions
-    var teams = [];
-    for (key in divisions)
-        teams = teams.concat(divisions[key].teams);
-    teams.sort(function(a, b) {
-        var a0 = a.charAt(0);
-        var b0 = b.charAt(0);
-        if (a0 < b0)
-            return -1;
-        else if (a0 > b0)
-            return 1;
-        else
-            return 0;
-    });
-    var html = 
-        "<button type='button' onclick='closeModal()'>Done</button>\
-        <form action='javascript:void(0)' onsubmit='addThisFixture(\"" + user + "\")'>\
-        <table><tr>\
-        <td>Date<input type='date' value='" + saveObject.date.toISOString().substring(0, 10) + "' id='fixtureDate' autofocus>\
-        <td>Away Team<br><select id='awayTeam' required>\
-            <option value='' disabled selected>---</option>";
-    for (let i = 0; i < teams.length; i++)
-        html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>"
-    html = html + "</select></td>\
-    <td>Home Team<br><select id='homeTeam'required>\
-    <option value='' disabled selected>---</option>";
-    for (let i = 0; i < teams.length; i++)
-        html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
-    html = html + "</select></td></tr></table>\
-        <input type='submit' value='Add Fixture'>\
-        </form>";
-    openModal(html);
-}
-
-function addThisFixture(user) {
-    var newFixture = new Object();
-    newFixture.date = new Date($("#fixtureDate").val());
-    newFixture.away = $("#awayTeam").val();
-    newFixture.home = $("#homeTeam").val();
-    saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures.push(newFixture);
-    fixtures(user);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

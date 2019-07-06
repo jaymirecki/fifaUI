@@ -34,7 +34,6 @@ function showSaves(userId) {
             save.doc = new Date(save.doc);
             save.dom = new Date(save.dom);
             save.date = new Date(save.date);
-            console.log(save);
             saveTable = 
                 saveTable + "<tr class='fifaTable' id='" + save._id + "'><td class='fifaTable' name='name' onclick='selectGame(this.parentNode)'>" 
                 + save.name + "</td><td class='fifaTable' onclick='selectGame(this.parentNode)'>" + save.settings.currentSelections.team + "</td><td class='fifaTable' onclick='selectGame(this.parentNode)'>" + save.dom.toLocaleString("default") + "</td><td><button type='button' onclick='deleteGame(\"" + userId + "\", \"" + save._id + "\")'>Delete</button></tr>";

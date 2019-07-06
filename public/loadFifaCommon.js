@@ -206,6 +206,42 @@ function closeModal() {
         $("#fifaModalBackground").hide();
 }
 
+function calculateTable(teams, fixtures) {
+    fixtures.sort(function(a, b) {
+        return new Date(a.date) - new Date(b.date);
+    });
+
+    var table = newTable(teams)
+
+    var awayResults = { home: "l", draw: "d", away: 'w' };
+    var homeResults = { home: "w", draw: "d", away: 'l' };
+
+    for (let i = 0; i < fixtures.length; i++) {
+        var f = fixtures[i];
+        if (!f.score)
+            return;
+        var a = f.away;
+        var h = f.home;
+        var ag = parseInt(f.score.away, 10);
+        var hg = parseInt(f.score.home, 10);
+        var r = f.score.result;
+        for (let j = 0; j < table.length; j++) {
+            if (table[j].t == a) {
+                table[j][awayResults[r]]++;
+                var gf = table[j].gf + ag;
+                table[j].gf = table[j].gf + ag;
+                table[j].ga = table[j].ga + hg;
+            }
+            else if (table[j].t == h) {
+                table[j][homeResults[r]]++;
+                table[j].gf = table[j].gf + hg;
+                table[j].ga = table[j].ga + ag;
+            }
+        }
+    }
+    return table;
+}
+
 function calculatePowerRankings(teams, fixtures) {
     fixtures.sort(function(a, b) {
         return new Date(a.date) - new Date(b.date);
