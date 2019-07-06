@@ -39,6 +39,7 @@ function showHeader() {
             <p id='managerInfo'>[Manager Name]</p>\
             <p id='gameDate'>[1/1/2019]</p>\
             <button type='button' id='saveGameButton'>Save Game</button>\
+            <button type='button' id='settingsButton'>Settings</button>\
         </div>";
 
 
@@ -140,6 +141,9 @@ function insertSaveInfo(user) {
         }, function() {
             openModal("<p>Failed to save game. Please try again.</p><button type='button' onclick='closeModal()'>Okay</button>")
         });
+    });
+    $("#settingsButton").click(function() {
+        openSettings();
     });
 
     roster();
@@ -579,6 +583,75 @@ function updateThisFixture(i) {
     table();
     power();
     showFullFixtures();
+}
+
+function openSettings() {
+    var ignoreStats = ["stats", "deepStats", "attr", "currentSelections"];
+    var html = 
+        "<form action='javascript:void(0)' onsubmit='updateSettings()'>\
+            <table class='fifaTable'>";
+
+    html = html + "<tr><th colspan='2'>Statistics</th></tr>";
+    for (key in saveObject.settings.stats) {
+        var checked = "";
+        if (saveObject.settings.stats[key].on)
+            checked = "checked";
+        html = html + "<tr class='fifaTable' onclick='$(\"#stats" + key + "\").prop(\"checked\", !$(\"#stats" + key + "\").prop(\"checked\"))'><td>" + saveObject.settings.stats[key].display + "</td>\
+            <td><input type='checkbox' id='stats" + key + "' " + checked + "></td></tr>";
+    }
+
+    html = html + "<tr><th colspan='2'>Deep Statistics</th></tr>";
+    for (key in saveObject.settings.deepStats) {
+        var checked = "";
+        if (saveObject.settings.deepStats[key].on)
+            checked = "checked";
+        html = html + 
+            "<tr class='fifaTable' onclick='$(\"#deepStats" + key + "\").prop(\"checked\", !$(\"#deepStats" + key + "\").prop(\"checked\"))'><td>" + saveObject.settings.deepStats[key].display + "</td>\
+            <td><input type='checkbox' id='deepStats" + key + "' " + checked + "></td></tr>";
+    }
+
+    html = html + "<tr><th colspan='2'>Attributes</th></tr>";
+    for (key in saveObject.settings.attr) {
+        var checked = "";
+        if (saveObject.settings.attr[key].on)
+            checked = "checked";
+        html = html + 
+            "<tr class='fifaTable' onclick='$(\"#attr" + key + "\").prop(\"checked\", !$(\"#attr" + key + "\").prop(\"checked\"))'><td>" + saveObject.settings.attr[key].display + "</td>\
+            <td><input type='checkbox' id='attr" + key + "' " + checked + "></td></tr>";
+    }
+
+    html = html + "<tr><th colspan='2'>Other Options</th></tr>";
+    for (key in saveObject.settings) {
+        if (ignoreStats.includes(key))
+            continue;
+        var checked = "";
+        if (saveObject.settings[key].on)
+            checked = "checked";
+        html = html + "<tr class='fifaTable' onclick='$(\"#" + key + "\").prop(\"checked\", !$(\"#" + key + "\").prop(\"checked\"))'><td>" + saveObject.settings[key].display + "</td>\
+            <td><input type='checkbox' id='" + key + "' " + checked + "></td></tr>";
+    }
+    html = html + "</table><input type='submit' value='Update Settings'></form>";
+    openModal(html);
+}
+
+function updateSettings() {
+    var ignoreStats = ["stats", "deepStats", "attr", "currentSelections"];
+    for (key in saveObject.settings.stats) {
+        saveObject.settings.stats[key].on = $("#stats" + key).prop("checked");
+    }
+    for (key in saveObject.settings.deepStats) {
+        saveObject.settings.deepStats[key].on = $("#deepStats" + key).prop("checked");
+    }
+    for (key in saveObject.settings.attr) {
+        saveObject.settings.attr[key].on = $("#attr" + key).prop("checked");
+    }
+    for (key in saveObject.settings) {
+        if (ignoreStats.includes(key))
+            continue;
+        console.log($("#" + key).prop("checked"));
+        saveObject.settings[key].on = $("#" + key).prop("checked");
+    }
+    closeModal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
