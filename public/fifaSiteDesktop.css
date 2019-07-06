@@ -136,6 +136,9 @@ input.fifaRoster, select.fifaRoster, button.fifaRoster {
     padding-right: 20px;
     box-shadow: 2px 2px;
     font-family: 'Arial Narrow Bold',Arial,sans-serif;
+    max-height: 90%;
+    /* overflow: scroll; */
+    overflow: auto;
 }
 
 #fifaModalBackground {

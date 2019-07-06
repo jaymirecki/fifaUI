@@ -1,5 +1,5 @@
 var saveObject;
-var numTeams = 50;
+var numTeams = 20;
 var numPlayers = 18;
 var numFixtures = 5;
 
@@ -96,7 +96,7 @@ function showDashboard() {
     power = power + "</table>";
 
     var compFixtures = 
-        "<table class='fifaTable' id='fifaPlayCompFixtures'><tr class='fifaTable'><th colspan='4'>Competition Fixtures</th></tr>";
+        "<table class='fifaTable' id='fifaPlayCompFixtures' onclick='showFullFixtures()'><tr class='fifaTable'><th colspan='4'>Competition Fixtures</th></tr>";
     for (let i = 0; i < 5; i++)
         compFixtures = compFixtures + 
             "<tr class='fifaTable'><td>[DATE]</td><td>[TEAM 1]</td><td>vs.</td><td>[TEAM 2]</td></tr>";
@@ -373,6 +373,70 @@ function showFullRoster() {
 
     rosterHtml = rosterHtml + "</table><button type='button' onclick='closeModal()'>Close</button>";
     openModal(rosterHtml);
+}
+function showFullFixtures() {
+    var fixtures = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures;
+    console.log(fixtures);
+    var html = 
+        "<table class='fifaTable'><tr class='fifaTable'><th colspan='4'></th></tr>";
+    for (let i = 0; i < fixtures.length; i++) {
+        var f = fixtures[i]
+        html = html + 
+            "<tr class='fifaTable' onclick='editFixtureNumber(" + i + ")'><td>" + new Date(f.date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td>\
+            <td>" + f.away + "<br>" + f.score.away + "</td><td>vs.</td>\
+                <td>" + f.home + "<br>" + f.score.home + "</td></tr>";
+    }
+    html = html + "</table><button type='button' onclick='closeModal()'>Close</button>";
+    openModal(html);
+}
+function editFixtureNumber(i) {
+    var f = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures[i];
+
+    var divisions = 
+        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions;
+    var teams = [];
+    for (key in divisions)
+        teams = teams.concat(divisions[key].teams);
+    teams.sort(function(a, b) {
+        var a0 = a.charAt(0);
+        var b0 = b.charAt(0);
+        if (a0 < b0)
+            return -1;
+        else if (a0 > b0)
+            return 1;
+        else
+            return 0;
+    });
+
+    var html =
+        "<button type='button' onclick='closeModal()'>Cancel</button>\
+        <form action='javascript:void(0)' onsubmit='console.log(\"here\"); updateThisFixture(" + i + ")'>\
+        <table><tr>\
+        <td>Date<input type='date' value='" + new Date(f.date).toISOString().substring(0, 10) + "' id='fixtureDate' focus>\
+        <td>Away Team<br><select id='awayTeam' required>";
+    for (let i = 0; i < teams.length; i++) {
+        if (teams[i] == f.away)
+            html = html + "<option value='" + teams[i] + "' selected>"+ teams[i] + "</option>";
+        else
+            html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
+    }
+    html = html + "</select></td>\
+    <td>Home Team<br><select id='homeTeam'required>";
+    for (let i = 0; i < teams.length; i++) {
+        if (teams[i] == f.home)
+            html = html + "<option value='" + teams[i] + "' selected>"+ teams[i] + "</option>";
+        else
+            html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
+    }
+    html = html + "</select></td></tr></table>\
+        <input type='submit' value='Update'>\
+        </form>";
+    openModal(html);
+    console.log(html);
+}
+
+function updateThisFixture(i) {
+    console.log(i);
 }
 
 function sortRosterBy(field) {

@@ -211,7 +211,6 @@ function calculatePowerRankings(teams, fixtures) {
         return new Date(a.date) - new Date(b.date);
     });
     teams = teams.map(p => p.t);
-    console.log(teams);
     var currPower = newPower(teams);
     var oldPower = newPower(teams);
     for (let i = 0; i < currPower.length; i++) {
@@ -246,9 +245,7 @@ function calculatePowerRankings(teams, fixtures) {
         }
         currPower[i].m = oldIndex - i;
     }
-    console.log(currPower);
-    console.log(oldPower);
-    return power;
+    return currPower;
 }
 
 function sortPowerRankings(a, b) {
