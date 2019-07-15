@@ -10,6 +10,7 @@ var fifaPlayLineupsHeader =
 
 function loadFifaContent() {
     startLoading();
+
     showHeader();
     var auth = new MAuth(function() {
         auth.login(function(user) {
@@ -29,10 +30,18 @@ function loadFifaContent() {
                 }
                 saveObject = result;
                 saveObject.date = new Date(new Date(saveObject.date).setUTCHours(0,0,0,0));
-                insertSaveInfo(user._id);
+                loadScripts(user._id);
             };
             request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             request.send();
+        });
+    });
+}
+
+function loadScripts(user) {
+    loadScript("../loadFifaFixtureManagement.js", function() {
+        loadScript("../loadFifaLineupManagement.js", function() {
+            insertSaveInfo(user);
         });
     });
 }
@@ -342,220 +351,6 @@ function fixtures(user) {
     $("#addFixturesButton").click(function() { addFixtures(user); });
 }
 
-function lineups(user) {
-    var currLineup = 
-        saveObject.team[saveObject.settings.currentSelections.team].lineups[saveObject.settings.currentSelections.lineup];
-    $("#fifaPlayLineups").click(function() {
-        lineupManagement(user);
-    });
-    if (!currLineup) {
-        $("#fifaPlayLineups").html("<tr><th>No Lineups Created</th></tr><tr><td>Click here to create a lineup</td><tr>");
-        return;
-    }
-    var lineups = fifaPlayLineupsHeader;
-    for (let i = 0; i < 11 && i < currLineup.starters.length; i++) {
-        lineups = lineups + 
-            "<tr class='fifaTable'><td>" + currLineup.starters[i].position + "</td>\
-                <td>" + currLineup.starters[i].player.name + "</td></tr>";
-    }
-    $("#fifaPlayLineups").html(lineups);
-    $("#currLineupName").html("Current Lineup: " + currLineup.name);
-}
-
-function lineupManagement(user) {
-    var lineups = 
-    saveObject.team[saveObject.settings.currentSelections.team].lineups;
-    var currLineup = lineups[saveObject.settings.currentSelections.lineup];
-
-    var html = 
-        "<table class='fifaTable'><tr><td><table class='fifaTable'>";
-    for (let i = 0; i < lineups.length + 1; i = i + 2) {
-        if (i == lineups.length)
-            html = html + "<tr><td class='bordered' onclick='editLineup(" + i  + ", \"" + user + "\")'>New Lineup</td><td class='bordered' ></td></tr>";
-        else
-            html = html + "<tr><td class='bordered' onclick='saveObject.settings.currentSelections.lineup = " + i + "; lineupManagement(\"" + user + "\")'>" + lineups[i].name + "</td>";
-        if (i + 1 == lineups.length)
-            html = html + "<td class='bordered' onclick='editLineup(" + (i + 1)  + ", \"" + user + "\")'>New Lineup</td></tr>";
-        else if (i + 1 > lineups.length)
-            continue;
-        else
-            html = html + "<td class='bordered' onclick='saveObject.settings.currentSelections.lineup = " + (i + 1) + "; lineupManagement(\"" + user + "\")'>" + lineups[i + 1].name + "</td></tr>";
-    }
-    html = html + "</table></td>";
-    if (!currLineup) {
-        html = html + "<td></td></tr></table>\
-        <button type='button' onclick='closeModal()'>Close</button>";
-        openModal(html);
-        return;
-    }
-    html = html + 
-        "<td><table class='fifaTable'><tr><th colspan='3'>" + currLineup.name + "</th></tr>\
-            <tr><th colspan='2'>Starting IX</th><th>Bench</th></tr>\
-            <tr><th>Position</th><th>Player</th><th>Player</th></tr>";
-    for (let i = 0; i < 11; i++) {
-        html = html + 
-            "<tr class='fifaTable'>\
-                <td>" + currLineup.starters[i].position + "</td>\
-                <td>" + currLineup.starters[i].player.name + "</td>"
-        if (i < 8)
-            html = html + "<td>" + currLineup.bench[i].name + "</td></tr>";
-        else
-            html = html + "<td></td></tr>";
-    }
-    html = html + "<tr class='fifaTable'><td></td><td><button type='button' onclick='editLineup(" + saveObject.settings.currentSelections.lineup + ", \"" + user + "\")'>Edit Lineup</button></td><td>\
-    <button type='button' onclick='saveObject.team[saveObject.settings.currentSelections.team].lineups[saveObject.team[saveObject.settings.currentSelections.team].lineups.length] = saveObject.team[saveObject.settings.currentSelections.team].lineups[saveObject.settings.currentSelections.lineup]; editLineup(saveObject.team[saveObject.settings.currentSelections.team].lineups.length - 1, \"" + user + "\")'>New Lineup from This Lineup</button></td></tr>";
-    html = html + "</table></td></tr></table>\
-    <button type='button' onclick='closeModal(); lineups(\"" + user + "\")'>Close</button>";
-    openModal(html);
-}
-
-function editLineup(index, user) {
-    sortRosterBy("position");
-    var lineup = 
-        saveObject.team[saveObject.settings.currentSelections.team].lineups[index];
-    var roster = 
-        saveObject.team[saveObject.settings.currentSelections.team].roster;
-    if (!lineup) {
-        var lineup = { name: "", starters: [], bench: [] };
-    }
-
-    html = 
-        "<table class='fifaTable' id='lineupEditTable'>\
-        <tr><th colspan='3'>Lineup Name: <input id='lineupName' type='text' value='" + lineup.name + "'></th></tr>\
-        <tr><th colspan='2'>Starting XI</th><th>Bench</th>\
-        <tr><th>Position</th><th>Player</th><th>Player</th></tr>";
-    for (let i = 0; i < 11; i++) {
-        if (lineup.starters[i])
-            var sPos = lineup.starters[i].position;
-
-        html = html + "<tr class='fifaTable'><td><select required>";
-        var sPos = "";
-        if (i == 0)
-            html = html + "<option selected>GK</option>";
-        else if (!lineup.starters[i])
-            html = html + 
-                "<option selected disabled>---</option>";
-        else
-            var sPos = lineup.starters[i].position;
-
-        var disabled = "";
-        if (i == 0)
-            var disabled = "disabled";
-        for (let j = 1; j < positionList().length; j++) {
-            var selected = "";
-            if (sPos == positionList()[j])
-                var selected = "selected";
-            html = html + 
-                "<option " + selected + " " + disabled + ">" + positionList()[j] + "</option>";
-        }
-        html = html + "</select></td>";
-
-        html = html + "<td><select required>";
-        var sName = "";
-        if (!lineup.starters[i])
-            html = html + 
-                "<option selected disabled>---</option>";
-        else
-            sName = lineup.starters[i].player.name;
-        for (let j = 0; j < roster.length; j++) {
-            var selected = "";
-            if (sName == roster[j].name) {
-                var selected = "selected";
-            }
-            html = html + 
-                "<option " + selected + ">" + roster[j].name + ": " + roster[j].position + "</option>";
-        }
-        html = html + "</select></td>";
-
-        if (i < 8) {
-            html = html + "<td><select required>";
-            var bName = "";
-            if (!lineup.bench[i])
-                html = html + 
-                    "<option selected disabled>---</option>";
-            else
-                var bName = lineup.bench[i].name;
-            for (let j = 0; j < roster.length; j++) {
-                var selected = "";
-                if (bName == roster[j].name)
-                    var selected = "selected";
-                html = html + 
-                    "<option " + selected + ">" + roster[j].name + ": " + roster[j].position + "</option>";
-            }
-            html = html + "</select></td></tr>";
-        } else
-            html = html + "<td></td></tr>";
-    }
-    html = html + "</table><p id='fifaPlayLineupEditError' style='color: red'>You must fill all fields</p>";
-    html = html + 
-        "<button type='button' onclick='saveLineup(" + index + ", \"" + user + "\")'>\
-            Save Lineup</button>\
-        <button type='button' onclick='lineupManagement(\"" + user + "\")'>\
-            Cancel</button>";
-    openModal(html);
-    $("#fifaPlayLineupEditError").hide();
-}
-
-function saveLineup(index, user) {
-    var lineup = new Object();
-    lineup.name = $("#lineupName").val();
-    lineup.starters = getStarters();
-    lineup.bench = getBench();
-    
-    if ($("#fifaPlayLineupEditError").is(":hidden")) {
-        lineup.starters.sort(function(a, b) {
-            return positionList().indexOf(a.position) - positionList().indexOf(b.position);
-        });
-        lineup.bench.sort(function(a, b) {
-            return positionList().indexOf(a.position[0]) - positionList().indexOf(b.position[0]);
-        });
-        saveObject.team[saveObject.settings.currentSelections.team].lineups[index] = lineup;
-        saveObject.settings.currentSelections.lineup = index;
-    }
-    lineupManagement(user);
-}
-
-function getStarters() {
-    var playerTable = document.getElementById("lineupEditTable");
-    var playerRows = playerTable.children[0].children;
-    var players = [];
-    for (let i = 3; i < playerRows.length; i++)
-        players[i - 3] = getStarter(playerRows[i]);
-    return players;
-}
-
-function getBench() {
-    var playerTable = document.getElementById("lineupEditTable");
-    var playerRows = playerTable.children[0].children;
-    var players = [];
-    for (let i = 3; i < playerRows.length - 3; i++)
-        players[i - 3] = getBenchPlayer(playerRows[i]);
-    return players;
-}
-
-function getStarter(playerRow) {
-    var roster = saveObject.team[saveObject.settings.currentSelections.team].roster;
-    var player = new Object();
-    player.position = playerRow.children[0].children[0].value;
-    var name = playerRow.children[1].children[0].value;
-    if (player.position == "---" || player.name == "---")
-        $("#fifaPlayLineupEditError").show();
-    else
-        player.player = findPlayerInRoster(name.split(":")[0], roster);
-    return player;
-}
-
-function getBenchPlayer(playerRow) {
-    var roster = saveObject.team[saveObject.settings.currentSelections.team].roster;
-    var player;
-    var name = playerRow.children[2].children[0].value;
-    if (name == "---" || $("#lineupName").val() == "")
-        $("#fifaPlayLineupEditError").show();
-    else
-        player = findPlayerInRoster(name.split(":")[0], roster);
-    return player;
-}
-
 function showPlayer(playerName, statCategory, deep) {
     var player = getPlayerFromRoster(playerName, saveObject.team[saveObject.settings.currentSelections.team].roster);
     var htmlText = 
@@ -673,27 +468,6 @@ function showFullPower() {
     openModal(html);
 }
 
-function showFullFixtures() {
-    var fixtures = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures;
-    var html = 
-        "<table class='fifaTable'><tr class='fifaTable'><th colspan='4'></th></tr>";
-    for (let i = 0; i < fixtures.length; i++) {
-        var f = fixtures[i]
-        html = html + 
-            "<tr class='fifaTable' onclick='editFixtureNumber(" + i + ")'><td>" + new Date(f.date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td>";
-        if (f.score)
-            html = html + 
-                "<td>" + f.away + "<br>" + f.score.away + "</td><td>vs.</td>\
-                <td>" + f.home + "<br>" + f.score.home + "</td></tr>";
-        else
-            html = html + 
-            "<td>" + f.away + "</td><td>vs.</td>\
-            <td>" + f.home + "</td></tr>";
-    }
-    html = html + "</table><button type='button' onclick='closeModal()'>Close</button>";
-    openModal(html);
-}
-
 function sortRosterBy(field) {
     var roster = saveObject.team[saveObject.settings.currentSelections.team].roster;
     roster.sort(function(a, b) {
@@ -707,119 +481,6 @@ function sortRosterBy(field) {
 ////////////////////////////////////////////////////////////////////////////////
 //                                 EDIT SAVES                                 //
 ////////////////////////////////////////////////////////////////////////////////
-function addFixtures(user) {
-    var divisions = 
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions
-    var teams = [];
-    for (key in divisions)
-        teams = teams.concat(divisions[key].teams);
-    teams.sort(function(a, b) {
-        var a0 = a.charAt(0);
-        var b0 = b.charAt(0);
-        if (a0 < b0)
-            return -1;
-        else if (a0 > b0)
-            return 1;
-        else
-            return 0;
-    });
-    var html = 
-        "<button type='button' onclick='closeModal()'>Done</button>\
-        <form action='javascript:void(0)' onsubmit='addThisFixture(\"" + user + "\")'>\
-        <table><tr>\
-        <td>Date<input type='date' value='" + saveObject.date.toISOString().substring(0, 10) + "' id='fixtureDate' autofocus>\
-        <td>Away Team<br><select id='awayTeam' required>\
-            <option value='' disabled selected>---</option>";
-    for (let i = 0; i < teams.length; i++)
-        html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>"
-    html = html + "</select></td>\
-    <td>Home Team<br><select id='homeTeam'required>\
-    <option value='' disabled selected>---</option>";
-    for (let i = 0; i < teams.length; i++)
-        html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
-    html = html + "</select></td></tr></table>\
-        <input type='submit' value='Add Fixture'>\
-        </form>";
-    openModal(html);
-}
-
-function addThisFixture(user) {
-    var newFixture = new Object();
-    newFixture.date = new Date($("#fixtureDate").val());
-    newFixture.away = $("#awayTeam").val();
-    newFixture.home = $("#homeTeam").val();
-    saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures.push(newFixture);
-    fixtures(user);
-}
-function editFixtureNumber(i) {
-    var f = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures[i];
-
-    var divisions = 
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions;
-    var teams = [];
-    for (key in divisions)
-        teams = teams.concat(divisions[key].teams);
-    teams.sort(function(a, b) {
-        var a0 = a.charAt(0);
-        var b0 = b.charAt(0);
-        if (a0 < b0)
-            return -1;
-        else if (a0 > b0)
-            return 1;
-        else
-            return 0;
-    });
-
-    var html =
-        "<button type='button' onclick='showFullFixtures()'>Cancel</button>\
-        <form action='javascript:void(0)' onsubmit='updateThisFixture(" + i + ")'>\
-        <table><tr><th>Date</th><th>Away Team</th><th>Home Team</th></tr><tr>\
-        <td><input type='date' value='" + new Date(f.date).toISOString().substring(0, 10) + "' id='fixtureDate' focus>\
-        <td><select id='awayTeam' required>";
-    for (let i = 0; i < teams.length; i++) {
-        if (teams[i] == f.away)
-            html = html + "<option value='" + teams[i] + "' selected>"+ teams[i] + "</option>";
-        else
-            html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
-    }
-    html = html + "</select></td>\
-    <td><select id='homeTeam'required>";
-    for (let i = 0; i < teams.length; i++) {
-        if (teams[i] == f.home)
-            html = html + "<option value='" + teams[i] + "' selected>"+ teams[i] + "</option>";
-        else
-            html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
-    }
-    if (f.score)
-        html = html + "</select></td></tr>\
-            <tr><td></td><td><input type='number' id='awayScore' value='" + f.score.away + "'></td>\
-            <td><input type='number' id='homeScore' value='" + f.score.home + "'></td></tr>";
-    html = html + "</table><input type='submit' value='Update'></form>";
-    openModal(html);
-    // console.log(html);
-}
-
-function updateThisFixture(i) {
-    var f = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures[i];
-
-    f.date = new Date($("#fixtureDate").val());
-    f.away = $("#awayTeam").val();
-    f.home = $("#homeTeam").val();
-    if (f.score) {
-        f.score.away = $("#awayScore").val();
-        f.score.home = $("#homeScore").val();
-        if (f.score.away > f.score.home)
-            f.score.result = "away";
-        else if (f.score.away < f.score.home)
-            f.score.result = "home";
-        else
-            f.score.result = "draw";
-    }
-    table();
-    power();
-    showFullFixtures();
-}
-
 function openSettings() {
     var ignoreStats = ["stats", "deepStats", "attr", "currentSelections"];
     var html = 
@@ -922,71 +583,6 @@ function advanceToThisDate(user) {
         $("#hiddenError").html("That date is invalid.");
     else
         completeFixtures(newDate, user);
-}
-
-function completeFixtures(newDate, user) {
-    newDate = new Date(newDate);
-    var competitions =
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions;
-    for (key in competitions) {
-        var fixtures = competitions[key].fixtures;
-        for (let i = 0; i < fixtures.length; i++) {
-            var f = fixtures[i];
-            if (!f.score && new Date(f.date) < newDate) {
-                var html = 
-                    "Please enter the score for this game:\
-                    <table><tr><td colspan='3'>"+ key + "</td></tr>\
-                    <tr><td>" + fixtures[i].away + "<input type='number' id='away'></td>\
-                    <td>vs.</td><td>" + fixtures[i].home + "<input type='number' id='home'></td></tr></table>\
-                    <button type='button' onclick='completeFixtures(\"" + newDate + "\", \"" + user + "\")'>Submit Score</button>";
-                if ($("#away").val() && $("#home").val()) {
-                    f.score = { away: $("#away").val(), home: $("#home").val() };
-                    var awayResult, homeResult;
-                    if (f.score.away > f.score.home) {
-                        awayResult = "w";
-                        homeResult = "l";
-                        f.score.result = "away";
-                    } else if (f.score.away < f.score.home) {
-                        awayResult = "l";
-                        homeResult = "w";
-                        f.score.result = "home";
-                    } else {
-                        awayResult = homeResult = "d";
-                        f.score.result = "draw";
-                    }
-                    for (d in competitions[key].divisions) {
-                        var division = competitions[key].divisions[d];
-                        if (division.teams.indexOf(f.away) > -1)
-                            for (let i = 0; i < division.table.length; i++)
-                                if (division.table[i].t == f.away)
-                                    division.table[i][awayResult]++;
-                        if (division.teams.indexOf(f.home) > -1)
-                            for (let i = 0; i < division.table.length; i++)
-                                if (division.table[i].t == f.home)
-                                    division.table[i][homeResult]++;
-                    }
-                    $("#away, #home").val("");
-                    closeModal();
-                    completeFixtures(newDate, user);
-                } else
-                    openModal(html);
-                return;
-            }
-        }
-    }
-    saveObject.date = newDate;
-    insertSaveInfo(user);
-}
-
-var fifaGlobalModalInputList;
-
-function openModalFromList(input, complete) {
-    if (fifaGlobalModalInputList && input < fifaGlobalModalInputList.length)
-        openModal(fifaGlobalModalInputList[input]);
-    else {
-        closeModal();
-        complete();
-    }
 }
 
 function donezo() {

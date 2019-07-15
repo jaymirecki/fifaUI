@@ -27,7 +27,7 @@ function showSaves(userId) {
                 return 0;
         });
         var saveTable =
-            "<table class='centered' class='fifaTable' id='saves'><tr class='fifaTable'><th class='fifaTable'>Name</th><th>Team</th><th class='fifaTable'>Date Modified</th><th></th></tr>";
+            "<div class='centered'><table class='fifaTable' id='saves'><tr class='fifaTable'><th class='fifaTable'>Name</th><th>Team</th><th class='fifaTable'>Date Modified</th><th></th></tr>";
         for (let i = 0; i < results.length; i++) {
             save = results[i];
             save.doc = new Date(save.doc);
@@ -38,7 +38,7 @@ function showSaves(userId) {
                 + save.name + "</td><td class='fifaTable' onclick='selectGame(this.parentNode)'>" + save.settings.currentSelections.team + "</td><td class='fifaTable' onclick='selectGame(this.parentNode)'>" + save.dom.toLocaleString("default") + "</td><td><button type='button' onclick='deleteGame(\"" + userId + "\", \"" + save._id + "\")'>Delete</button></tr>";
             }
         saveTable = 
-            saveTable + "<tr class='fifaTable' onclick='selectGame(this)' id='newgame'><td class='fifaTable' colspan='4'>New Game</td></tr></table><button type='button' onclick='logout()'>Logout</button>"
+            saveTable + "<tr class='fifaTable' onclick='selectGame(this)' id='newgame'><td class='fifaTable' colspan='4'>New Game</td></tr></table></div><button type='button' onclick='logout()'>Logout</button>"
         $("#fifaContent").html(saveTable);
     }
     request.send();
