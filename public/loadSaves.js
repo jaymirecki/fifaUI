@@ -8,7 +8,6 @@ function loadFifaContent(user) {
 }
 
 function showSaves(userId) {
-    // var userId = user._id;
     var request = new XMLHttpRequest();
     var getString = baseUrl + "saves?u=" + userId;
     request.open("GET", getString, true);

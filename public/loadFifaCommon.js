@@ -211,7 +211,7 @@ function calculateTable(teams, fixtures) {
         return new Date(a.date) - new Date(b.date);
     });
 
-    var table = newTable(teams)
+    var table = newTable(teams);
 
     var awayResults = { home: "l", draw: "d", away: 'w' };
     var homeResults = { home: "w", draw: "d", away: 'l' };
@@ -219,7 +219,7 @@ function calculateTable(teams, fixtures) {
     for (let i = 0; i < fixtures.length; i++) {
         var f = fixtures[i];
         if (!f.score)
-            return;
+            continue;
         var a = f.away;
         var h = f.home;
         var ag = parseInt(f.score.away, 10);
@@ -295,4 +295,11 @@ function sortPowerRankings(a, b) {
         return 1;
     else
         return 0;
+}
+
+function findPlayerInRoster(name, roster) {
+    for (let i = 0; i < roster.length; i++)
+        if (roster[i].name == name)
+            return roster[i];
+    return {};
 }

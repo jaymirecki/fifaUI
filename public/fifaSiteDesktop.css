@@ -17,29 +17,19 @@ td {
 table.fifaTable {
     border: 1px solid black;
     border-collapse: collapse;
-}
-tr.fifaTable {
-    /* border-bottom: 1px solid black; */
     cursor: default;
-    /* border: 1px solid black; */
 }
 tr.fifaTable:last-child {
     border-bottom: none;
-    /* text-align: center; */
 }
-/* tr.fifaTable:nth-child(even) {
-    background-color: rgba(50, 173, 255, 0.37);
-    background: linear-gradient(white, rgba(50, 173, 255, 0.37));
-}
-tr.fifaTable:nth-child(odd) {
-    background-color: white;
-    background: linear-gradient(rgba(50, 173, 255, 0.37), white);
-} */
 tr.fifaTable {
     background: linear-gradient(white, rgba(50, 173, 255, 0.37), white);
 }
 td {
     padding: 0px 5px;
+}
+td.bordered {
+    border: 1px solid black;
 }
 tr.fifaTable:hover {
     background-color: rgba(24, 126, 194, 0.37);
