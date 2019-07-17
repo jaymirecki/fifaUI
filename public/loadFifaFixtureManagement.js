@@ -1,5 +1,5 @@
 function showFullFixtures() {
-    var fixtures = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures;
+    var fixtures = saveObject.getFixtures();
     var html = 
         "<table class='fifaTable'><tr class='fifaTable'><th colspan='4'></th></tr>";
     for (let i = 0; i < fixtures.length; i++) {
@@ -20,8 +20,7 @@ function showFullFixtures() {
 }
 
 function addFixtures(user) {
-    var divisions = 
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions
+    var divisions = saveObject.getDivisions();
     var teams = [];
     for (key in divisions)
         teams = teams.concat(divisions[key].teams);
@@ -39,7 +38,7 @@ function addFixtures(user) {
         "<button type='button' onclick='closeModal()'>Done</button>\
         <form action='javascript:void(0)' onsubmit='addThisFixture(\"" + user + "\")'>\
         <table><tr>\
-        <td>Date<input type='date' value='" + saveObject.date.toISOString().substring(0, 10) + "' id='fixtureDate' autofocus>\
+        <td>Date<input type='date' value='" + saveObject.getDate().toISOString().substring(0, 10) + "' id='fixtureDate' autofocus>\
         <td>Home Team<br><select id='homeTeam' required>\
             <option value='' disabled selected>---</option>";
     for (let i = 0; i < teams.length; i++)
@@ -60,15 +59,14 @@ function addThisFixture(user) {
     newFixture.date = new Date($("#fixtureDate").val());
     newFixture.away = $("#awayTeam").val();
     newFixture.home = $("#homeTeam").val();
-    saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures.push(newFixture);
+    saveObject.addFixture(newFixture);
 
     fixtures(user);
 }
 function editFixtureNumber(i) {
-    var f = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures[i];
+    var f = saveObject.getFixtures()[i];
 
-    var divisions = 
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions;
+    var divisions = saveObject.getDivisions();
     var teams = [];
     for (key in divisions)
         teams = teams.concat(divisions[key].teams);
@@ -113,7 +111,7 @@ function editFixtureNumber(i) {
 }
 
 function updateThisFixture(i) {
-    var f = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures[i];
+    var f = saveObject.getFixtures()[i];
 
     f.date = new Date($("#fixtureDate").val());
     f.away = $("#awayTeam").val();
@@ -135,8 +133,7 @@ function updateThisFixture(i) {
 
 function completeFixtures(newDate, user) {
     newDate = new Date(newDate);
-    var competitions =
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions;
+    var competitions = saveObject.getCompetitions();
     for (key in competitions) {
         var fixtures = competitions[key].fixtures;
         for (let i = 0; i < fixtures.length; i++) {
@@ -183,6 +180,6 @@ function completeFixtures(newDate, user) {
             }
         }
     }
-    saveObject.date = newDate;
+    saveObject.setDate(newDate);
     insertSaveInfo(user);
 }

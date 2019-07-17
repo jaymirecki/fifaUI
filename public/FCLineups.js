@@ -51,8 +51,7 @@ class FCLineups {
     }
 
     saveLineups() {
-        saveObject.team[saveObject.settings.currentSelections.team].lineups = this.lineups;
-        saveObject.settings.currentSelections.lineup = this.index;
+        saveObject.updateLineups(this.lineups, this.index);
     }
 
     getLineupTable(index, edit, domId) {
@@ -187,7 +186,7 @@ class FCLineups {
             this.saveLineup(index);
         }.bind(this));
         $(".FCLineupsEditPlayer").change(function() {
-            lineup = this.getLineup();
+            lineup = this.getLineupFromEdit();
             this.editLineup(lineup, index);
         }.bind(this))
     }
@@ -214,8 +213,9 @@ class FCLineups {
         $("#fifaPlayFixturesCloseModal").click(function() {
             if (this.saveGame)
                 this.saveLineups();
-            closeModal();
+            // closeModal();
             this.updateLineupWidget();
+            closeModal();
         }.bind(this));
     }
     
@@ -246,7 +246,7 @@ class FCLineups {
         }
     }
 
-    getLineup() {
+    getLineupFromEdit() {
         var lineup = new Object();
         lineup.name = $("#lineupName").val();
         lineup.starters = this.getStarters();
@@ -312,7 +312,7 @@ class FCLineups {
     }
 
     availableReplacements(lineup) {
-        var roster = saveObject.team[saveObject.settings.currentSelections.team].roster;
+        var roster = saveObject.getRoster();
         var replacements = [];
         sortRosterBy("position");
         for (let i = 0; i < roster.length; i++) {

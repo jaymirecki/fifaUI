@@ -1,5 +1,5 @@
 function loadPlayGame(fixture, user) {
-    var teamName = saveObject.settings.currentSelections.team;
+    var teamName = saveObject.getCurrentTeam().name;
     if (fixture.home == teamName)
         var side = "home";
     else
@@ -11,7 +11,7 @@ function loadPlayGame(fixture, user) {
 }
 
 function fifaPlayGameLineupSelect(fixture, teamName, user) {
-    var lineups = new FCLineups(saveObject.team[teamName].lineups, saveObject.settings.currentSelections.lineup);
+    var lineups = new FCLineups(saveObject.getLineups(), saveObject.getCurrentLineup());
     var lineupsHtml = FCLineups.getLineupWidget() 
         + "<button type='button' id='fifaPlayGameSelectLineup'>\
             Select This Lineup and Start Game\

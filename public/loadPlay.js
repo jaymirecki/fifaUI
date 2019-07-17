@@ -31,6 +31,7 @@ function loadFifaContent() {
                 }
                 saveObject = result;
                 saveObject.date = new Date(new Date(saveObject.date).setUTCHours(0,0,0,0));
+                saveObject = new FCSave(saveObject);
                 userId = user._id;
                 insertSaveInfo(user._id);
             };
@@ -41,9 +42,11 @@ function loadFifaContent() {
 }
 
 function loadScripts(user) {
-    loadScript("../loadFifaFixtureManagement.js", function() {
-        loadScript("../FCLineups.js", function() {
-            showHeader(user);
+    loadScript("../FCSave.js", function() {
+        loadScript("../loadFifaFixtureManagement.js", function() {
+            loadScript("../FCLineups.js", function() {
+                showHeader(user);
+            });
         });
     });
 }
@@ -145,11 +148,11 @@ function insertSaveInfo(user) {
     teamSelectBar(user);
     competitionSelectBar(user);
     divisionSelectBar(user);
-    $("#saveInfo").html(saveObject.name + ", " + saveObject.game);
-    $("#managerInfo").html(saveObject.manager);
-    $("#gameDate").html(new Date(saveObject.date).toLocaleDateString("default", { timeZone: "UTC" }) + "<button type='button' onclick='advanceDate(\"" + user + "\")'>Advance Date</button>");
+    $("#saveInfo").html(saveObject.getName() + ", " + saveObject.getGame());
+    $("#managerInfo").html(saveObject.getManager());
+    $("#gameDate").html(new Date(saveObject.getDate()).toLocaleDateString("default", { timeZone: "UTC" }) + "<button type='button' onclick='advanceDate(\"" + user + "\")'>Advance Date</button>");
     $("#saveGameButton").click(function() {
-        saveGame(user, saveObject, function(results) {
+        saveGame(user, saveObject.object, function(results) {
             openModal("<p>Game saved succesfully.</p><button type='button' onclick='closeModal(); insertSaveInfo(\"" + user + "\")'>Okay</button>");
             if (saveObject._id != results.save._id)
                 window.history.replaceState({}, "Play - FIFA Career Companion", results.save._id);
@@ -161,7 +164,7 @@ function insertSaveInfo(user) {
         openSettings();
     });
 
-    var currTeam = saveObject.team[saveObject.settings.currentSelections.team];
+    var currTeam = saveObject.getCurrentTeam();
 
     roster();
 
@@ -170,15 +173,15 @@ function insertSaveInfo(user) {
     power();
 
     fixtures(user);
-    new FCLineups(currTeam.lineups, saveObject.settings.currentSelections.lineup).updateLineupWidget(true);
+    new FCLineups(saveObject.getLineups(), saveObject.currentLineup).updateLineupWidget(true);
 
     stopLoading();
 }
 
 function teamSelectBar(user) {
     var html = "";
-    for (key in saveObject.team) {
-        if (key == saveObject.settings.currentSelections.team)
+    for (key in saveObject.getTeams()) {
+        if (key == saveObject.getCurrentTeam().name)
             html = html + "<div class='fifaPlayTabSelected'>" + key + "</div>";
         else
             html = html + "<div class='fifaPlayTab'>" + key + "</div>";
@@ -186,10 +189,8 @@ function teamSelectBar(user) {
     html = html + "<div class='fifaPlayTabEnd'></div>";
     $("#fifaPlayTeamBar").html(html);
     $("#fifaPlayTeamBar").find(".fifaPlayTab, .fifaPlayTabSelected").click(function() {
-        if (saveObject.settings.currentSelections.team != $(this).html()) {
-            saveObject.settings.currentSelections.team = $(this).html();
-            saveObject.settings.currentSelections.competition = 
-                Object.keys(saveObject.team[saveObject.settings.currentSelections.team].league.competitions)[0];
+        if (saveObject.getCurrentTeam().name != $(this).html()) {
+            saveObject.updateCurrentTeam($(this).html());
             insertSaveInfo(user);
         }
     });
@@ -198,10 +199,10 @@ function teamSelectBar(user) {
 function competitionSelectBar(user) {
     var html = "";
 
-    var competitions = 
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions;
+    var competitions = saveObject.getCompetitions();
+    console.log(competitions);
     for (key in competitions) {
-        if (key == saveObject.settings.currentSelections.competition) {
+        if (key == saveObject.getCurrentCompetition().name) {
             html = html + "<div class='fifaPlayTabSelected'>" + key + "</div>";
         }
         else
@@ -210,10 +211,8 @@ function competitionSelectBar(user) {
     html = html + "<div class='fifaPlayTabEnd'></div>";
     $("#fifaPlayCompBar").html(html);
     $("#fifaPlayCompBar").find(".fifaPlayTab, .fifaPlayTabSelected").click(function() {
-        if (saveObject.settings.currentSelections.competition != $(this).html()) {
-            saveObject.settings.currentSelections.competition = $(this).html();
-            saveObject.settings.currentSelections.division = 
-                Object.keys(saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions)[0];
+        if (saveObject.getCurrentCompetition().name != $(this).html()) {
+            saveObject.updateCurrentCompetition($(this).html());
             insertSaveInfo(user);
         }
     });
@@ -222,10 +221,9 @@ function competitionSelectBar(user) {
 function divisionSelectBar(user) {
     var html = "";
 
-    var divisions = 
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions;
+    var divisions = saveObject.getDivisions();
     for (key in divisions) {
-        if (key == saveObject.settings.currentSelections.division)
+        if (key == saveObject.getCurrentDivision().name)
             html = html + "<div class='fifaPlayTabSelected'>" + key + "</div>";    
         else
             html = html + "<div class='fifaPlayTab'>" + key + "</div>";
@@ -233,13 +231,13 @@ function divisionSelectBar(user) {
     html = html + "<div class='fifaPlayTabEnd'></div>";
     $("#fifaPlayDivBar").html(html);
     $("#fifaPlayDivBar").find(".fifaPlayTab, .fifaPlayTabSelected").click(function() {
-        saveObject.settings.currentSelections.division = $(this).html();
+        saveObject.updateCurrentDivision($(this).html());
         insertSaveInfo(user);
     });
 }
 
 function roster() {
-    var currentRoster = saveObject.team[saveObject.settings.currentSelections.team].roster;
+    var currentRoster = saveObject.getRoster();
     currentRoster.sort(function(a, b) {
         if (a.attr.ovr > b.attr.ovr)
             return -1;
@@ -264,11 +262,7 @@ function roster() {
 }
 
 function table() {
-    saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions[saveObject.settings.currentSelections.division].table = 
-        calculateTable(saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions[saveObject.settings.currentSelections.division].teams, saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures);
-    
-    var currentTable = 
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions[saveObject.settings.currentSelections.division].table;
+    var currentTable = saveObject.getTable();
     
     currentTable.sort(function(a, b) {
         var ap = a.w * 3 + a.d;
@@ -293,11 +287,7 @@ function table() {
 }
 
 function power() {
-    var currentPower = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].power;
-
-    currentPower = calculatePowerRankings(currentPower, saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures);
-
-    saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].power = currentPower;
+    currentPower = saveObject.getPowerRankings();
 
     currentPower.sort(function(a, b) {
         var ap = a.scr;
@@ -321,12 +311,8 @@ function power() {
 }
 
 function fixtures(user) {
-    var team = saveObject.settings.currentSelections.team;
-    var fixtures = 
-        saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures.filter(f => new Date(f.date) >= saveObject.date);
-    fixtures.sort(function(a, b) {
-        return new Date(a.date) - new Date(b.date);
-    });
+    var team = saveObject.getCurrentTeam().name;
+    var fixtures = saveObject.getUnplayedFixtures();
     var teamFixtureList = fixtures.filter(f => f.away == team || f.home == team);
 
     var compFixtures = 
@@ -387,21 +373,21 @@ function getPlayerFromRoster(playerName, roster) {
 }
 
 function showFullRoster() {
-    var currentRoster = saveObject.team[saveObject.settings.currentSelections.team].roster;
+    var currentRoster = saveObject.getRoster();
     
     var rosterHtml = 
         "<table class='fifaTable'><tr class='fifaTable'><th onclick='sortRosterBy(\"position\")'>Position</th><th onclick='sortRosterBy(\"name\")'>Name</th>";
-    for (key in saveObject.settings.stats)
-        if (saveObject.settings.stats[key].on)
+    for (key in saveObject.getSettings().stats)
+        if (saveObject.getSettings().stats[key].on)
             rosterHtml = 
-                rosterHtml + "<th onclick='sortRosterBy(\"" + key + "\")'>" + saveObject.settings.stats[key].display + "</th>";
+                rosterHtml + "<th onclick='sortRosterBy(\"" + key + "\")'>" + saveObject.getSettings().stats[key].display + "</th>";
     rosterHtml = rosterHtml + "</tr>";
 
     for (key in currentRoster) {
         var player = currentRoster[key]
         rosterHtml = rosterHtml + "<tr class='fifaTable'><td>" + player.position + "</td><td>" + player.name + "</td>";
-        for (key in saveObject.settings.stats)
-            if (saveObject.settings.stats[key].on)
+        for (key in saveObject.getSettings().stats)
+            if (saveObject.getSettings().stats[key].on)
                 rosterHtml = 
                     rosterHtml + "<th>" + player.season.stats[key] + "</th>";
         rosterHtml = rosterHtml + "</tr>";
@@ -412,7 +398,7 @@ function showFullRoster() {
 }
 
 function showFullTable() {
-    var table = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].divisions[saveObject.settings.currentSelections.division].table;
+    var table = saveObject.getTable();
     
     table.sort(function(a, b) {
         var ap = a.w * 3 + a.d;
@@ -439,7 +425,7 @@ function showFullTable() {
 }
 
 function showFullPower() {
-    var power = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].power;
+    var power = saveObject.getPowerRankings();
 
     power.sort(function(a, b) {
         var ap = a.scr;
@@ -464,13 +450,12 @@ function showFullPower() {
 }
 
 function sortRosterBy(field) {
-    var roster = saveObject.team[saveObject.settings.currentSelections.team].roster;
+    var roster = saveObject.getRoster();
     roster.sort(function(a, b) {
         if (field == "position")
             return positionList().indexOf(a.position[0]) - positionList().indexOf(b.position[0]);
 
     });
-    showFullRoster();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -482,43 +467,44 @@ function openSettings() {
         "<form action='javascript:void(0)' onsubmit='updateSettings()'>\
             <table class='fifaTable'>";
 
+    var settings = saveObject.getSettings();
     html = html + "<tr><th colspan='2'>Statistics</th></tr>";
-    for (key in saveObject.settings.stats) {
+    for (key in settings.stats) {
         var checked = "";
-        if (saveObject.settings.stats[key].on)
+        if (settings.stats[key].on)
             checked = "checked";
-        html = html + "<tr class='fifaTable' onclick='$(\"#stats" + key + "\").prop(\"checked\", !$(\"#stats" + key + "\").prop(\"checked\"))'><td>" + saveObject.settings.stats[key].display + "</td>\
+        html = html + "<tr class='fifaTable' onclick='$(\"#stats" + key + "\").prop(\"checked\", !$(\"#stats" + key + "\").prop(\"checked\"))'><td>" + settings.stats[key].display + "</td>\
             <td><input type='checkbox' id='stats" + key + "' " + checked + "></td></tr>";
     }
 
     html = html + "<tr><th colspan='2'>Deep Statistics</th></tr>";
-    for (key in saveObject.settings.deepStats) {
+    for (key in settings.deepStats) {
         var checked = "";
-        if (saveObject.settings.deepStats[key].on)
+        if (settings.deepStats[key].on)
             checked = "checked";
         html = html + 
-            "<tr class='fifaTable' onclick='$(\"#deepStats" + key + "\").prop(\"checked\", !$(\"#deepStats" + key + "\").prop(\"checked\"))'><td>" + saveObject.settings.deepStats[key].display + "</td>\
+            "<tr class='fifaTable' onclick='$(\"#deepStats" + key + "\").prop(\"checked\", !$(\"#deepStats" + key + "\").prop(\"checked\"))'><td>" + settings.deepStats[key].display + "</td>\
             <td><input type='checkbox' id='deepStats" + key + "' " + checked + "></td></tr>";
     }
 
     html = html + "<tr><th colspan='2'>Attributes</th></tr>";
-    for (key in saveObject.settings.attr) {
+    for (key in settings.attr) {
         var checked = "";
-        if (saveObject.settings.attr[key].on)
+        if (settings.attr[key].on)
             checked = "checked";
         html = html + 
-            "<tr class='fifaTable' onclick='$(\"#attr" + key + "\").prop(\"checked\", !$(\"#attr" + key + "\").prop(\"checked\"))'><td>" + saveObject.settings.attr[key].display + "</td>\
+            "<tr class='fifaTable' onclick='$(\"#attr" + key + "\").prop(\"checked\", !$(\"#attr" + key + "\").prop(\"checked\"))'><td>" + settings.attr[key].display + "</td>\
             <td><input type='checkbox' id='attr" + key + "' " + checked + "></td></tr>";
     }
 
     html = html + "<tr><th colspan='2'>Other Options</th></tr>";
-    for (key in saveObject.settings) {
+    for (key in settings) {
         if (ignoreStats.includes(key))
             continue;
         var checked = "";
-        if (saveObject.settings[key].on)
+        if (settings[key].on)
             checked = "checked";
-        html = html + "<tr class='fifaTable' onclick='$(\"#" + key + "\").prop(\"checked\", !$(\"#" + key + "\").prop(\"checked\"))'><td>" + saveObject.settings[key].display + "</td>\
+        html = html + "<tr class='fifaTable' onclick='$(\"#" + key + "\").prop(\"checked\", !$(\"#" + key + "\").prop(\"checked\"))'><td>" + settings[key].display + "</td>\
             <td><input type='checkbox' id='" + key + "' " + checked + "></td></tr>";
     }
     html = html + "</table><input type='submit' value='Update Settings'></form>";
@@ -526,33 +512,35 @@ function openSettings() {
 }
 
 function updateSettings() {
+    var settings = saveObject.getSettings();
     var ignoreStats = ["stats", "deepStats", "attr", "currentSelections"];
-    for (key in saveObject.settings.stats) {
-        saveObject.settings.stats[key].on = $("#stats" + key).prop("checked");
+    for (key in settings.stats) {
+        settings.stats[key].on = $("#stats" + key).prop("checked");
     }
-    for (key in saveObject.settings.deepStats) {
-        saveObject.settings.deepStats[key].on = $("#deepStats" + key).prop("checked");
+    for (key in settings.deepStats) {
+        settings.deepStats[key].on = $("#deepStats" + key).prop("checked");
     }
-    for (key in saveObject.settings.attr) {
-        saveObject.settings.attr[key].on = $("#attr" + key).prop("checked");
+    for (key in settings.attr) {
+        settings.attr[key].on = $("#attr" + key).prop("checked");
     }
-    for (key in saveObject.settings) {
+    for (key in settings) {
         if (ignoreStats.includes(key))
             continue;
         console.log($("#" + key).prop("checked"));
-        saveObject.settings[key].on = $("#" + key).prop("checked");
+        settings[key].on = $("#" + key).prop("checked");
     }
+    saveObject.setSettings(settings);
     closeModal();
 }
 
 function playGame() {
-    var fixtures = saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures;
+    var fixtures = saveObject.getUnplayedFixtures();
 
-    var team = saveObject.team[saveObject.settings.currentSelections.team].name;
+    var team = saveObject.getCurrentTeam().name;
     for (let i = 0; i < fixtures.length; i++) {
         var f = fixtures[i];
-        f.competition = saveObject.settings.currentSelections.competition;
-        if (new Date(f.date).getTime() == saveObject.date.getTime() && (f.away == team || f.home == team)) {
+        f.competition = saveObject.getCurrentCompetition().name;
+        if (new Date(f.date).getTime() == saveObject.getDate().getTime() && (f.away == team || f.home == team)) {
             loadScript("/loadPlayGame.js", function() {
                 var html = 
                     "<p>Would you like to play " + f.home + " vs. " + f.away + "?\
@@ -580,19 +568,15 @@ function advanceDate(user) {
     openModal("<button type='button' onclick='closeModal()'>Cancel</button>\
     <br>Please enter the date you are simming to:\
     <p id='hiddenError'></p>\
-    <input type='date' id='newDate' value='" + saveObject.date.toISOString().substring(0, 10) + "'>\
+    <input type='date' id='newDate' value='" + saveObject.getDate().toISOString().substring(0, 10) + "'>\
     <button type='button' onclick='advanceToThisDate(\"" + user + "\")'>Advance Date</button>");
     $("#hiddenError").show();
 }
 
 function advanceToThisDate(user) {
     var newDate = new Date($("#newDate").val());
-    if (newDate <= saveObject.date)
+    if (newDate <= saveObject.getDate())
         $("#hiddenError").html("That date is invalid.");
     else
         completeFixtures(newDate, user);
-}
-
-function donezo() {
-    console.log(saveObject);
 }
