@@ -255,10 +255,7 @@ class FCLineups {
     }
     
     saveLineup(index) {
-        var lineup = new Object();
-        lineup.name = $("#lineupName").val();
-        lineup.starters = this.getStarters();
-        lineup.bench = this.getBench();
+        var lineup = getLineup();
         
         if ($("#fifaPlayLineupEditError").is(":hidden")) {
             lineup.starters.sort(function(a, b) {

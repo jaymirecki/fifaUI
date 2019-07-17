@@ -42,7 +42,7 @@ function loadFifaContent() {
 
 function loadScripts(user) {
     loadScript("../loadFifaFixtureManagement.js", function() {
-        loadScript("../loadFifaLineupManagement.js", function() {
+        loadScript("../FCLineups.js", function() {
             showHeader(user);
         });
     });
