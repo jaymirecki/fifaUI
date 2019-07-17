@@ -3,6 +3,8 @@
 A user authorization system, primarily for use with my personal projects.
 
 ## Change Log
+### v0.2.2
+* On play game page, lineup selection is only accessible before starting a game.
 ### v0.2.1
 * On play game page, in game stats are only accessible after selecting a lineup.
 ### v0.2.0

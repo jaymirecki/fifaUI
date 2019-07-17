@@ -20,6 +20,8 @@ function fifaPlayGameLineupSelect(fixture, teamName, user) {
     $("#playGameLayout").append(lineupsHtml);
     lineups.updateLineupWidget(false);
     $("#fifaPlayGameSelectLineup").click(function() {
+        $("#fifaPlayGameSelectLineup").prop("disabled", true);
+        lineups.disableWidget();
         fifaPlayGameStartGame(fixture, lineups.getLineup());
     });
 }

@@ -29,6 +29,10 @@ class FCLineups {
     getLineup() {
         return this.lineups[this.index];
     }
+
+    disableWidget() {
+        $("#fifaPlayLineups").off("click");
+    }
     
     updateLineupWidget(saveGame) {
         var currLineup = this.lineups[this.index];
