@@ -4,28 +4,23 @@ function loadPlayGame(fixture, user) {
         var side = "home";
     else
         var side = "away";
-
+    var lineups = new FCLineups()
     $("#fifaPlayContent").html("<table><tr id='playGameLayout'></tr></table>");
     fifaPlayGameLineupSelect(fixture, teamName, user);
     
 }
 
 function fifaPlayGameLineupSelect(fixture, teamName, user) {
-    var lineupsHtml = 
-    "<table class='fifaTable' id='fifaPlayLineups'>" + 
-    fifaPlayLineupsHeader;
-    for (let i = 0; i < 11; i++)
-        lineupsHtml = lineupsHtml + 
-            "<tr class='fifaTable'><td>[POS]</td><td>[PLAYER]</td></tr>";
-    lineupsHtml = lineupsHtml + "</table>\
-        <button type='button' id='fifaPlayGameSelectLineup'>\
+    var lineups = new FCLineups(saveObject.team[teamName].lineups, saveObject.settings.currentSelections.lineup);
+    var lineupsHtml = FCLineups.getLineupWidget() 
+        + "<button type='button' id='fifaPlayGameSelectLineup'>\
             Select This Lineup and Start Game\
         </button>";
 
     $("#playGameLayout").append(lineupsHtml);
-    lineups(user);
+    lineups.updateLineupWidget(false);
     $("#fifaPlayGameSelectLineup").click(function() {
-        fifaPlayGameStartGame(fixture, saveObject.team[teamName].lineups[saveObject.settings.currentSelections.lineup]);
+        fifaPlayGameStartGame(fixture, lineups.getLineup());
     });
 }
 

@@ -2,6 +2,7 @@ var saveObject;
 var numTeams = 8;
 var numPlayers = 18;
 var numFixtures = 5;
+var userId;
 
 var fifaPlayLineupsHeader = 
     "<tr><th colspan='2' id='currLineupName'>Current Lineup: [LINEUP NAME]</th></tr>\
@@ -11,7 +12,7 @@ var fifaPlayLineupsHeader =
 function loadFifaContent() {
     startLoading();
 
-    showHeader();
+    loadScripts();
     var auth = new MAuth(function() {
         auth.login(function(user) {
             startLoading();
@@ -30,7 +31,8 @@ function loadFifaContent() {
                 }
                 saveObject = result;
                 saveObject.date = new Date(new Date(saveObject.date).setUTCHours(0,0,0,0));
-                loadScripts(user._id);
+                userId = user._id;
+                insertSaveInfo(user._id);
             };
             request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             request.send();
@@ -41,7 +43,7 @@ function loadFifaContent() {
 function loadScripts(user) {
     loadScript("../loadFifaFixtureManagement.js", function() {
         loadScript("../loadFifaLineupManagement.js", function() {
-            insertSaveInfo(user);
+            showHeader(user);
         });
     });
 }
@@ -126,13 +128,7 @@ function showDashboard() {
             "<tr class='fifaTable'><td>[DATE]</td><td>[TEAM 1]</td><td>vs.</td><td>[TEAM 2]</td></tr>";
     teamFixtures = teamFixtures + "</table><br><button type='button' id='addFixturesButton'>Add Fixtures</button>";
 
-    var lineups = 
-        "<table class='fifaTable' id='fifaPlayLineups'>" + 
-        fifaPlayLineupsHeader;
-    for (let i = 0; i < 11; i++)
-        lineups = lineups + 
-            "<tr class='fifaTable'><td>[POS]</td><td>[PLAYER]</td></tr>";
-    lineups = lineups + "</table>";
+    var lineups = FCLineups.getLineupWidget();
 
     var htmlText = "<table><tr><td>" + roster + "</td><td>" + table + power + "</td><td>" + compFixtures + teamFixtures + "</td><td>" + lineups + "</td></tr></table>";
     $("#fifaPlayContent").html(htmlText);
@@ -165,6 +161,8 @@ function insertSaveInfo(user) {
         openSettings();
     });
 
+    var currTeam = saveObject.team[saveObject.settings.currentSelections.team];
+
     roster();
 
     table();
@@ -172,8 +170,7 @@ function insertSaveInfo(user) {
     power();
 
     fixtures(user);
-
-    lineups(user);
+    new FCLineups(currTeam.lineups, saveObject.settings.currentSelections.lineup).updateLineupWidget(true);
 
     stopLoading();
 }
