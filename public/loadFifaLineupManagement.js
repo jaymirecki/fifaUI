@@ -36,6 +36,7 @@ class FCLineups {
     
     updateLineupWidget(saveGame) {
         var currLineup = this.lineups[this.index];
+        this.availableReplacements(currLineup);
         $("#fifaPlayLineups").click(function() {
             this.lineupManagement();
         }.bind(this));
@@ -128,37 +129,43 @@ class FCLineups {
             }
             html = html + "</select></td>";
     
-            html = html + "<td><select required>";
+            html = html + "<td><select required class='FCLineupsEditPlayer'>";
             var sName = "";
             if (!lineup.starters[i])
                 html = html + 
                     "<option selected disabled>---</option>";
             else
                 sName = lineup.starters[i].player.name;
-            for (let j = 0; j < roster.length; j++) {
+
+            var replacements = this.availableReplacements(lineup);
+            replacements.unshift(lineup.starters[i].player);
+            for (let j = 0; j < replacements.length; j++) {
                 var selected = "";
-                if (sName == roster[j].name) {
+                if (sName == replacements[j].name) {
                     var selected = "selected";
                 }
                 html = html + 
-                    "<option " + selected + ">" + roster[j].name + ": " + roster[j].position + "</option>";
+                    "<option " + selected + ">" + replacements[j].name + ": " + replacements[j].position + "</option>";
             }
             html = html + "</select></td>";
     
             if (i < 8) {
-                html = html + "<td><select required>";
+                html = html + "<td><select required class='FCLineupsEditPlayer'>";
                 var bName = "";
                 if (!lineup.bench[i])
                     html = html + 
                         "<option selected disabled>---</option>";
                 else
                     var bName = lineup.bench[i].name;
-                for (let j = 0; j < roster.length; j++) {
+
+                var replacements = this.availableReplacements(lineup);
+                replacements.unshift(lineup.bench[i]);
+                for (let j = 0; j < replacements.length; j++) {
                     var selected = "";
-                    if (bName == roster[j].name)
+                    if (bName == replacements[j].name)
                         var selected = "selected";
                     html = html + 
-                        "<option " + selected + ">" + roster[j].name + ": " + roster[j].position + "</option>";
+                        "<option " + selected + ">" + replacements[j].name + ": " + replacements[j].position + "</option>";
                 }
                 html = html + "</select></td></tr>";
             } else
@@ -179,6 +186,10 @@ class FCLineups {
         $("#FCLineupsEditSave").click(function() {
             this.saveLineup(index);
         }.bind(this));
+        $(".FCLineupsEditPlayer").change(function() {
+            lineup = this.getLineup();
+            this.editLineup(lineup, index);
+        }.bind(this))
     }
     
     lineupManagement() {
@@ -233,6 +244,14 @@ class FCLineups {
                 this.lineupManagement();
             }.bind(this));
         }
+    }
+
+    getLineup() {
+        var lineup = new Object();
+        lineup.name = $("#lineupName").val();
+        lineup.starters = this.getStarters();
+        lineup.bench = this.getBench();
+        return lineup;
     }
     
     saveLineup(index) {
@@ -293,5 +312,24 @@ class FCLineups {
         else
             player = findPlayerInRoster(name.split(":")[0], roster);
         return player;
+    }
+
+    availableReplacements(lineup) {
+        var roster = saveObject.team[saveObject.settings.currentSelections.team].roster;
+        var replacements = [];
+        sortRosterBy("position");
+        for (let i = 0; i < roster.length; i++) {
+            var sub = true;
+            for (let j = 0; j < 11; j++) {
+                if (roster[i].name == lineup.starters[j].player.name) {
+                    sub = false;
+                } else if (j < 7 && roster[i].name == lineup.bench[j].name) {
+                    sub = false;
+                }
+            }
+            if (sub)
+                replacements.push(roster[i]);
+        }
+        return replacements;
     }
 }

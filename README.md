@@ -3,6 +3,8 @@
 A user authorization system, primarily for use with my personal projects.
 
 ## Change Log
+### v0.2.3
+* Editing a lineup now dynamically updates available players.
 ### v0.2.2
 * On play game page, lineup selection is only accessible before starting a game.
 ### v0.2.1
