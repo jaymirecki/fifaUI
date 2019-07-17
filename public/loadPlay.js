@@ -155,8 +155,6 @@ function insertSaveInfo(user) {
     $("#saveGameButton").click(function() {
         saveGame(user, saveObject, function(results) {
             openModal("<p>Game saved succesfully.</p><button type='button' onclick='closeModal(); insertSaveInfo(\"" + user + "\")'>Okay</button>");
-            console.log(saveObject._id);
-            console.log(results.save._id);
             if (saveObject._id != results.save._id)
                 window.history.replaceState({}, "Play - FIFA Career Companion", results.save._id);
         }, function() {
@@ -338,14 +336,14 @@ function fixtures(user) {
         "<tr class='fifaTable'><th colspan='4'>Competition Fixtures</th></tr>";
     for (let i = 0; i < fixtures.length && i < numFixtures; i++)
         compFixtures = compFixtures + 
-            "<tr class='fifaTable'><td>" + new Date(fixtures[i].date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td><td>" + fixtures[i].away + "</td><td>vs.</td><td>" + fixtures[i].home + "</td></tr>";
+            "<tr class='fifaTable'><td>" + new Date(fixtures[i].date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td><td>" + fixtures[i].home + "</td><td>vs.</td><td>" + fixtures[i].away + "</td></tr>";
     $("#fifaPlayCompFixtures").html(compFixtures);
 
     var teamFixtures = 
         "<tr class='fifaTable'><th colspan='4'>Team Fixtures</th></tr>";
     for (let i = 0; i < teamFixtureList.length && i < numFixtures; i++)
         teamFixtures = teamFixtures + 
-        "<tr class='fifaTable' onclick='playGame()'><td>" + new Date(teamFixtureList[i].date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td><td>" + teamFixtureList[i].away + "</td><td>vs.</td><td>" + teamFixtureList[i].home + "</td></tr>";
+        "<tr class='fifaTable' onclick='playGame()'><td>" + new Date(teamFixtureList[i].date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td><td>" + teamFixtureList[i].home + "</td><td>vs.</td><td>" + teamFixtureList[i].away + "</td></tr>";
     $("#fifaPlayTeamFixtures").html(teamFixtures);
 
     $("#addFixturesButton").click(function() { addFixtures(user); });
@@ -556,10 +554,23 @@ function playGame() {
     var team = saveObject.team[saveObject.settings.currentSelections.team].name;
     for (let i = 0; i < fixtures.length; i++) {
         var f = fixtures[i];
+        f.competition = saveObject.settings.currentSelections.competition;
         if (new Date(f.date).getTime() == saveObject.date.getTime() && (f.away == team || f.home == team)) {
-            console.log(f);
             loadScript("/loadPlayGame.js", function() {
-                loadPlayGame(f);
+                var html = 
+                    "<p>Would you like to play " + f.home + " vs. " + f.away + "?\
+                    <button type='button' id='playGameButton'>Play Game</button>\
+                    <button type='button' id='simGameButton'>Sim Game</button>\
+                    <button type='button' id='cancelGameButton'>Cancel</button>";
+                openModal(html);
+                $("#playGameButton").click(function() {
+                    loadPlayGame(f, "play");
+                    closeModal();
+                });
+                $("#simGameButton").click(function() {
+                    loadPlayGame(f, "sim");
+                });
+                $("#cancelGameButton").click(closeModal);
             });
         }
     }

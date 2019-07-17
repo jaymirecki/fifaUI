@@ -8,12 +8,12 @@ function showFullFixtures() {
             "<tr class='fifaTable' onclick='editFixtureNumber(" + i + ")'><td>" + new Date(f.date).toLocaleDateString("default", { timeZone: "UTC" }) + "</td>";
         if (f.score)
             html = html + 
-                "<td>" + f.away + "<br>" + f.score.away + "</td><td>vs.</td>\
-                <td>" + f.home + "<br>" + f.score.home + "</td></tr>";
+                "<td>" + f.home + "<br>" + f.score.home + "</td><td>vs.</td>\
+                <td>" + f.away + "<br>" + f.score.away + "</td></tr>";
         else
             html = html + 
-            "<td>" + f.away + "</td><td>vs.</td>\
-            <td>" + f.home + "</td></tr>";
+            "<td>" + f.home + "</td><td>vs.</td>\
+            <td>" + f.away + "</td></tr>";
     }
     html = html + "</table><button type='button' onclick='closeModal()'>Close</button>";
     openModal(html);
@@ -40,12 +40,12 @@ function addFixtures(user) {
         <form action='javascript:void(0)' onsubmit='addThisFixture(\"" + user + "\")'>\
         <table><tr>\
         <td>Date<input type='date' value='" + saveObject.date.toISOString().substring(0, 10) + "' id='fixtureDate' autofocus>\
-        <td>Away Team<br><select id='awayTeam' required>\
+        <td>Home Team<br><select id='homeTeam' required>\
             <option value='' disabled selected>---</option>";
     for (let i = 0; i < teams.length; i++)
         html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>"
     html = html + "</select></td>\
-    <td>Home Team<br><select id='homeTeam'required>\
+    <td>Away Team<br><select id='awayTeam'required>\
     <option value='' disabled selected>---</option>";
     for (let i = 0; i < teams.length; i++)
         html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
@@ -61,6 +61,7 @@ function addThisFixture(user) {
     newFixture.away = $("#awayTeam").val();
     newFixture.home = $("#homeTeam").val();
     saveObject.team[saveObject.settings.currentSelections.team].league.competitions[saveObject.settings.currentSelections.competition].fixtures.push(newFixture);
+
     fixtures(user);
 }
 function editFixtureNumber(i) {
@@ -85,27 +86,27 @@ function editFixtureNumber(i) {
     var html =
         "<button type='button' onclick='showFullFixtures()'>Cancel</button>\
         <form action='javascript:void(0)' onsubmit='updateThisFixture(" + i + ")'>\
-        <table><tr><th>Date</th><th>Away Team</th><th>Home Team</th></tr><tr>\
+        <table><tr><th>Date</th><th>Home Team</th><th>Away Team</th></tr><tr>\
         <td><input type='date' value='" + new Date(f.date).toISOString().substring(0, 10) + "' id='fixtureDate' focus>\
-        <td><select id='awayTeam' required>";
-    for (let i = 0; i < teams.length; i++) {
-        if (teams[i] == f.away)
-            html = html + "<option value='" + teams[i] + "' selected>"+ teams[i] + "</option>";
-        else
-            html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
-    }
-    html = html + "</select></td>\
-    <td><select id='homeTeam'required>";
+        <td><select id='homeTeam' required>";
     for (let i = 0; i < teams.length; i++) {
         if (teams[i] == f.home)
             html = html + "<option value='" + teams[i] + "' selected>"+ teams[i] + "</option>";
         else
             html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
     }
+    html = html + "</select></td>\
+    <td><select id='awayTeam'required>";
+    for (let i = 0; i < teams.length; i++) {
+        if (teams[i] == f.away)
+            html = html + "<option value='" + teams[i] + "' selected>"+ teams[i] + "</option>";
+        else
+            html = html + "<option value='" + teams[i] + "'>"+ teams[i] + "</option>";
+    }
     if (f.score)
         html = html + "</select></td></tr>\
-            <tr><td></td><td><input type='number' id='awayScore' value='" + f.score.away + "'></td>\
-            <td><input type='number' id='homeScore' value='" + f.score.home + "'></td></tr>";
+            <tr><td></td><td><input type='number' id='homeScore' value='" + f.score.home + "'></td>\
+            <td><input type='number' id='awayScore' value='" + f.score.away + "'></td></tr>";
     html = html + "</table><input type='submit' value='Update'></form>";
     openModal(html);
     // console.log(html);
@@ -144,8 +145,8 @@ function completeFixtures(newDate, user) {
                 var html = 
                     "Please enter the score for this game:\
                     <table><tr><td colspan='3'>"+ key + "</td></tr>\
-                    <tr><td>" + fixtures[i].away + "<input type='number' id='away'></td>\
-                    <td>vs.</td><td>" + fixtures[i].home + "<input type='number' id='home'></td></tr></table>\
+                    <tr><td>" + fixtures[i].home + "<input type='number' id='home'></td>\
+                    <td>vs.</td><td>" + fixtures[i].away + "<input type='number' id='away'></td></tr></table>\
                     <button type='button' onclick='completeFixtures(\"" + newDate + "\", \"" + user + "\")'>Submit Score</button>";
                 if ($("#away").val() && $("#home").val()) {
                     f.score = { away: $("#away").val(), home: $("#home").val() };
