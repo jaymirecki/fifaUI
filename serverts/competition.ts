@@ -14,7 +14,7 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
     }
 });
 
-export interface ICompetition extends mongoose.Document {
+interface ICompetition extends mongoose.Document {
     game: string;
     competition: string;
     team: string;
@@ -26,5 +26,26 @@ const CompetitionSchema = new mongoose.Schema({
     team: { type: String, required: true },
 });
 
-export const Competition = 
+const Competition = 
     mongoose.model<ICompetition>("Competition", CompetitionSchema);
+
+export async function getNewCompetitions(id: string, gameId: string, teamName: string) {
+    let comps: ICompetition[] = await Competition.find({ game: id });
+    for (let i in comps) {
+        let c: ICompetition = comps[i];
+        c.team = teamName;
+        c.game = gameId;
+        c = new Competition(c.toObject());
+        await c.save();
+    }
+    return comps[0].competition;
+}
+
+export async function getTeamCompetitions(game: string, team: string) {
+    let comps = await Competition.find({ game: game, team: team });
+    let compStrings: string[] = [];
+    for (let i in comps) {
+        compStrings[i] = comps[i].competition;
+    }
+    return compStrings;
+}

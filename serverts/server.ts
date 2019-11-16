@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { save, getSave, getSaves, createNewSave, getPlayers } from './database';
+import * as DB from './database';
 import { create } from 'domain';
 const app = express();
 var validator = require('validator');
@@ -15,26 +15,27 @@ function cors(response : express.Response) {
     return response;
 }
 
-app.get("/save", function(req : express.Request, res : express.Response) {
+app.get("/save", async function(req : express.Request, res : express.Response) {
     res = cors(res);
-    getSave(req, res);
+    let save = await DB.getSave(req.query.id);
+    res.send(save);
 });
 
 app.get("/saves", async function(req: express.Request, res: express.Response) {
     res = cors(res);
-    let saves = await getSaves(req.query.user);
+    let saves = await DB.getSaves(req.query.user);
     res.send(saves);
 });
 
 app.post("/save", function(req: express.Request, res: express.Response) {
     res = cors(res);
-    save(req, res);
+    DB.save(req, res);
 });
 
 app.post("/newsave", async function(req: express.Request, res: express.Response) {
     res = cors(res);
     console.log(req.body);
-    let id = await createNewSave(req.body);
+    let id = await DB.createNewSave(req.body);
     res.send({ id: id });
 });
 
@@ -52,7 +53,7 @@ app.get("/newgame", function(req: express.Request, res: express.Response) {
 });
 
 app.get("/createNewSave", function(req: express.Request, res: express.Response) {
-    createNewSave(req.query);
+    DB.createNewSave(req.query);
     res = cors(res);
     res.send("try it\n");
 });
@@ -60,15 +61,21 @@ app.get("/createNewSave", function(req: express.Request, res: express.Response) 
 app.get('/play', function(req: express.Request, res:express.Response) {
     res = cors(res);
     if (req.query.g)
-        res.sendFile(__dirname + '/public/newGame.html');
+        res.sendFile(__dirname + '/public/play.html');
     else
         res.sendFile(__dirname + '/public/choose_save.html');
 });
 
 app.get('/players', async function(req: express.Request, res: express.Response) {
     res = cors(res);
-    let p = await getPlayers(req.query.game, req.query.team);
+    let p = await DB.getPlayers(req.query.game, req.query.team);
     res.send(p);
+});
+
+app.get('/playerteams', async function(req: express.Request, res: express.Response) {
+    res = cors(res);
+    let teams = await DB.getGamePlayerTeams(req.query.id);
+    res.send(teams);
 });
 
 app.listen(process.env.PORT || 8888);

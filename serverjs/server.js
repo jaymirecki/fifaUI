@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var express = require("express");
-var database_1 = require("./database");
+var DB = require("./database");
 var app = express();
 var validator = require('validator');
 var bodyParser = require('body-parser');
@@ -49,8 +49,20 @@ function cors(response) {
     return response;
 }
 app.get("/save", function (req, res) {
-    res = cors(res);
-    database_1.getSave(req, res);
+    return __awaiter(this, void 0, void 0, function () {
+        var save;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    res = cors(res);
+                    return [4 /*yield*/, DB.getSave(req.query.id)];
+                case 1:
+                    save = _a.sent();
+                    res.send(save);
+                    return [2 /*return*/];
+            }
+        });
+    });
 });
 app.get("/saves", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
@@ -59,7 +71,7 @@ app.get("/saves", function (req, res) {
             switch (_a.label) {
                 case 0:
                     res = cors(res);
-                    return [4 /*yield*/, database_1.getSaves(req.query.user)];
+                    return [4 /*yield*/, DB.getSaves(req.query.user)];
                 case 1:
                     saves = _a.sent();
                     res.send(saves);
@@ -70,7 +82,7 @@ app.get("/saves", function (req, res) {
 });
 app.post("/save", function (req, res) {
     res = cors(res);
-    database_1.save(req, res);
+    DB.save(req, res);
 });
 app.post("/newsave", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
@@ -80,7 +92,7 @@ app.post("/newsave", function (req, res) {
                 case 0:
                     res = cors(res);
                     console.log(req.body);
-                    return [4 /*yield*/, database_1.createNewSave(req.body)];
+                    return [4 /*yield*/, DB.createNewSave(req.body)];
                 case 1:
                     id = _a.sent();
                     res.send({ id: id });
@@ -102,14 +114,14 @@ app.get("/newgame", function (req, res) {
     res.send(games);
 });
 app.get("/createNewSave", function (req, res) {
-    database_1.createNewSave(req.query);
+    DB.createNewSave(req.query);
     res = cors(res);
     res.send("try it\n");
 });
 app.get('/play', function (req, res) {
     res = cors(res);
     if (req.query.g)
-        res.sendFile(__dirname + '/public/newGame.html');
+        res.sendFile(__dirname + '/public/play.html');
     else
         res.sendFile(__dirname + '/public/choose_save.html');
 });
@@ -120,10 +132,26 @@ app.get('/players', function (req, res) {
             switch (_a.label) {
                 case 0:
                     res = cors(res);
-                    return [4 /*yield*/, database_1.getPlayers(req.query.game, req.query.team)];
+                    return [4 /*yield*/, DB.getPlayers(req.query.game, req.query.team)];
                 case 1:
                     p = _a.sent();
                     res.send(p);
+                    return [2 /*return*/];
+            }
+        });
+    });
+});
+app.get('/playerteams', function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var teams;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    res = cors(res);
+                    return [4 /*yield*/, DB.getGamePlayerTeams(req.query.id)];
+                case 1:
+                    teams = _a.sent();
+                    res.send(teams);
                     return [2 /*return*/];
             }
         });

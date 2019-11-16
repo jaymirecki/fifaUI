@@ -42,9 +42,7 @@ const SaveSchema = new mongoose.Schema({
 export const Save = mongoose.model<ISave>("Save", SaveSchema);
 
 export let save = (req: Request, res: Response) => {
-    console.log(req.body);
     var saveObject: ISave = validateSave(req.body);
-    console.log(saveObject);
     saveObject.dom = new Date();
     
     var save = new Save(saveObject);
@@ -59,14 +57,13 @@ export let save = (req: Request, res: Response) => {
     });
 };
 
-export let getSave = (req: Request, res: Response) => {
-    let save = Save.findById(req.query.id, (err: any, save: any) => {
-        if (err) {
-            res.send({ success: false, error: err });
-        } else {
-            res.send({ success: true, save: save });
-        }
-    });
+export async function getSave(id: string) {
+    let save = await Save.findById(id);
+    if (save == null)
+        return { error: "game not found" };
+    let saveObject = save.toObject();
+    saveObject.id = save.id;
+    return saveObject;
 };
 
 export let getSaves = async (user: string) => {

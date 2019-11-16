@@ -64,9 +64,7 @@ var SaveSchema = new mongoose.Schema({
 });
 exports.Save = mongoose.model("Save", SaveSchema);
 exports.save = function (req, res) {
-    console.log(req.body);
     var saveObject = validateSave(req.body);
-    console.log(saveObject);
     saveObject.dom = new Date();
     var save = new exports.Save(saveObject);
     save.save(function (err) {
@@ -79,16 +77,25 @@ exports.save = function (req, res) {
         }
     });
 };
-exports.getSave = function (req, res) {
-    var save = exports.Save.findById(req.query.id, function (err, save) {
-        if (err) {
-            res.send({ success: false, error: err });
-        }
-        else {
-            res.send({ success: true, save: save });
-        }
+function getSave(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var save, saveObject;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.Save.findById(id)];
+                case 1:
+                    save = _a.sent();
+                    if (save == null)
+                        return [2 /*return*/, { error: "game not found" }];
+                    saveObject = save.toObject();
+                    saveObject.id = save.id;
+                    return [2 /*return*/, saveObject];
+            }
+        });
     });
-};
+}
+exports.getSave = getSave;
+;
 exports.getSaves = function (user) { return __awaiter(void 0, void 0, void 0, function () {
     var saves, saveObjects, i;
     return __generator(this, function (_a) {

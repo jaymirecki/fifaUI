@@ -38,9 +38,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var mongoose = require("mongoose");
 var Save = require("./save");
-var team_1 = require("./team");
-var competition_1 = require("./competition");
-var division_1 = require("./division");
+var Team = require("./team");
+var Competition = require("./competition");
+var Division = require("./division");
 var teamsIn_1 = require("./teamsIn");
 var Settings = require("./settings");
 var Player = require("./player");
@@ -58,7 +58,28 @@ mongoose.connect(uri, mongooseOptions, function (err) {
     }
 });
 exports.save = Save.save;
-exports.getSave = Save.getSave;
+function getSave(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var save, settings;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Save.getSave(id)];
+                case 1:
+                    save = _a.sent();
+                    if (save.error)
+                        return [2 /*return*/, save];
+                    return [4 /*yield*/, Settings.getGameSettings(id)];
+                case 2:
+                    settings = _a.sent();
+                    save.team = settings.team;
+                    save.competition = settings.competition;
+                    save.division = settings.division;
+                    return [2 /*return*/, save];
+            }
+        });
+    });
+}
+exports.getSave = getSave;
 function getSaves(user) {
     return __awaiter(this, void 0, void 0, function () {
         var saves, _a, _b, _i, i, _c;
@@ -110,13 +131,13 @@ function createNewSave(s) {
                     return [4 /*yield*/, save.save()];
                 case 1:
                     _a.sent();
-                    getNewTeams(id, save.id, s.team);
+                    Team.getNewTeams(id, save.id, s.team);
                     getNewTeamsIn(id, save.id);
                     Player.getNewPlayers(id, save.id, s.team);
-                    return [4 /*yield*/, getNewCompetitions(id, save.id, s.team)];
+                    return [4 /*yield*/, Competition.getNewCompetitions(id, save.id, s.team)];
                 case 2:
                     c = _a.sent();
-                    return [4 /*yield*/, getNewDivisions(id, save.id)];
+                    return [4 /*yield*/, Division.getNewDivisions(id, save.id)];
                 case 3:
                     d = _a.sent();
                     Settings.newSettings(save.user, save.id, s.team, c, d);
@@ -127,83 +148,6 @@ function createNewSave(s) {
 }
 exports.createNewSave = createNewSave;
 ;
-function getNewTeams(id, gameId, teamName) {
-    return __awaiter(this, void 0, void 0, function () {
-        var teams, i, t;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, team_1.Team.find({ game: id })];
-                case 1:
-                    teams = _a.sent();
-                    for (i in teams) {
-                        t = teams[i];
-                        t.game = gameId;
-                        if (t.team == teamName) {
-                            t.player = true;
-                            t = new team_1.Team(t.toObject());
-                            t.save();
-                        }
-                        else {
-                            t.player = false;
-                            new team_1.Team(t.toObject()).save();
-                        }
-                    }
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-function getNewCompetitions(id, gameId, teamName) {
-    return __awaiter(this, void 0, void 0, function () {
-        var comps, _a, _b, _i, i, c;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0: return [4 /*yield*/, competition_1.Competition.find({ game: id })];
-                case 1:
-                    comps = _c.sent();
-                    _a = [];
-                    for (_b in comps)
-                        _a.push(_b);
-                    _i = 0;
-                    _c.label = 2;
-                case 2:
-                    if (!(_i < _a.length)) return [3 /*break*/, 5];
-                    i = _a[_i];
-                    c = comps[i];
-                    c.team = teamName;
-                    c.game = gameId;
-                    c = new competition_1.Competition(c.toObject());
-                    return [4 /*yield*/, c.save()];
-                case 3:
-                    _c.sent();
-                    _c.label = 4;
-                case 4:
-                    _i++;
-                    return [3 /*break*/, 2];
-                case 5: return [2 /*return*/, comps[0].competition];
-            }
-        });
-    });
-}
-function getNewDivisions(id, gameId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var divs, i, d;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, division_1.Division.find({ game: id })];
-                case 1:
-                    divs = _a.sent();
-                    for (i in divs) {
-                        d = divs[i];
-                        d.game = gameId;
-                        d = new division_1.Division(d.toObject());
-                        d.save();
-                    }
-                    return [2 /*return*/, divs[0].division];
-            }
-        });
-    });
-}
 function getNewTeamsIn(id, gameId) {
     return __awaiter(this, void 0, void 0, function () {
         var teams, i, t;
@@ -240,3 +184,52 @@ function getPlayers(game, team) {
     });
 }
 exports.getPlayers = getPlayers;
+function getGamePlayerTeams(game) {
+    return __awaiter(this, void 0, void 0, function () {
+        var teams, ts, _a, _b, _i, i, cs, _c, _d, _e, j, _f, _g;
+        return __generator(this, function (_h) {
+            switch (_h.label) {
+                case 0:
+                    teams = new Object();
+                    return [4 /*yield*/, Team.getGamePlayerTeams(game)];
+                case 1:
+                    ts = _h.sent();
+                    _a = [];
+                    for (_b in ts)
+                        _a.push(_b);
+                    _i = 0;
+                    _h.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 8];
+                    i = _a[_i];
+                    teams[ts[i]] = new Object();
+                    return [4 /*yield*/, Competition.getTeamCompetitions(game, ts[i])];
+                case 3:
+                    cs = _h.sent();
+                    _c = [];
+                    for (_d in cs)
+                        _c.push(_d);
+                    _e = 0;
+                    _h.label = 4;
+                case 4:
+                    if (!(_e < _c.length)) return [3 /*break*/, 7];
+                    j = _c[_e];
+                    _f = teams[ts[i]];
+                    _g = cs[j];
+                    return [4 /*yield*/, Division.getCompetitionDivisions(game, cs[j])];
+                case 5:
+                    _f[_g] =
+                        _h.sent();
+                    _h.label = 6;
+                case 6:
+                    _e++;
+                    return [3 /*break*/, 4];
+                case 7:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 8: return [2 /*return*/, teams];
+            }
+        });
+    });
+}
+exports.getGamePlayerTeams = getGamePlayerTeams;

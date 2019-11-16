@@ -29,3 +29,28 @@ const TeamSchema = new mongoose.Schema({
 });
 
 export const Team = mongoose.model<ITeam>("Team", TeamSchema);
+
+export async function getNewTeams(id: string, gameId: string, teamName: string) {
+    let teams: ITeam[] = await Team.find({ game: id });
+    for (let i in teams) {
+        let t: ITeam = teams[i];
+        t.game = gameId;
+        if (t.team == teamName) {
+            t.player = true;
+            t = new Team(t.toObject());
+            t.save();
+        } else {
+            t.player = false;
+            new Team(t.toObject()).save();
+        }
+    }
+}
+
+export async function getGamePlayerTeams(game: string) {
+    let teams = await Team.find({ game: game, player: true });
+    let teamNames: string[] = [];
+    for (let i in teams) {
+        teamNames[i] = teams[i].team;
+    }
+    return teamNames;
+}

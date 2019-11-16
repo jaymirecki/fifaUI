@@ -10,7 +10,7 @@ function loadMireckiContent() {
         if (playerRequest.readyState != 4)
             return;
         // console.log(playerRequest.responseText);
-        var players = JSON.parse(playerRequest.responseText);
+        players = JSON.parse(playerRequest.responseText);
         console.log(players);
         buildTable(players, date);
     };
@@ -27,9 +27,6 @@ function loadMireckiContent() {
         playerRequest.send();
     };
     dateRequest.send();
-    // while (!players || !date)
-    //     continue;
-    // buildTable(players, date);
 }
 var path = window.location.pathname.split("/");
 console.log(window.location.href.split("?")[1]);

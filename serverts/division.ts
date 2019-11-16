@@ -14,7 +14,7 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
     }
 });
 
-export interface IDivision extends mongoose.Document {
+interface IDivision extends mongoose.Document {
     game: string;
     competition: string;
     division: string;
@@ -26,5 +26,25 @@ const DivisionSchema = new mongoose.Schema({
     division: { type: String, required: true },
 });
 
-export const Division = 
+const Division = 
     mongoose.model<IDivision>("Division", DivisionSchema);
+
+export async function getNewDivisions(id: string, gameId: string) {
+    let divs: IDivision[] = await Division.find({ game: id });
+    for (let i in divs) {
+        let d = divs[i];
+        d.game = gameId;
+        d = new Division(d.toObject());
+        d.save();
+    }
+    return divs[0].division;
+}
+
+export async function getCompetitionDivisions(game: string, competition: string) {
+    let divs = await Division.find({ game: game, competition: competition});
+    let divStrings: string[] = []
+    for (let i in divs) {
+        divStrings[i] = divs[i].division;
+    }
+    return divStrings;
+}

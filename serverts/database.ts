@@ -1,8 +1,8 @@
 import * as mongoose from "mongoose";
 import * as Save from './save';
-import { Team, ITeam } from './team';
-import { Competition, ICompetition } from './competition';
-import { Division, IDivision } from './division';
+import * as Team from './team';
+import * as Competition from './competition';
+import * as Division from './division';
 import { TeamsIn, ITeamsIn } from './teamsIn';
 import * as Settings from './settings';
 import * as Player from './player';
@@ -22,7 +22,17 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 });
 
 export const save = Save.save;
-export const getSave = Save.getSave;
+
+export async function getSave(id: string) {
+    let save = await Save.getSave(id);
+    if (save.error)
+        return save;
+    let settings = await Settings.getGameSettings(id);
+    save.team = settings.team;
+    save.competition = settings.competition;
+    save.division = settings.division;
+    return save;
+}
 
 export async function getSaves(user: string) {
     let saves = await Save.getSaves(user);
@@ -46,53 +56,14 @@ export async function createNewSave(s: any) {
     };
     var save: Save.ISave = new Save.Save(saveObject);
     await save.save();
-    getNewTeams(id, save.id, s.team);
+    Team.getNewTeams(id, save.id, s.team);
     getNewTeamsIn(id, save.id);
     Player.getNewPlayers(id, save.id, s.team);
-    let c = await getNewCompetitions(id, save.id, s.team);
-    let d = await getNewDivisions(id, save.id);
+    let c = await Competition.getNewCompetitions(id, save.id, s.team);
+    let d = await Division.getNewDivisions(id, save.id);
     Settings.newSettings(save.user, save.id, s.team, c, d);
     return save.id;
 };
-
-async function getNewTeams(id: string, gameId: string, teamName: string) {
-    let teams: ITeam[] = await Team.find({ game: id });
-    for (let i in teams) {
-        let t: ITeam = teams[i];
-        t.game = gameId;
-        if (t.team == teamName) {
-            t.player = true;
-            t = new Team(t.toObject());
-            t.save();
-        } else {
-            t.player = false;
-            new Team(t.toObject()).save();
-        }
-    }
-}
-
-async function getNewCompetitions(id: string, gameId: string, teamName: string) {
-    let comps: ICompetition[] = await Competition.find({ game: id });
-    for (let i in comps) {
-        let c: ICompetition = comps[i];
-        c.team = teamName;
-        c.game = gameId;
-        c = new Competition(c.toObject());
-        await c.save();
-    }
-    return comps[0].competition;
-}
-
-async function getNewDivisions(id: string, gameId: string) {
-    let divs: IDivision[] = await Division.find({ game: id });
-    for (let i in divs) {
-        let d = divs[i];
-        d.game = gameId;
-        d = new Division(d.toObject());
-        d.save();
-    }
-    return divs[0].division;
-}
 
 async function getNewTeamsIn(id: string, gameId: string) {
     let teams: ITeamsIn[] = await TeamsIn.find({ game: id }, (err: any, res: any) => {
@@ -111,4 +82,18 @@ export async function getPlayers(game: string, team: string) {
         return await Player.getTeamPlayers(game, team);
     else
         return await Player.getGamePlayers(game);
+}
+
+export async function getGamePlayerTeams(game: string) {
+    let teams: any = new Object();
+    let ts: string[] = await Team.getGamePlayerTeams(game);
+    for (let i in ts) {
+        teams[ts[i]] = new Object();
+        let cs: string[] = await Competition.getTeamCompetitions(game, ts[i]);
+        for (let j in cs) {
+            teams[ts[i]][cs[j]] = 
+                await Division.getCompetitionDivisions(game, cs[j]);
+        }
+    }
+    return teams;
 }
