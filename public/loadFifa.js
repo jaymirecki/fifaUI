@@ -8,10 +8,12 @@ function loadMireckiContent() {
                               "http://mirecki-auth.herokuapp.com/mauth.js",
                               "https://mirecki-auth.herokuapp.com/mauth.js");;
 
-    loadScript(mauthUrl, function() {
-        $("#mireckiContent").html("<div id='fifaContent'></div>");
-        loadScript("/loadFifaCommon.js", function() {
-            loadFifaContent();
+    loadScript("https://code.jquery.com/jquery-3.4.1.slim.js", function() {
+        loadScript(mauthUrl, function() {
+            $("#mireckiContent").html("<div id='fifaContent'></div>");
+            loadScript("/loadFifaCommon.js", function() {
+                loadFifaContent();
+            });
         });
     });
 }

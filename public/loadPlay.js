@@ -3,6 +3,10 @@ var numTeams = 8;
 var numPlayers = 18;
 var numFixtures = 5;
 var userId;
+var manager;
+var save;
+var game;
+var date;
 
 var fifaPlayLineupsHeader = 
     "<tr><th colspan='2' id='currLineupName'>Current Lineup: [LINEUP NAME]</th></tr>\
@@ -45,7 +49,9 @@ function loadScripts(user) {
     loadScript("../FCSave.js", function() {
         loadScript("../loadFifaFixtureManagement.js", function() {
             loadScript("../FCLineups.js", function() {
-                showHeader(user);
+                loadScript("../FCGame.js", function() {
+                    showHeader(user);
+                });
             });
         });
     });
@@ -549,7 +555,17 @@ function playGame() {
                     <button type='button' id='cancelGameButton'>Cancel</button>";
                 openModal(html);
                 $("#playGameButton").click(function() {
-                    loadPlayGame(f, "play");
+                    // loadPlayGame(lineups, "play");
+                    var lineups = 
+                        new FCLineups(saveObject.getLineups(), saveObject.getCurrentLineup(), saveObject.getRoster());
+                    var gameObject = new FCGame(f, team, lineups, playGame);
+                    $("#fifaPlayContent").html(
+                            "<table><tr>\
+                                <td id='playGameLineups'></td>\
+                                <td id='playGameRoster'></td>\
+                                <td id='playGameEvents'></td>\
+                            </td></tr></table>");
+                    gameObject.getUiElements("playGameLineups", "playGameRoster", "playGameEvents");
                     closeModal();
                 });
                 $("#simGameButton").click(function() {

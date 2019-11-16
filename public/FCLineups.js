@@ -1,8 +1,9 @@
 class FCLineups {
-    constructor(lineups, index) {
+    constructor(lineups, index, roster) {
         this.lineups = lineups;
         this.index = index;
         this.saveGame = false;
+        this.roster = roster;
         this.tableHeader = 
             "<tr><th colspan='2' id='currLineupName'>Current Lineup: [LINEUP NAME]</th></tr>\
             <tr><th>Position</th><th>Player</th></tr>";
@@ -28,6 +29,10 @@ class FCLineups {
 
     getLineup() {
         return this.lineups[this.index];
+    }
+
+    getRoster() {
+        return this.roster;
     }
 
     disableWidget() {
