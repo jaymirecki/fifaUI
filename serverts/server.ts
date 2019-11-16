@@ -21,7 +21,6 @@ app.get("/save", function(req : express.Request, res : express.Response) {
 });
 
 app.get("/saves", function(req: express.Request, res: express.Response) {
-    console.log(req.query);
     res = cors(res);
     console.log(req.query);
     getSaves(req, res);

@@ -36,72 +36,48 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var express = require("express");
-var database_1 = require("./database");
-var app = express();
-var validator = require('validator');
-var bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(__dirname + '/public'));
-function cors(response) {
-    response.header("Access-Control-Allow-Origin", "*");
-    return response;
-}
-app.get("/save", function (req, res) {
-    res = cors(res);
-    database_1.getSave(req, res);
+var mongoose = require("mongoose");
+var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
+var mongooseOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+};
+mongoose.connect(uri, mongooseOptions, function (err) {
+    if (err) {
+        console.log(err.message);
+    }
+    else {
+        console.log("Save Successfully Connected!");
+    }
 });
-app.get("/saves", function (req, res) {
-    console.log(req.query);
-    res = cors(res);
-    console.log(req.query);
-    database_1.getSaves(req, res);
+;
+var SettingsSchema = new mongoose.Schema({
+    user: { type: String, required: true },
+    game: { type: String, required: true },
+    majorVersion: { type: Number, required: true },
+    minorVersion: { type: Number, required: true },
+    team: { type: String, required: true },
+    competition: { type: String, required: true },
+    division: { type: String, required: true }
 });
-app.post("/save", function (req, res) {
-    res = cors(res);
-    database_1.save(req, res);
-});
-app.post("/newsave", function (req, res) {
+var Settings = mongoose.model("Settings", SettingsSchema);
+function newSettings(user, game, team, competition, division) {
     return __awaiter(this, void 0, void 0, function () {
-        var id;
+        var s, settings;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    res = cors(res);
-                    console.log(req.body);
-                    return [4 /*yield*/, database_1.createNewSave(req.body)];
-                case 1:
-                    id = _a.sent();
-                    res.send({ id: id });
-                    return [2 /*return*/];
-            }
+            s = {
+                user: user,
+                game: game,
+                majorVersion: 0,
+                minorVersion: 1,
+                team: team,
+                competition: competition,
+                division: division
+            };
+            settings = new Settings(s);
+            settings.save();
+            return [2 /*return*/];
         });
     });
-});
-app.get("/newgame", function (req, res) {
-    res = cors(res);
-    var games = {
-        FIFA19: {
-            MLS: {
-                teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'],
-                date: new Date(2018, 1, 1, 12)
-            }
-        }
-    };
-    res.send(games);
-});
-app.get("/createNewSave", function (req, res) {
-    database_1.createNewSave(req.query);
-    res = cors(res);
-    res.send("try it\n");
-});
-app.get('/play', function (req, res) {
-    res = cors(res);
-    console.log(req.query.g);
-    if (req.query.g)
-        res.sendFile(__dirname + '/public/newGame2.html');
-    else
-        res.sendFile(__dirname + '/public/choose_save.html');
-});
-app.listen(process.env.PORT || 8888);
+}
+exports.newSettings = newSettings;
