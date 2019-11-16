@@ -37,14 +37,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var mongoose = require("mongoose");
-var save_1 = require("./save");
-exports.save = save_1.save;
-exports.getSave = save_1.getSave;
-exports.getSaves = save_1.getSaves;
+var Save = require("./save");
 var team_1 = require("./team");
 var competition_1 = require("./competition");
 var division_1 = require("./division");
 var teamsIn_1 = require("./teamsIn");
+var Settings = require("./settings");
+var Player = require("./player");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 var mongooseOptions = {
     useNewUrlParser: true,
@@ -58,10 +57,41 @@ mongoose.connect(uri, mongooseOptions, function (err) {
         console.log("Database Successfully Connected!");
     }
 });
-exports["default"] = { save: save_1.save, getSave: save_1.getSave, getSaves: save_1.getSaves };
+exports.save = Save.save;
+exports.getSave = Save.getSave;
+function getSaves(user) {
+    return __awaiter(this, void 0, void 0, function () {
+        var saves, _a, _b, _i, i, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0: return [4 /*yield*/, Save.getSaves(user)];
+                case 1:
+                    saves = _d.sent();
+                    _a = [];
+                    for (_b in saves)
+                        _a.push(_b);
+                    _i = 0;
+                    _d.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    i = _a[_i];
+                    _c = saves[i];
+                    return [4 /*yield*/, Settings.getGameSettings(saves[i].id)];
+                case 3:
+                    _c.team = (_d.sent()).team;
+                    _d.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5: return [2 /*return*/, saves];
+            }
+        });
+    });
+}
+exports.getSaves = getSaves;
 function createNewSave(s) {
     return __awaiter(this, void 0, void 0, function () {
-        var id, saveObject, save;
+        var id, saveObject, save, c, d;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -76,14 +106,20 @@ function createNewSave(s) {
                         doc: new Date(parseInt(s.doc)),
                         dom: new Date(parseInt(s.doc))
                     };
-                    save = new save_1.Save(saveObject);
+                    save = new Save.Save(saveObject);
                     return [4 /*yield*/, save.save()];
                 case 1:
                     _a.sent();
                     getNewTeams(id, save.id, s.team);
-                    getNewCompetitions(id, save.id, s.team);
-                    getNewDivisions(id, save.id);
                     getNewTeamsIn(id, save.id);
+                    Player.getNewPlayers(id, save.id, s.team);
+                    return [4 /*yield*/, getNewCompetitions(id, save.id, s.team)];
+                case 2:
+                    c = _a.sent();
+                    return [4 /*yield*/, getNewDivisions(id, save.id)];
+                case 3:
+                    d = _a.sent();
+                    Settings.newSettings(save.user, save.id, s.team, c, d);
                     return [2 /*return*/, save.id];
             }
         });
@@ -102,7 +138,6 @@ function getNewTeams(id, gameId, teamName) {
                     for (i in teams) {
                         t = teams[i];
                         t.game = gameId;
-                        console.log("Team: " + t.team);
                         if (t.team == teamName) {
                             t.player = true;
                             t = new team_1.Team(t.toObject());
@@ -126,7 +161,6 @@ function getNewCompetitions(id, gameId, teamName) {
                 case 0: return [4 /*yield*/, competition_1.Competition.find({ game: id })];
                 case 1:
                     comps = _c.sent();
-                    console.log(comps);
                     _a = [];
                     for (_b in comps)
                         _a.push(_b);
@@ -142,12 +176,11 @@ function getNewCompetitions(id, gameId, teamName) {
                     return [4 /*yield*/, c.save()];
                 case 3:
                     _c.sent();
-                    console.log("Competition: " + c.competition);
                     _c.label = 4;
                 case 4:
                     _i++;
                     return [3 /*break*/, 2];
-                case 5: return [2 /*return*/];
+                case 5: return [2 /*return*/, comps[0].competition];
             }
         });
     });
@@ -165,9 +198,8 @@ function getNewDivisions(id, gameId) {
                         d.game = gameId;
                         d = new division_1.Division(d.toObject());
                         d.save();
-                        console.log("Division: " + d.division);
                     }
-                    return [2 /*return*/];
+                    return [2 /*return*/, divs[0].division];
             }
         });
     });
@@ -177,25 +209,34 @@ function getNewTeamsIn(id, gameId) {
         var teams, i, t;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    console.log(id);
-                    console.log(gameId);
-                    return [4 /*yield*/, teamsIn_1.TeamsIn.find({ game: id }, function (err, res) {
-                            console.log(err);
-                            console.log(res);
-                        })];
+                case 0: return [4 /*yield*/, teamsIn_1.TeamsIn.find({ game: id }, function (err, res) {
+                        console.log(err);
+                    })];
                 case 1:
                     teams = _a.sent();
-                    console.log(teams);
                     for (i in teams) {
                         t = teams[i];
                         t.game = gameId;
                         t = new teamsIn_1.TeamsIn(t.toObject());
                         t.save();
-                        console.log("TeamsIn: " + t.team);
                     }
                     return [2 /*return*/];
             }
         });
     });
 }
+function getPlayers(game, team) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!team) return [3 /*break*/, 2];
+                    return [4 /*yield*/, Player.getTeamPlayers(game, team)];
+                case 1: return [2 /*return*/, _a.sent()];
+                case 2: return [4 /*yield*/, Player.getGamePlayers(game)];
+                case 3: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+exports.getPlayers = getPlayers;

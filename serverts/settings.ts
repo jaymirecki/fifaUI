@@ -51,3 +51,8 @@ export async function newSettings(user: string, game: string, team: string, comp
     let settings = new Settings(s);
     settings.save();
 }
+
+export async function getGameSettings(game: string) {
+    let settings = await Settings.find({ game: game });
+    return settings[0].toObject();
+}

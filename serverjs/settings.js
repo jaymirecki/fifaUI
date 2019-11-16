@@ -81,3 +81,17 @@ function newSettings(user, game, team, competition, division) {
     });
 }
 exports.newSettings = newSettings;
+function getGameSettings(game) {
+    return __awaiter(this, void 0, void 0, function () {
+        var settings;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Settings.find({ game: game })];
+                case 1:
+                    settings = _a.sent();
+                    return [2 /*return*/, settings[0].toObject()];
+            }
+        });
+    });
+}
+exports.getGameSettings = getGameSettings;

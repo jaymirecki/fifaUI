@@ -48,7 +48,7 @@ function showSaves(userId, results) {
         save.date = new Date(save.date);
         saveTable =
             saveTable + "<tr class='fifaTable' id='" + save._id + "'><td class='fifaTable' name='name' onclick='selectGame(this.parentNode)'>"
-                + save.name + "</td><td class='fifaTable' onclick='selectGame(this.parentNode)'>" + save.settings.currentSelections.team + "</td><td class='fifaTable' onclick='selectGame(this.parentNode)'>" + save.dom.toLocaleString("default") + "</td><td><button type='button' onclick='deleteGame(\"" + userId + "\", \"" + save._id + "\")'>Delete</button></tr>";
+                + save.name + "</td><td class='fifaTable' onclick='selectGame(this.parentNode)'>" + save.team + "</td><td class='fifaTable' onclick='selectGame(this.parentNode)'>" + save.dom.toLocaleString("default") + "</td><td><button type='button' onclick='deleteGame(\"" + userId + "\", \"" + save._id + "\")'>Delete</button></tr>";
     }
     saveTable =
         saveTable + 
@@ -98,7 +98,7 @@ var newGameForm = (user) => {
                     <select id="teamSelect" required>\
                         <option value="" disabled selected>---</option>\
                     </select><br>\
-                    <input type="submit">\
+                    <input id="formSubmit" type="submit">\
                 </form>';
             openModal(form);
             $("#fifaNewGame").submit(function() {
@@ -137,6 +137,7 @@ function updateTeams(teams) {
 }
 
 function createGame(user, results) {
+    $("#formSubmit").prop("disabled", true);
     let save = {
         user: user,
         name: $("#name").val(),

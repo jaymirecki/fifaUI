@@ -1,9 +1,11 @@
 import * as mongoose from "mongoose";
-import { Save, ISave, save, getSave, getSaves } from './save';
+import * as Save from './save';
 import { Team, ITeam } from './team';
 import { Competition, ICompetition } from './competition';
 import { Division, IDivision } from './division';
 import { TeamsIn, ITeamsIn } from './teamsIn';
+import * as Settings from './settings';
+import * as Player from './player';
 
 const uri: string = 
     process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
@@ -19,8 +21,16 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
     }
 });
 
-export { save, getSave, getSaves };
-export default { save, getSave, getSaves };
+export const save = Save.save;
+export const getSave = Save.getSave;
+
+export async function getSaves(user: string) {
+    let saves = await Save.getSaves(user);
+    for (let i in saves) {
+        saves[i].team = (await Settings.getGameSettings(saves[i].id)).team;
+    }
+    return saves;
+}
 
 export async function createNewSave(s: any) {
     var id: string = s.game + s.league;
@@ -34,12 +44,14 @@ export async function createNewSave(s: any) {
         doc: new Date(parseInt(s.doc)),
         dom: new Date(parseInt(s.doc))
     };
-    var save: ISave = new Save(saveObject);
+    var save: Save.ISave = new Save.Save(saveObject);
     await save.save();
     getNewTeams(id, save.id, s.team);
-    getNewCompetitions(id, save.id, s.team);
-    getNewDivisions(id, save.id);
     getNewTeamsIn(id, save.id);
+    Player.getNewPlayers(id, save.id, s.team);
+    let c = await getNewCompetitions(id, save.id, s.team);
+    let d = await getNewDivisions(id, save.id);
+    Settings.newSettings(save.user, save.id, s.team, c, d);
     return save.id;
 };
 
@@ -48,7 +60,6 @@ async function getNewTeams(id: string, gameId: string, teamName: string) {
     for (let i in teams) {
         let t: ITeam = teams[i];
         t.game = gameId;
-        console.log("Team: " + t.team);
         if (t.team == teamName) {
             t.player = true;
             t = new Team(t.toObject());
@@ -62,15 +73,14 @@ async function getNewTeams(id: string, gameId: string, teamName: string) {
 
 async function getNewCompetitions(id: string, gameId: string, teamName: string) {
     let comps: ICompetition[] = await Competition.find({ game: id });
-    console.log(comps);
     for (let i in comps) {
         let c: ICompetition = comps[i];
         c.team = teamName;
         c.game = gameId;
         c = new Competition(c.toObject());
         await c.save();
-        console.log("Competition: " + c.competition);
     }
+    return comps[0].competition;
 }
 
 async function getNewDivisions(id: string, gameId: string) {
@@ -80,23 +90,25 @@ async function getNewDivisions(id: string, gameId: string) {
         d.game = gameId;
         d = new Division(d.toObject());
         d.save();
-        console.log("Division: " + d.division);
     }
+    return divs[0].division;
 }
 
 async function getNewTeamsIn(id: string, gameId: string) {
-    console.log(id);
-    console.log(gameId);
     let teams: ITeamsIn[] = await TeamsIn.find({ game: id }, (err: any, res: any) => {
         console.log(err);
-        console.log(res);
     });
-    console.log(teams);
     for (let i in teams) {
         let t: ITeamsIn = teams[i];
         t.game = gameId;
         t = new TeamsIn(t.toObject());
         t.save();
-        console.log("TeamsIn: " + t.team);
     }
+}
+
+export async function getPlayers(game: string, team: string) {
+    if (team)
+        return await Player.getTeamPlayers(game, team);
+    else
+        return await Player.getGamePlayers(game);
 }

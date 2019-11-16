@@ -3,7 +3,10 @@ import * as mongoose from "mongoose";
 const uri: string = 
     process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 
-mongoose.connect(uri, (err: any) => {
+var mongooseOptions = { 
+    useNewUrlParser: true,
+    useUnifiedTopology: true }
+mongoose.connect(uri, mongooseOptions, (err: any) => {
     if (err) {
         console.log(err.message);
     } else {

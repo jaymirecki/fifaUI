@@ -69,15 +69,14 @@ export let getSave = (req: Request, res: Response) => {
     });
 };
 
-export let getSaves = (req: Request, res: Response) => {
-    console.log(req.query);
-    Save.find({ user: req.query.user }, (err: any, saves: ISave[]) => {
-        if (err) {
-            res.send({ error: err });
-        } else {
-            res.send(saves);
-        }
-    });
+export let getSaves = async (user: string) => {
+    let saves = await Save.find({ user: user });
+    let saveObjects: any = [];
+    for (let i in saves) {
+        saveObjects[i] = saves[i].toObject();
+        saveObjects[i].id = saves[i].id;
+    }
+    return saveObjects;
 };
 
 var validateSave = (save: any) => {

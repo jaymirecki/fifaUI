@@ -3,10 +3,10 @@
   "description": "UI for EA's FIFA game.",
   "private": true,
   "version": "0.0.1",
-  "main": "server2.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node serverjs/server.js",
+    "start": "node server.js",
     "tsc": "tsc"
   },
   "repository": {

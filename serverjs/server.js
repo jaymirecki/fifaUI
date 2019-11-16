@@ -53,9 +53,20 @@ app.get("/save", function (req, res) {
     database_1.getSave(req, res);
 });
 app.get("/saves", function (req, res) {
-    res = cors(res);
-    console.log(req.query);
-    database_1.getSaves(req, res);
+    return __awaiter(this, void 0, void 0, function () {
+        var saves;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    res = cors(res);
+                    return [4 /*yield*/, database_1.getSaves(req.query.user)];
+                case 1:
+                    saves = _a.sent();
+                    res.send(saves);
+                    return [2 /*return*/];
+            }
+        });
+    });
 });
 app.post("/save", function (req, res) {
     res = cors(res);
@@ -83,7 +94,7 @@ app.get("/newgame", function (req, res) {
     var games = {
         FIFA19: {
             MLS: {
-                teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'],
+                teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia Union', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'],
                 date: new Date(2018, 1, 1, 12)
             }
         }
@@ -97,10 +108,25 @@ app.get("/createNewSave", function (req, res) {
 });
 app.get('/play', function (req, res) {
     res = cors(res);
-    console.log(req.query.g);
     if (req.query.g)
-        res.sendFile(__dirname + '/public/newGame2.html');
+        res.sendFile(__dirname + '/public/newGame.html');
     else
         res.sendFile(__dirname + '/public/choose_save.html');
+});
+app.get('/players', function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var p;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    res = cors(res);
+                    return [4 /*yield*/, database_1.getPlayers(req.query.game, req.query.team)];
+                case 1:
+                    p = _a.sent();
+                    res.send(p);
+                    return [2 /*return*/];
+            }
+        });
+    });
 });
 app.listen(process.env.PORT || 8888);

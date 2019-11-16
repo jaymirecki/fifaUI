@@ -36,105 +36,97 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var mongoose = require("mongoose");
-var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
-var mongooseOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-};
-mongoose.connect(uri, mongooseOptions, function (err) {
-    if (err) {
-        console.log(err.message);
-    }
-    else {
-        console.log("Database Successfully Connected!");
-    }
-});
-;
-var PlayerSchema = new mongoose.Schema({
-    firstName: { type: String, required: false },
-    lastName: { type: String, required: true },
-    game: { type: String, required: true },
-    team: { type: String, required: true },
-    ovr: { type: Number, required: false },
-    age: { type: Date, required: false },
-    wage: { type: Number, required: false },
-    contract: { type: Date, required: false },
-    value: { type: Number, required: false },
-    nationality: { type: String, required: false },
-    gk: { type: Number, required: true },
-    sw: { type: Number, required: true },
-    rwb: { type: Number, required: true },
-    rb: { type: Number, required: true },
-    cb: { type: Number, required: true },
-    lb: { type: Number, required: true },
-    lwb: { type: Number, required: true },
-    cdm: { type: Number, required: true },
-    rm: { type: Number, required: true },
-    cm: { type: Number, required: true },
-    lm: { type: Number, required: true },
-    cam: { type: Number, required: true },
-    cf: { type: Number, required: true },
-    rw: { type: Number, required: true },
-    st: { type: Number, required: true },
-    lw: { type: Number, required: true }
-});
-var Player = mongoose.model("Player", PlayerSchema);
-function getTeamPlayers(game, team) {
-    return __awaiter(this, void 0, void 0, function () {
-        var players, playerObjects, i;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Player.find({ game: game, team: team })];
-                case 1:
-                    players = _a.sent();
-                    playerObjects = [];
-                    for (i in players) {
-                        playerObjects[i] = players[i].toObject();
-                    }
-                    return [2 /*return*/, playerObjects];
-            }
-        });
-    });
+var express = require("express");
+var database_1 = require("./serverjs/database");
+var app = express();
+var validator = require('validator');
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(__dirname + '/public'));
+function cors(response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    return response;
 }
-exports.getTeamPlayers = getTeamPlayers;
-function getGamePlayers(game) {
+app.get("/save", function (req, res) {
+    res = cors(res);
+    database_1.getSave(req, res);
+});
+app.get("/saves", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var players, playerObjects, i;
+        var saves;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Player.find({ game: game })];
+                case 0:
+                    res = cors(res);
+                    return [4 /*yield*/, database_1.getSaves(req.query.user)];
                 case 1:
-                    players = _a.sent();
-                    playerObjects = [];
-                    for (i in players) {
-                        playerObjects[i] = players[i].toObject();
-                    }
-                    return [2 /*return*/, playerObjects];
-            }
-        });
-    });
-}
-exports.getGamePlayers = getGamePlayers;
-function getNewPlayers(id, gameId, teamName) {
-    return __awaiter(this, void 0, void 0, function () {
-        var players, i, p;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Player.find({ game: id, team: teamName })];
-                case 1:
-                    players = _a.sent();
-                    for (i in players) {
-                        p = players[i];
-                        p.game = gameId;
-                        p.age = new Date(p.age);
-                        p.contract = new Date(p.age);
-                        p = new Player(p.toObject());
-                        p.save();
-                    }
+                    saves = _a.sent();
+                    res.send(saves);
                     return [2 /*return*/];
             }
         });
     });
-}
-exports.getNewPlayers = getNewPlayers;
+});
+app.post("/save", function (req, res) {
+    res = cors(res);
+    database_1.save(req, res);
+});
+app.post("/newsave", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var id;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    res = cors(res);
+                    console.log(req.body);
+                    return [4 /*yield*/, database_1.createNewSave(req.body)];
+                case 1:
+                    id = _a.sent();
+                    res.send({ id: id });
+                    return [2 /*return*/];
+            }
+        });
+    });
+});
+app.get("/newgame", function (req, res) {
+    res = cors(res);
+    var games = {
+        FIFA19: {
+            MLS: {
+                teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia Union', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'],
+                date: new Date(2018, 1, 1, 12)
+            }
+        }
+    };
+    res.send(games);
+});
+app.get("/createNewSave", function (req, res) {
+    database_1.createNewSave(req.query);
+    res = cors(res);
+    res.send("try it\n");
+});
+app.get('/play', function (req, res) {
+    res = cors(res);
+    if (req.query.g)
+        res.sendFile(__dirname + '/public/newGame.html');
+    else
+        res.sendFile(__dirname + '/public/choose_save.html');
+});
+app.get('/players', function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var p;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    res = cors(res);
+                    return [4 /*yield*/, database_1.getPlayers(req.query.game, req.query.team)];
+                case 1:
+                    p = _a.sent();
+                    res.send(p);
+                    return [2 /*return*/];
+            }
+        });
+    });
+});
+app.listen(process.env.PORT || 8888);
