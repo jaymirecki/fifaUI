@@ -3,7 +3,7 @@ class FCSave {
         this.object = saveObject;
         this.user = saveObject.user;
         this.game = saveObject.game;
-        this.date = saveObject.date;
+        this.date = new Date(saveObject.date);
         this.team = saveObject.team;
         this.competition = saveObject.competition;
         this.division = saveObject.division;

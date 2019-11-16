@@ -47,7 +47,7 @@ mongoose.connect(uri, mongooseOptions, function (err) {
         console.log(err.message);
     }
     else {
-        console.log("Save Successfully Connected!");
+        console.log("Settings Successfully Connected!");
     }
 });
 ;

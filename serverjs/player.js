@@ -47,7 +47,7 @@ mongoose.connect(uri, mongooseOptions, function (err) {
         console.log(err.message);
     }
     else {
-        console.log("Database Successfully Connected!");
+        console.log("Player Successfully Connected!");
     }
 });
 ;
@@ -82,7 +82,7 @@ var PlayerSchema = new mongoose.Schema({
 var Player = mongoose.model("Player", PlayerSchema);
 function getTeamPlayers(game, team) {
     return __awaiter(this, void 0, void 0, function () {
-        var players, playerObjects, i;
+        var players, playerObjects, i, positions, k, p, j, i, i;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, Player.find({ game: game, team: team })];
@@ -92,6 +92,23 @@ function getTeamPlayers(game, team) {
                     for (i in players) {
                         playerObjects[i] = players[i].toObject();
                     }
+                    positions = ["gk", "sw", "rwb", "rb", "cb", "lb", "lwb", "cdm", "rm", "cm", "lm", "cam", "cf", "rw", "st", "lw"];
+                    for (k in playerObjects) {
+                        p = playerObjects[k];
+                        p.position = "";
+                        for (j = 1; j < 5; j++) {
+                            for (i in positions) {
+                                if (p[positions[i]] == j)
+                                    p.position = p.position + positions[i].toUpperCase() + ",";
+                            }
+                        }
+                        p.position = p.position.substring(0, p.position.length - 1);
+                        for (i in positions) {
+                            delete p[positions[i]];
+                        }
+                        playerObjects[k] = p;
+                    }
+                    console.log(playerObjects);
                     return [2 /*return*/, playerObjects];
             }
         });

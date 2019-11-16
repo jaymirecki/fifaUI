@@ -10,7 +10,7 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
     if (err) {
         console.log(err.message);
     } else {
-        console.log("Database Successfully Connected!");
+        console.log("Player Successfully Connected!");
     }
 });
 
@@ -78,10 +78,28 @@ const Player =
 
 export async function getTeamPlayers(game: string, team: string) {
     let players = await Player.find({ game: game, team: team });
-    let playerObjects: IPlayer[] = [];
+    let playerObjects: any = [];
     for (let i in players) {
         playerObjects[i] = players[i].toObject();
     }
+
+    let positions = ["gk", "sw", "rwb", "rb", "cb", "lb", "lwb", "cdm", "rm", "cm", "lm", "cam", "cf", "rw", "st", "lw"];
+    for (let k in playerObjects) {
+        let p = playerObjects[k];
+        p.position = "";
+        for (let j = 1; j < 5; j++) {
+            for (let i in positions) {
+                if (p[positions[i]] == j)
+                p.position = p.position + positions[i].toUpperCase() + ", ";
+            }
+        }
+        p.position = p.position.substring(0, p.position.length - 1);
+        for (let i in positions) {
+            delete p[positions[i]];
+        }
+        playerObjects[k] = p;
+    }
+
     return playerObjects;
 }
 

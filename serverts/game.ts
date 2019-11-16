@@ -10,7 +10,7 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
     if (err) {
         console.log(err.message);
     } else {
-        console.log("Database Successfully Connected!");
+        console.log("Game Successfully Connected!");
     }
 });
 
