@@ -52,9 +52,12 @@ function showSaves(userId, results) {
     }
     saveTable =
         saveTable + 
-        "<tr class='fifaTable' onclick='newGameForm(\"" + userId + "\")' id='newgame'><td class='fifaTable' colspan='4'>New Game</td></tr>\
+        "<tr class='fifaTable' id='newgame'><td class='fifaTable' colspan='4'>New Game</td></tr>\
         </table></div><button type='button' onclick='logout()'>Logout</button>";
     $("#fifaContent").html(saveTable);
+    $("#newgame").click(function() {
+        newGameForm(userId);
+    })
 }
 
 function logout() {

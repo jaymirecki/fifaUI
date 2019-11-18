@@ -2,7 +2,7 @@ function loadMireckiContent() {
     baseUrl = detectHost("http://localhost:8888/",
                              "http://fifa-companion.herokuapp.com/",
                              "https://fifa-companion.herokuapp.com/")
-    addStyle(baseUrl + "fifaSiteDesktop.css");
+    addStyle("/fifaSiteDesktop.css");
 
     var mauthUrl = detectHost("https://mirecki-auth.herokuapp.com/mauth.js",
                               "http://mirecki-auth.herokuapp.com/mauth.js",
