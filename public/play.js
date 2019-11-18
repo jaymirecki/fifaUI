@@ -7,7 +7,6 @@ async function loadFifaContent() {
         addStyle("/fifaSiteMobile.css");
     addHeaderTemplate();
     addContentTemplate();
-    addRosterTemplate();
     loadScripts();
 }
 function loadScripts() {
@@ -62,13 +61,13 @@ function addContentTemplate() {
 function addRosterTemplate() {
     let roster = 
         '<button id="fifaPlayBack" class="fifaPlayContentTab disable">Back</button>\
-        <button id="fifaPlayRosterButton" class="fifaPlayContentTab disable">Roster</button>\
+        <button id="fifaPlayRosterButton" class="fifaPlayContentTab fifaPlayContentTabSelected" disable">Roster</button>\
         <button id="fifaPlayLineupButton" class="fifaPlayContentTab disable">Lineups</button>\
         <table id="fifaPlayRosterTable" class="fifaPlayContent">\
-            <tr><th>Name</th><th>Position</th><th>Age</th><th>Ovr</th></tr>';
+            <tr class="fifaPlayContent"><th>Name</th><th>Position</th><th>Age</th><th>Ovr</th></tr>';
         for (let i = 0; i < 18; i++) {
             roster = roster + 
-                '<tr><td>---</td><td>---</td><td>---</td><td>---</td>'
+                '<tr class="fifaPlayContent"><td>---</td><td>---</td><td>---</td><td>---</td>'
         }
         roster = roster + '</table>';
     $("#fifaPlayContent").html(roster);
@@ -162,12 +161,12 @@ function updateHeader() {
 
 function updateRoster() {
     let roster = fifaPlayRoster.getRoster(fifaPlaySave.team);
-    let content = "<tr><th>Name</th><th>Position</th><th>Age</th><th>Ovr</th></tr>";
+    let content = '<tr class="fifaPlayContent"><th>Name</th><th>Position</th><th>Age</th><th>Ovr</th></tr>';
     for (let i in roster) {
         let p = roster[i];
         p.age = new Date(fifaPlaySave.date - p.age).getUTCFullYear() - 1970
         content = content + 
-            '<tr id="' + p.id + '" class="fifaPlayTable"><td>' + p.firstName + ' ' + p.lastName + '</td><td>' + p.position + '</td><td>' + p.age + '</td><td>' + p.ovr + '</td></tr>';
+            '<tr id="' + p.id + '" class="fifaPlayContent"><td>' + p.firstName + ' ' + p.lastName + '</td><td>' + p.position + '</td><td>' + p.age + '</td><td>' + p.ovr + '</td></tr>';
     }
     $("#fifaPlayRosterTable").html(content);
 }

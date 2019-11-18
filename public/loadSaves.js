@@ -6,11 +6,9 @@ function loadFifaContent() {
     });
 }
 
-var baseURL = "/";
-
 function getSaves(userId) {
     var request = new XMLHttpRequest();
-    var getString = baseURL + "saves?user=" + userId;
+    var getString = "/saves?user=" + userId;
     console.log(getString);
     request.open("GET", getString, true);
     request.onreadystatechange = function () {
@@ -68,7 +66,7 @@ function logout() {
 
 var newGameForm = (user) => {
     var request = new XMLHttpRequest();
-    var getString = baseURL + "newgame";
+    var getString = "/newgame";
     request.open("GET", getString, true);
     request.onreadystatechange = function () {
         if (request.readyState != 4)
@@ -155,7 +153,7 @@ function createGame(user, results) {
     };
     save = objectToPostString(save);
     var request = new XMLHttpRequest();
-    var getString = baseURL + "newsave";
+    var getString = "/newsave";
     request.open("POST", getString, true);
     request.onreadystatechange = function () {
         if (request.readyState != 4)
@@ -179,9 +177,9 @@ function objectToPostString(obj) {
 function selectGame(game) {
     var gameName = game.id;
     if (gameName == "newgame")
-        window.location.href = baseUrl + "new_game";
+        window.location.href = "/new_game";
     else
-        window.location.href = baseUrl + "play/" + gameName;
+        window.location.href = "/play?g=" + gameName;
 }
 
 function deleteGame(user, gameId) {

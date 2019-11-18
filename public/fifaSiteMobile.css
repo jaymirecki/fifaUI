@@ -8,6 +8,7 @@ button.fifaPlayContent {
     width: 100%;
     height: 50px;
     font-size: 20px;
+    border-radius: 4px;
 }
 
 button.fifaPlayContentTab {
@@ -15,4 +16,30 @@ button.fifaPlayContentTab {
     float: left;
     height: 50px;
     font-size: 20px;
+    border-radius: 8px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border: black solid 1px;
+    box-shadow: none;
+}
+
+button.fifaPlayContentTabSelected {
+    border-bottom: black none 0px;
+}
+
+table.fifaPlayContent {
+    width: 100%;
+    border-collapse: collapse;
+    cursor: default;
+    font-size: 17px;
+}
+
+tr.fifaPlayContent {
+    width: 100%;
+    background: linear-gradient(white, rgba(50, 173, 255, 0.37), white);
+    border-collapse: collapse;
+}
+
+tr.fifaPlayContent:hover {
+    background-color: rgba(24, 126, 194, 0.37);
 }
