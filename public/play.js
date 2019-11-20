@@ -6,8 +6,8 @@ async function loadFifaContent() {
     if (isMobile())
         addStyle("/fifaSiteMobile.css");
     addHeaderTemplate();
-    // addContentTemplate();
-    addRosterTemplate();
+    addContentTemplate();
+    // addRosterTemplate();
     loadScripts();
 }
 function loadScripts() {
