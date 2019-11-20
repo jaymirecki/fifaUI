@@ -6,7 +6,8 @@ async function loadFifaContent() {
     if (isMobile())
         addStyle("/fifaSiteMobile.css");
     addHeaderTemplate();
-    addContentTemplate();
+    // addContentTemplate();
+    addRosterTemplate();
     loadScripts();
 }
 function loadScripts() {
@@ -74,7 +75,92 @@ function addRosterTemplate() {
     $(".fifaPlayContentTab").css("width", (1 / 3 * 100).toString() + "%");
     $("#fifaPlayBack").click(function() {
         addContentTemplate();
-    })
+    });
+    $("#fifaPlayLineupButton").click(function() {
+        addLineupTemplate();
+    });
+}
+
+function addLineupTemplate() {
+    let lineups = 
+        '<button id="fifaPlayBack" class="fifaPlayContentTab disable">Back</button>\
+        <button id="fifaPlayRosterButton" class="fifaPlayContentTab" disable">Roster</button>\
+        <button id="fifaPlayLineupButton" class="fifaPlayContentTab fifaPlayContentTabSelected disable">Lineups</button>\
+        <table id="fifaPlayLineupTable" class="fifaPlayContent"></table>';
+    $("#fifaPlayContent").html(lineups);
+    $(".fifaPlayLineupSelect").css('height', $(".fifaPlayLineupSelect").css('width'));
+    $(".fifaPlayContentTab").css("width", (1 / 3 * 100).toString() + "%");
+    $("#fifaPlayBack").click(function() {
+        addContentTemplate();
+    });
+    $("#fifaPlayRosterButton").click(function() {
+        addRosterTemplate();
+        updateRoster();
+    });
+    // $('.fifaPlayLineupSelect').click(function() {
+    //     let name = $(this).attr('id');
+    //     if ($(this).attr('id') == 'jsdflsaldkhgsalonv') {
+    //         console.log("new lineup");
+    //         name = fifaPlayRoster.newLineup(fifaPlaySave.team);
+    //     } else
+    //         console.log("not a new lineup")
+    //     console.log(name);
+    //     editLineup(name);
+    // });
+    updateLineups();
+}
+
+function editLineup(name) {
+    let lineup = fifaPlayRoster.getLineup(fifaPlaySave.team, name);
+    editLineupStatic(name, lineup);
+}
+
+function editLineupStatic(name, lineup) {
+    console.log(lineup);
+    let table = 
+        '<tr><th><input type="text" value="' + name + '"></th>\
+            <th><button id="fifaPlayLineupSave" class="fifaPlayContent">Save</button></tr>\
+        <tr><th colspan="2">Starters</th></tr>\
+        <tr><th>Player</th><th>Position</th></tr>';
+    for (let i in lineup.starters) {
+        let s = lineup.starters[i];
+        let replacements = fifaPlayRoster.getLineupReplacementsFor(lineup, s.id);
+        table = table + 
+            '<tr><td><select class="fifaPlayLineupName" id="name' + s.id + '"><option value="' + s.id + '">' + s.name + '</option>';
+        for (let j in replacements) {
+            let r = replacements[j];
+            table = table + '<option value="' + r.id + '">' + r.name + '</option>'
+        }
+        table = table + '</td><td><select id="pos' + s.id + '"><option>' + s.playedPosition + '</option>';
+        let positions = fifaPlayRoster.positions;
+        for (let j in positions) {
+            let p = positions[j];
+            if (p != s.playedPosition)
+                table = table + '<option>' + p + '</option>';
+        }
+        '</select></td></tr>';
+    }
+    table = table + 
+        '<tr><th colspan="2">Bench</th></tr>\
+        <tr><th>Player</th><th>Position</th></tr>';
+    for (let i in lineup.bench) {
+        let b = lineup.bench[i]
+        table = table + 
+            '<tr><td>' + lineup.bench[i].name + '</td><td>' + lineup.bench[i].position + '</td></tr>';
+    }
+    $('#fifaPlayLineupTable').html(table);
+    $('.fifaPlayLineupName').change(function() {
+        let current = $(this).attr('id');
+        current = current.substring(4, current.length);
+        let bench = $(this).val();
+        fifaPlayRoster.switchPlayerToBenchStatic(lineup, current, bench);
+        editLineupStatic(name, lineup);
+    });
+    $('#fifaPlayLineupSave').click(function() {
+        console.log("Save");
+        fifaPlayRoster.saveLineup(fifaPlaySave.team, name, lineup);
+        updateLineups();
+    });
 }
 
 function getSave() {
@@ -169,4 +255,43 @@ function updateRoster() {
             '<tr id="' + p.id + '" class="fifaPlayContent"><td>' + p.firstName + ' ' + p.lastName + '</td><td>' + p.position + '</td><td>' + p.age + '</td><td>' + p.ovr + '</td></tr>';
     }
     $("#fifaPlayRosterTable").html(content);
+}
+
+function updateLineups() {
+    let table = '';
+    let count = 0;
+    for (let i in fifaPlayRoster.lineups[fifaPlaySave.team]) {
+        console.log(i);
+        if (count % 2 == 0)
+            table = table + "<tr>";
+        table = table + 
+            '<td class="fifaPlayLineupSelect" id="' + i + '">' + i + '</td>';
+        if (count++ % 2 == 1)
+            table = table + '</tr>';
+    }
+    if (count % 2 == 0)
+        table = table + "<tr>";
+    table = table + 
+        '<td class="fifaPlayLineupSelect" id="jsdflsaldkhgsalonv">New Lineup</td><td></td><td></td>';
+    if (count++ % 2 == 1)
+        table = table + '</tr>';
+    table = table + '</table>';
+    $("#fifaPlayLineupTable").html(table);
+    let padding = $('.fifaPlayLineupSelect').css('width');
+    padding = padding.substring(0, padding.length - 2);
+    padding = parseInt(padding) / 2 - 5;
+    padding = padding + 'px';
+    $(".fifaPlayLineupSelect").css('padding-top', padding);
+    $(".fifaPlayLineupSelect").css('padding-bottom', padding);
+    $("#fifaPlayBack").click(function() {
+        addContentTemplate();
+    });
+    $('.fifaPlayLineupSelect').click(function() {
+        let name = $(this).attr('id');
+        if ($(this).attr('id') == 'jsdflsaldkhgsalonv') {
+            name = fifaPlayRoster.newLineup(fifaPlaySave.team);
+            editLineupStatic(name, fifaPlayRoster.getFreshLineup(fifaPlaySave.team, 7));
+        } else
+            editLineup(name);
+    });
 }

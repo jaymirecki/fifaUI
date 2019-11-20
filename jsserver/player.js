@@ -108,7 +108,6 @@ function getTeamPlayers(game, team) {
                         }
                         playerObjects[k] = p;
                     }
-                    console.log(playerObjects);
                     return [2 /*return*/, playerObjects];
             }
         });

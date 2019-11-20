@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var express = require("express");
-var DB = require("./serverjs/database");
+var DB = require("./jsserver/database");
 var app = express();
 var validator = require('validator');
 var bodyParser = require('body-parser');

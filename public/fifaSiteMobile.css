@@ -21,6 +21,7 @@ button.fifaPlayContentTab {
     border-bottom-right-radius: 0px;
     border: black solid 1px;
     box-shadow: none;
+    margin-bottom: 10px;
 }
 
 button.fifaPlayContentTabSelected {
@@ -42,4 +43,11 @@ tr.fifaPlayContent {
 
 tr.fifaPlayContent:hover {
     background-color: rgba(24, 126, 194, 0.37);
+}
+
+td.fifaPlayLineupSelect {
+    border: black solid 1px;
+    width: 50%;
+    text-align: center;
+    padding-top: 0%;
 }

@@ -1,7 +1,7 @@
-rm serverjs/*.js
+rm jsserver/*.js
 rm server.js
 echo "compiling ts..."
-tsc serverts/*.ts
+tsc tsserver/*.ts
 echo "done compiling ts"
-mv serverts/*.js serverjs
-sed 's/.\/database/.\/serverjs\/database/' serverjs/server.js > server.js
+mv tsserver/*.js jsserver
+sed 's/.\/database/.\/jsserver\/database/' jsserver/server.js > server.js

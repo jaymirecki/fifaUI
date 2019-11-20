@@ -90,7 +90,7 @@ export async function getTeamPlayers(game: string, team: string) {
         for (let j = 1; j < 5; j++) {
             for (let i in positions) {
                 if (p[positions[i]] == j)
-                p.position = p.position + positions[i].toUpperCase() + ", ";
+                p.position = p.position + positions[i].toUpperCase() + ",";
             }
         }
         p.position = p.position.substring(0, p.position.length - 1);
