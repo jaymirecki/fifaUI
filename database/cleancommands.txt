@@ -1,7 +1,10 @@
 use fifa
-db.saves.remove({})
-db.teams.remove({})
-db.competitions.remove({})
-db.divisions.remove({})
-db.teamsins.remove({})
-db.players.remove({})
+db.saves.remove({});
+db.teams.remove({});
+db.competitions.remove({});
+db.divisions.remove({});
+db.teamsins.remove({});
+db.players.remove({});
+db.playerfors.remove({});
+db.playerdynamicinfos.remove({});
+db.playerstaticinfos.remove({});

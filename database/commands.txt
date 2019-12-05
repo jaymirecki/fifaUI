@@ -1,33 +1,47 @@
 use fifa
-db.players.update({ GK: "false" }, { $set: { GK: false } }, { multi: true })
-db.players.update({ SW: "false" }, { $set: { SW: false } }, { multi: true })
-db.players.update({ RWB: "false" }, { $set: { RWB: false } }, { multi: true })
-db.players.update({ RB: "false" }, { $set: { RB: false } }, { multi: true })
-db.players.update({ CB: "false" }, { $set: { CB: false } }, { multi: true })
-db.players.update({ LB: "false" }, { $set: { LB: false } }, { multi: true })
-db.players.update({ LWB: "false" }, { $set: { LWB: false } }, { multi: true })
-db.players.update({ CDM: "false" }, { $set: { CDM: false } }, { multi: true })
-db.players.update({ RM: "false" }, { $set: { RM: false } }, { multi: true })
-db.players.update({ CM: "false" }, { $set: { CM: false } }, { multi: true })
-db.players.update({ LM: "false" }, { $set: { LM: false } }, { multi: true })
-db.players.update({ CAM: "false" }, { $set: { CAM: false } }, { multi: true })
-db.players.update({ CF: "false" }, { $set: { CF: false } }, { multi: true })
-db.players.update({ RW: "false" }, { $set: { RW: false } }, { multi: true })
-db.players.update({ ST: "false" }, { $set: { ST: false } }, { multi: true })
-db.players.update({ LW: "false" }, { $set: { LW: false } }, { multi: true })
-db.players.update({ GK: "true" }, { $set: { GK: true } }, { multi: true })
-db.players.update({ SW: "true" }, { $set: { SW: true } }, { multi: true })
-db.players.update({ RWB: "true" }, { $set: { RWB: true } }, { multi: true })
-db.players.update({ RB: "true" }, { $set: { RB: true } }, { multi: true })
-db.players.update({ CB: "true" }, { $set: { CB: true } }, { multi: true })
-db.players.update({ LB: "true" }, { $set: { LB: true } }, { multi: true })
-db.players.update({ LWB: "true" }, { $set: { LWB: true } }, { multi: true })
-db.players.update({ CDM: "true" }, { $set: { CDM: true } }, { multi: true })
-db.players.update({ RM: "true" }, { $set: { RM: true } }, { multi: true })
-db.players.update({ CM: "true" }, { $set: { CM: true } }, { multi: true })
-db.players.update({ LM: "true" }, { $set: { LM: true } }, { multi: true })
-db.players.update({ CAM: "true" }, { $set: { CAM: true } }, { multi: true })
-db.players.update({ CF: "true" }, { $set: { CF: true } }, { multi: true })
-db.players.update({ RW: "true" }, { $set: { RW: true } }, { multi: true })
-db.players.update({ ST: "true" }, { $set: { ST: true } }, { multi: true })
-db.players.update({ LW: "true" }, { $set: { LW: true } }, { multi: true })
+
+db.divisions.find().forEach(function(division) {
+    comp = db.competitions.findOne({ name: division.competitionId })._id;
+    db.divisions.update({ _id: division._id }, { $set: { competitionId: comp }});
+});
+
+db.teamsins.find().forEach(function(teamsIn) {
+    comp = db.competitions.findOne({ name: teamsIn.saveId })._id;
+    div = db.divisions.findOne({ competitionId: comp, name: teamsIn.divisionId })._id;
+    game = db.saves.findOne({ user: teamsIn.gameId }).game;
+    save = db.saves.findOne({ user: teamsIn.gameId })._id;
+    team = db.teams.findOne({ name: teamsIn.teamId })._id;
+    db.teamsins.update({ _id: teamsIn._id }, { $set: { saveId: save, gameId: game, divisionId: div , teamId: team }});
+});
+
+db.playerdynamicinfos.find().forEach(function(player) {
+    db.playerstaticinfos.insert({
+        firstName: player.firstName,
+        lastName: player.lastName,
+        birthDate: new Date(player.birthDate),
+        foot: player.foot
+    });
+    id = db.playerstaticinfos.findOne({
+        firstName: player.firstName,
+        lastName: player.lastName,
+        birthDate: new Date(player.birthDate),
+        foot: player.foot })._id;
+    team = db.teams.findOne({ name: player.team })._id;
+    db.playerfors.insert({
+        teamId: team,
+        playerId: player._id
+    });
+    db.playerdynamicinfos.update(
+        { _id: player._id },
+        { $set: { 
+            saveId: save,
+            playerId: id,
+            contractExpiration: new Date(player.contractExpiration)
+          },
+          $unset: { 
+            firstName: "",
+            lastName: "",
+            birthDate: "",
+            foot: ""
+          }});
+});
