@@ -1,4 +1,6 @@
 import * as mongoose from "mongoose";
+import { ObjectID } from "bson";
+import * as Competition from "./competition";
 
 const uri: string = 
     process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
@@ -15,36 +17,51 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 });
 
 interface IDivision extends mongoose.Document {
-    game: string;
+    name: string;
     competition: string;
-    division: string;
+    tier: number;
 };
 
 const DivisionSchema = new mongoose.Schema({
-    game: { type: String, required: true },
-    competition: { type: String, required: true },
-    division: { type: String, required: true },
+    name: { type: String, required: true },
+    competition: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Division",
+        required: true
+    }
 });
 
 const Division = 
     mongoose.model<IDivision>("Division", DivisionSchema);
 
-export async function getNewDivisions(id: string, gameId: string) {
-    let divs: IDivision[] = await Division.find({ game: id });
-    for (let i in divs) {
-        let d = divs[i];
-        d.game = gameId;
-        d = new Division(d.toObject());
-        d.save();
-    }
-    return divs[0].division;
+// export async function getNewDivisions(id: string, gameId: string) {
+//     let divs: IDivision[] = await Division.find({ game: id });
+//     for (let i in divs) {
+//         let d = divs[i];
+//         d.game = gameId;
+//         d = new Division(d.toObject());
+//         d.save();
+//     }
+//     return divs[0].division;
+// }
+
+export async function getAllDivisions() {
+    let divs = await Division.find({});
+    return divs;
 }
 
 export async function getCompetitionDivisions(game: string, competition: string) {
-    let divs = await Division.find({ game: game, competition: competition});
+    let divs = await Division.find({ competition: competition});
     let divStrings: string[] = []
     for (let i in divs) {
-        divStrings[i] = divs[i].division;
+        divStrings[i] = divs[i].name;
     }
     return divStrings;
+}
+
+export async function getDivisionCompetition(division: string) {
+    let cid = await Division.find({ _id: mongoose.Types.ObjectId(division) });
+    let c = await Competition.getCompetitionById(cid[0].competition);
+    // let comp = c.toObject();
+    return c;
 }

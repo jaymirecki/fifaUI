@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var mongoose = require("mongoose");
+var Competition = require("./competition");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 var mongooseOptions = {
     useNewUrlParser: true,
@@ -52,42 +53,49 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var DivisionSchema = new mongoose.Schema({
-    game: { type: String, required: true },
-    competition: { type: String, required: true },
-    division: { type: String, required: true }
+    name: { type: String, required: true },
+    competition: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Division",
+        required: true
+    }
 });
 var Division = mongoose.model("Division", DivisionSchema);
-function getNewDivisions(id, gameId) {
+// export async function getNewDivisions(id: string, gameId: string) {
+//     let divs: IDivision[] = await Division.find({ game: id });
+//     for (let i in divs) {
+//         let d = divs[i];
+//         d.game = gameId;
+//         d = new Division(d.toObject());
+//         d.save();
+//     }
+//     return divs[0].division;
+// }
+function getAllDivisions() {
     return __awaiter(this, void 0, void 0, function () {
-        var divs, i, d;
+        var divs;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Division.find({ game: id })];
+                case 0: return [4 /*yield*/, Division.find({})];
                 case 1:
                     divs = _a.sent();
-                    for (i in divs) {
-                        d = divs[i];
-                        d.game = gameId;
-                        d = new Division(d.toObject());
-                        d.save();
-                    }
-                    return [2 /*return*/, divs[0].division];
+                    return [2 /*return*/, divs];
             }
         });
     });
 }
-exports.getNewDivisions = getNewDivisions;
+exports.getAllDivisions = getAllDivisions;
 function getCompetitionDivisions(game, competition) {
     return __awaiter(this, void 0, void 0, function () {
         var divs, divStrings, i;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Division.find({ game: game, competition: competition })];
+                case 0: return [4 /*yield*/, Division.find({ competition: competition })];
                 case 1:
                     divs = _a.sent();
                     divStrings = [];
                     for (i in divs) {
-                        divStrings[i] = divs[i].division;
+                        divStrings[i] = divs[i].name;
                     }
                     return [2 /*return*/, divStrings];
             }
@@ -95,3 +103,21 @@ function getCompetitionDivisions(game, competition) {
     });
 }
 exports.getCompetitionDivisions = getCompetitionDivisions;
+function getDivisionCompetition(division) {
+    return __awaiter(this, void 0, void 0, function () {
+        var cid, c;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Division.find({ _id: mongoose.Types.ObjectId(division) })];
+                case 1:
+                    cid = _a.sent();
+                    return [4 /*yield*/, Competition.getCompetitionById(cid[0].competition)];
+                case 2:
+                    c = _a.sent();
+                    // let comp = c.toObject();
+                    return [2 /*return*/, c];
+            }
+        });
+    });
+}
+exports.getDivisionCompetition = getDivisionCompetition;

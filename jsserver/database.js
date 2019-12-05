@@ -41,9 +41,10 @@ var Save = require("./save");
 var Team = require("./team");
 var Competition = require("./competition");
 var Division = require("./division");
-var teamsIn_1 = require("./teamsIn");
+var TeamsIn = require("./teamsIn");
 var Settings = require("./settings");
 var Player = require("./player");
+var Game = require("./game");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 var mongooseOptions = {
     useNewUrlParser: true,
@@ -112,63 +113,44 @@ function getSaves(user) {
 exports.getSaves = getSaves;
 function createNewSave(s) {
     return __awaiter(this, void 0, void 0, function () {
-        var id, saveObject, save, c, d;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    id = s.game + s.league;
-                    saveObject = {
-                        user: s.user,
-                        shared: false,
-                        name: s.name,
-                        managerName: s.managerName,
-                        date: new Date(),
-                        game: s.game,
-                        doc: new Date(parseInt(s.doc)),
-                        dom: new Date(parseInt(s.doc))
-                    };
-                    save = new Save.Save(saveObject);
-                    return [4 /*yield*/, save.save()];
-                case 1:
-                    _a.sent();
-                    Team.getNewTeams(id, save.id, s.team);
-                    getNewTeamsIn(id, save.id);
-                    Player.getNewPlayers(id, save.id, s.team);
-                    return [4 /*yield*/, Competition.getNewCompetitions(id, save.id, s.team)];
-                case 2:
-                    c = _a.sent();
-                    return [4 /*yield*/, Division.getNewDivisions(id, save.id)];
-                case 3:
-                    d = _a.sent();
-                    Settings.newSettings(save.user, save.id, s.team, c, d);
-                    return [2 /*return*/, save.id];
-            }
+            // var id: string = s.game + s.league;
+            // let saveObject: any = {
+            //     user: s.user,
+            //     shared: false,
+            //     name: s.name,
+            //     managerName: s.managerName,
+            //     date: new Date(),
+            //     game: s.game,
+            //     doc: new Date(parseInt(s.doc)),
+            //     dom: new Date(parseInt(s.doc))
+            // };
+            // var save: Save.ISave = new Save.Save(saveObject);
+            // await save.save();
+            // Team.getNewTeams(id, save.id, s.team);
+            // getNewTeamsIn(id, save.id);
+            // Player.getNewPlayers(id, save.id, s.team);
+            // let c = await Competition.getNewCompetitions(id, save.id, s.team);
+            // let d = await Division.getNewDivisions(id, save.id);
+            // Settings.newSettings(save.user, save.id, s.team, c, d);
+            // return save.id;
+            return [2 /*return*/, "not implemented"];
         });
     });
 }
 exports.createNewSave = createNewSave;
 ;
-function getNewTeamsIn(id, gameId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var teams, i, t;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, teamsIn_1.TeamsIn.find({ game: id }, function (err, res) {
-                        console.log(err);
-                    })];
-                case 1:
-                    teams = _a.sent();
-                    for (i in teams) {
-                        t = teams[i];
-                        t.game = gameId;
-                        t = new teamsIn_1.TeamsIn(t.toObject());
-                        t.save();
-                    }
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
+// async function getNewTeamsIn(id: string, gameId: string) {
+//     let teams: ITeamsIn[] = await TeamsIn.find({ game: id }, (err: any, res: any) => {
+//         console.log(err);
+//     });
+//     for (let i in teams) {
+//         let t: ITeamsIn = teams[i];
+//         t.game = gameId;
+//         t = new TeamsIn(t.toObject());
+//         t.save();
+//     }
+// }
 function getPlayers(game, team) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -233,3 +215,63 @@ function getGamePlayerTeams(game) {
     });
 }
 exports.getGamePlayerTeams = getGamePlayerTeams;
+function getNewGameTemplates() {
+    return __awaiter(this, void 0, void 0, function () {
+        var games, ret, _a, _b, _i, i, g, teams, _c, _d, _e, j, c, g, c;
+        return __generator(this, function (_f) {
+            switch (_f.label) {
+                case 0: return [4 /*yield*/, Game.getAllGames()];
+                case 1:
+                    games = _f.sent();
+                    ret = new Object();
+                    _a = [];
+                    for (_b in games)
+                        _a.push(_b);
+                    _i = 0;
+                    _f.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 8];
+                    i = _a[_i];
+                    g = games[i].name;
+                    ret[g] = new Object();
+                    return [4 /*yield*/, TeamsIn.getTeamByGame(games[i].id)];
+                case 3:
+                    teams = _f.sent();
+                    _c = [];
+                    for (_d in teams)
+                        _c.push(_d);
+                    _e = 0;
+                    _f.label = 4;
+                case 4:
+                    if (!(_e < _c.length)) return [3 /*break*/, 7];
+                    j = _c[_e];
+                    return [4 /*yield*/, TeamsIn.getTeamCompetition(games[i].id, teams[j].id)];
+                case 5:
+                    c = _f.sent();
+                    if (!ret[g][c.name]) {
+                        ret[g][c.name] = { teams: new Map(), date: c.start };
+                    }
+                    ret[g][c.name].teams.set(teams[j].id, {
+                        id: teams[j].id,
+                        name: teams[j].name
+                    });
+                    _f.label = 6;
+                case 6:
+                    _e++;
+                    return [3 /*break*/, 4];
+                case 7:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 8:
+                    for (g in ret) {
+                        for (c in ret[g]) {
+                            ret[g][c].teams = Array.from(ret[g][c].teams.values());
+                        }
+                    }
+                    console.log(ret);
+                    return [2 /*return*/, ret];
+            }
+        });
+    });
+}
+exports.getNewGameTemplates = getNewGameTemplates;

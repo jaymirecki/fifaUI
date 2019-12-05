@@ -1,17 +1,24 @@
 use fifa
 
+db.saves.find().forEach(function(save) {
+    db.saves.update({ _id: save._id }, { $set: { teams: [] }});
+});
+
+db.competitions.find().forEach(function(comp) {
+    db.competitions.update({ _id: comp._id }, { $set: { start: new Date(comp.start) }});
+});
+
 db.divisions.find().forEach(function(division) {
-    comp = db.competitions.findOne({ name: division.competitionId })._id;
-    db.divisions.update({ _id: division._id }, { $set: { competitionId: comp }});
+    comp = db.competitions.findOne({ name: division.competition })._id;
+    db.divisions.update({ _id: division._id }, { $set: { competition: comp }});
 });
 
 db.teamsins.find().forEach(function(teamsIn) {
-    comp = db.competitions.findOne({ name: teamsIn.saveId })._id;
-    div = db.divisions.findOne({ competitionId: comp, name: teamsIn.divisionId })._id;
-    game = db.saves.findOne({ user: teamsIn.gameId }).game;
-    save = db.saves.findOne({ user: teamsIn.gameId })._id;
-    team = db.teams.findOne({ name: teamsIn.teamId })._id;
-    db.teamsins.update({ _id: teamsIn._id }, { $set: { saveId: save, gameId: game, divisionId: div , teamId: team }});
+    comp = db.competitions.findOne({ name: teamsIn.competition })._id;
+    div = db.divisions.findOne({ competition: comp, name: teamsIn.division })._id;
+    game = db.games.findOne({ name: teamsIn.game })._id;
+    team = db.teams.findOne({ name: teamsIn.team })._id;
+    db.teamsins.update({ _id: teamsIn._id }, { $set: { game: game, division: div , team: team }});
 });
 
 db.playerdynamicinfos.find().forEach(function(player) {
@@ -31,6 +38,7 @@ db.playerdynamicinfos.find().forEach(function(player) {
         teamId: team,
         playerId: player._id
     });
+    save = db.saves.findOne({ user: "template" });
     db.playerdynamicinfos.update(
         { _id: player._id },
         { $set: { 

@@ -15,27 +15,23 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 });
 
 interface IGame extends mongoose.Document {
-    date: Date;
-    homeTeam: string;
-    awayTeam: string;
-    homeScore: number;
-    awayScore: number;
-    length: string;
+    name: string
 };
 
 const GameSchema = new mongoose.Schema({
-    date: { type: Date, required: true},
-    homeTeam: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Team",
-        required: true},
-    awayTeam: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Team",
-        required: true},
-    homeScore: { type: Number, required: true},
-    awayScore: { type: Number, required: true},
-    length: { type: String, required: true}
+    name: { type: String, required: true}
 });
 
 const Game = mongoose.model<IGame>("Game", GameSchema);
+
+export async function getAllGames() {
+    let games = await Game.find({});
+    let glist: any[] = [];
+    for (let i in games) {
+        glist.push({
+            name: games[i].name,
+            id: games[i].id
+        });
+    }
+    return glist;
+}

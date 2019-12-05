@@ -52,52 +52,35 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var TeamSchema = new mongoose.Schema({
-    game: {
-        type: String,
-        required: true
-    },
-    team: { type: String, required: true },
-    player: { type: Boolean, required: true }
+    name: { type: String, required: true }
 });
-exports.Team = mongoose.model("Team", TeamSchema);
-function getNewTeams(id, gameId, teamName) {
-    return __awaiter(this, void 0, void 0, function () {
-        var teams, i, t;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.Team.find({ game: id })];
-                case 1:
-                    teams = _a.sent();
-                    for (i in teams) {
-                        t = teams[i];
-                        t.game = gameId;
-                        if (t.team == teamName) {
-                            t.player = true;
-                            t = new exports.Team(t.toObject());
-                            t.save();
-                        }
-                        else {
-                            t.player = false;
-                            new exports.Team(t.toObject()).save();
-                        }
-                    }
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-exports.getNewTeams = getNewTeams;
+var Team = mongoose.model("Team", TeamSchema);
+// export async function getNewTeams(id: string, gameId: string, teamName: string) {
+//     let teams: ITeam[] = await Team.find({ game: id });
+//     for (let i in teams) {
+//         let t: ITeam = teams[i];
+//         t.game = gameId;
+//         if (t.team == teamName) {
+//             t.player = true;
+//             t = new Team(t.toObject());
+//             t.save();
+//         } else {
+//             t.player = false;
+//             new Team(t.toObject()).save();
+//         }
+//     }
+// }
 function getGamePlayerTeams(game) {
     return __awaiter(this, void 0, void 0, function () {
         var teams, teamNames, i;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.Team.find({ game: game, player: true })];
+                case 0: return [4 /*yield*/, Team.find({ game: game, player: true })];
                 case 1:
                     teams = _a.sent();
                     teamNames = [];
                     for (i in teams) {
-                        teamNames[i] = teams[i].team;
+                        teamNames[i] = teams[i].name;
                     }
                     return [2 /*return*/, teamNames];
             }
@@ -105,3 +88,17 @@ function getGamePlayerTeams(game) {
     });
 }
 exports.getGamePlayerTeams = getGamePlayerTeams;
+function getTeamById(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var t;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Team.findById(id)];
+                case 1:
+                    t = _a.sent();
+                    return [2 /*return*/, t];
+            }
+        });
+    });
+}
+exports.getTeamById = getTeamById;

@@ -39,9 +39,10 @@ app.post("/newsave", async function(req: express.Request, res: express.Response)
     res.send({ id: id });
 });
 
-app.get("/newgame", function(req: express.Request, res: express.Response) {
+app.get("/newgame", async function(req: express.Request, res: express.Response) {
     res = cors(res);
-    let games = {
+    let games = await DB.getNewGameTemplates();
+    let ret = {
         FIFA19: {
             MLS: {
                 teams: [ 'Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia Union', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC' ],

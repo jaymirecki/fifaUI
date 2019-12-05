@@ -52,44 +52,22 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var CompetitionSchema = new mongoose.Schema({
-    game: { type: String, required: true },
-    competition: { type: String, required: true },
-    team: { type: String, required: true }
+    name: { type: String, required: true },
+    league: { type: Boolean, required: true },
+    start: { type: Date, required: true }
 });
 var Competition = mongoose.model("Competition", CompetitionSchema);
-function getNewCompetitions(id, gameId, teamName) {
-    return __awaiter(this, void 0, void 0, function () {
-        var comps, _a, _b, _i, i, c;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0: return [4 /*yield*/, Competition.find({ game: id })];
-                case 1:
-                    comps = _c.sent();
-                    _a = [];
-                    for (_b in comps)
-                        _a.push(_b);
-                    _i = 0;
-                    _c.label = 2;
-                case 2:
-                    if (!(_i < _a.length)) return [3 /*break*/, 5];
-                    i = _a[_i];
-                    c = comps[i];
-                    c.team = teamName;
-                    c.game = gameId;
-                    c = new Competition(c.toObject());
-                    return [4 /*yield*/, c.save()];
-                case 3:
-                    _c.sent();
-                    _c.label = 4;
-                case 4:
-                    _i++;
-                    return [3 /*break*/, 2];
-                case 5: return [2 /*return*/, comps[0].competition];
-            }
-        });
-    });
-}
-exports.getNewCompetitions = getNewCompetitions;
+// export async function getNewCompetitions(id: string, gameId: string, teamName: string) {
+//     let comps: ICompetition[] = await Competition.find({ game: id });
+//     for (let i in comps) {
+//         let c: ICompetition = comps[i];
+//         c.team = teamName;
+//         c.game = gameId;
+//         c = new Competition(c.toObject());
+//         await c.save();
+//     }
+//     return comps[0].competition;
+// }
 function getTeamCompetitions(game, team) {
     return __awaiter(this, void 0, void 0, function () {
         var comps, compStrings, i;
@@ -100,7 +78,7 @@ function getTeamCompetitions(game, team) {
                     comps = _a.sent();
                     compStrings = [];
                     for (i in comps) {
-                        compStrings[i] = comps[i].competition;
+                        compStrings[i] = comps[i].name;
                     }
                     return [2 /*return*/, compStrings];
             }
@@ -108,3 +86,31 @@ function getTeamCompetitions(game, team) {
     });
 }
 exports.getTeamCompetitions = getTeamCompetitions;
+function getCompetitionById(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var comp;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Competition.findById(id)];
+                case 1:
+                    comp = _a.sent();
+                    return [2 /*return*/, comp];
+            }
+        });
+    });
+}
+exports.getCompetitionById = getCompetitionById;
+function getTeamCompetition(team) {
+    return __awaiter(this, void 0, void 0, function () {
+        var c;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Competition.find({ team: team, league: true })];
+                case 1:
+                    c = _a.sent();
+                    return [2 /*return*/, c[0]];
+            }
+        });
+    });
+}
+exports.getTeamCompetition = getTeamCompetition;
