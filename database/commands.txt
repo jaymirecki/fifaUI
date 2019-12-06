@@ -14,11 +14,20 @@ db.divisions.find().forEach(function(division) {
 });
 
 db.teamsins.find().forEach(function(teamsIn) {
-    comp = db.competitions.findOne({ name: teamsIn.competition })._id;
+    save = db.saves.findOne({ user: "template" })._id;
+    comp = db.competitions.findOne({ name: teamsIn.saveId })._id;
     div = db.divisions.findOne({ competition: comp, name: teamsIn.division })._id;
     game = db.games.findOne({ name: teamsIn.game })._id;
     team = db.teams.findOne({ name: teamsIn.team })._id;
-    db.teamsins.update({ _id: teamsIn._id }, { $set: { game: game, division: div , team: team }});
+    db.teamsins.update(
+        { _id: teamsIn._id }, 
+        { $set: {
+            saveId: save,
+            game: game,
+            division: div,
+            team: team,
+            player: false
+        }});
 });
 
 db.playerdynamicinfos.find().forEach(function(player) {

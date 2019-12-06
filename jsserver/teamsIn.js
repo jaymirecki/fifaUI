@@ -39,6 +39,8 @@ exports.__esModule = true;
 var mongoose = require("mongoose");
 var Team = require("./team");
 var Division = require("./division");
+var Game = require("./game");
+var save_1 = require("./save");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 var mongooseOptions = {
     useNewUrlParser: true,
@@ -69,16 +71,25 @@ var TeamsInSchema = new mongoose.Schema({
         ref: 'Division',
         required: true
     },
+    game: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Game',
+        required: true
+    },
+    season: { type: Number, required: true },
     player: { type: Boolean, required: true }
 });
 exports.TeamsIn = mongoose.model("TeamsIn", TeamsInSchema);
 function getAllUniqueTeams() {
     return __awaiter(this, void 0, void 0, function () {
-        var teams, tlist, _a, _b, _i, i, team;
+        var template, teams, tlist, _a, _b, _i, i, team;
         return __generator(this, function (_c) {
             switch (_c.label) {
-                case 0: return [4 /*yield*/, exports.TeamsIn.find({})];
+                case 0: return [4 /*yield*/, save_1.getTemplateId()];
                 case 1:
+                    template = _c.sent();
+                    return [4 /*yield*/, exports.TeamsIn.find({ saveId: template })];
+                case 2:
                     teams = _c.sent();
                     tlist = [];
                     console.log(teams);
@@ -86,22 +97,24 @@ function getAllUniqueTeams() {
                     for (_b in teams)
                         _a.push(_b);
                     _i = 0;
-                    _c.label = 2;
-                case 2:
-                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    _c.label = 3;
+                case 3:
+                    if (!(_i < _a.length)) return [3 /*break*/, 6];
                     i = _a[_i];
                     return [4 /*yield*/, Team.getTeamById(teams[i].team)];
-                case 3:
-                    team = _c.sent();
-                    tlist.push({
-                        id: team.id,
-                        name: team.name
-                    });
-                    _c.label = 4;
                 case 4:
+                    team = _c.sent();
+                    if (team) {
+                        tlist.push({
+                            id: team.id,
+                            name: team.name
+                        });
+                    }
+                    _c.label = 5;
+                case 5:
                     _i++;
-                    return [3 /*break*/, 2];
-                case 5: 
+                    return [3 /*break*/, 3];
+                case 6: 
                 // teams.forEach(async function(t) {
                 //     let team = await Team.getTeamById(t.team);
                 //     console.log(team.name);
@@ -115,42 +128,64 @@ function getAllUniqueTeams() {
 exports.getAllUniqueTeams = getAllUniqueTeams;
 function getTeamByGame(game) {
     return __awaiter(this, void 0, void 0, function () {
-        var teams, tlist, _a, _b, _i, i, t;
+        var template, teams, tlist, _a, _b, _i, i, t;
         return __generator(this, function (_c) {
             switch (_c.label) {
-                case 0: return [4 /*yield*/, exports.TeamsIn.find({ game: new mongoose.Types.ObjectId(game) })];
+                case 0: return [4 /*yield*/, save_1.getTemplateId()];
                 case 1:
+                    template = _c.sent();
+                    return [4 /*yield*/, exports.TeamsIn.find({ game: new mongoose.Types.ObjectId(game) })];
+                case 2:
                     teams = _c.sent();
                     tlist = [];
                     _a = [];
                     for (_b in teams)
                         _a.push(_b);
                     _i = 0;
-                    _c.label = 2;
-                case 2:
-                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    _c.label = 3;
+                case 3:
+                    if (!(_i < _a.length)) return [3 /*break*/, 6];
                     i = _a[_i];
                     return [4 /*yield*/, Team.getTeamById(teams[i].team)];
-                case 3:
+                case 4:
                     t = _c.sent();
                     if (t)
                         tlist.push(t);
-                    _c.label = 4;
-                case 4:
+                    _c.label = 5;
+                case 5:
                     _i++;
-                    return [3 /*break*/, 2];
-                case 5: return [2 /*return*/, tlist];
+                    return [3 /*break*/, 3];
+                case 6: return [2 /*return*/, tlist];
             }
         });
     });
 }
 exports.getTeamByGame = getTeamByGame;
-function getTeamCompetition(game, team) {
+function getTeamCompetition(game, team, saveId, season) {
     return __awaiter(this, void 0, void 0, function () {
-        var ds, cs, _a, _b, _i, i, c;
+        var dc;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, getTeamDivisionCompetition(game, team, saveId, season)];
+                case 1:
+                    dc = _a.sent();
+                    return [2 /*return*/, dc.competition];
+            }
+        });
+    });
+}
+exports.getTeamCompetition = getTeamCompetition;
+function getTeamDivisionsCompetitions(game, team, saveId, season) {
+    return __awaiter(this, void 0, void 0, function () {
+        var ds, cs, _a, _b, _i, i, c, d;
         return __generator(this, function (_c) {
             switch (_c.label) {
-                case 0: return [4 /*yield*/, exports.TeamsIn.find({ game: mongoose.Types.ObjectId(game), team: mongoose.Types.ObjectId(team) })];
+                case 0: return [4 /*yield*/, exports.TeamsIn.find({
+                        game: mongoose.Types.ObjectId(game),
+                        team: mongoose.Types.ObjectId(team),
+                        saveId: mongoose.Types.ObjectId(saveId),
+                        season: season
+                    })];
                 case 1:
                     ds = _c.sent();
                     cs = [];
@@ -160,24 +195,178 @@ function getTeamCompetition(game, team) {
                     _i = 0;
                     _c.label = 2;
                 case 2:
-                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    if (!(_i < _a.length)) return [3 /*break*/, 6];
                     i = _a[_i];
                     return [4 /*yield*/, Division.getDivisionCompetition(ds[i].division)];
                 case 3:
                     c = _c.sent();
-                    if (c)
-                        cs.push(c);
+                    return [4 /*yield*/, Division.getDivisionById(ds[i].division)];
+                case 4:
+                    d = _c.sent();
+                    if (c && d)
+                        cs.push({ division: d, competition: c });
+                    _c.label = 5;
+                case 5:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 6: return [2 /*return*/, cs];
+            }
+        });
+    });
+}
+exports.getTeamDivisionsCompetitions = getTeamDivisionsCompetitions;
+function getTeamCompetitions(game, team, saveId, season) {
+    return __awaiter(this, void 0, void 0, function () {
+        var cds, cs, i;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, getTeamDivisionsCompetitions(game, team, saveId, season)];
+                case 1:
+                    cds = _a.sent();
+                    cs = [];
+                    for (i in cds) {
+                        cs.push(cds[i].competition);
+                    }
+                    return [2 /*return*/, cs];
+            }
+        });
+    });
+}
+exports.getTeamCompetitions = getTeamCompetitions;
+function getTeamDivision(game, team, saveId, season) {
+    return __awaiter(this, void 0, void 0, function () {
+        var dc;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, getTeamDivisionCompetition(game, team, saveId, season)];
+                case 1:
+                    dc = _a.sent();
+                    return [2 /*return*/, dc.division];
+            }
+        });
+    });
+}
+exports.getTeamDivision = getTeamDivision;
+function getCompetitionTeams(game, competition, saveId, season) {
+    return __awaiter(this, void 0, void 0, function () {
+        var ds, ts, _a, _b, _i, i, newts, j;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0: return [4 /*yield*/, Division.getCompetitionDivisions(game, competition)];
+                case 1:
+                    ds = _c.sent();
+                    ts = new Set();
+                    _a = [];
+                    for (_b in ds)
+                        _a.push(_b);
+                    _i = 0;
+                    _c.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    i = _a[_i];
+                    return [4 /*yield*/, exports.TeamsIn.find({
+                            game: game,
+                            saveId: saveId,
+                            season: season,
+                            division: ds[i].id
+                        })];
+                case 3:
+                    newts = _c.sent();
+                    for (j in newts) {
+                        ts.add(newts[j]);
+                    }
                     _c.label = 4;
                 case 4:
                     _i++;
                     return [3 /*break*/, 2];
-                case 5:
+                case 5: return [2 /*return*/, Array.from(ts.values())];
+            }
+        });
+    });
+}
+function getTeamDivisionCompetition(game, team, saveId, season) {
+    return __awaiter(this, void 0, void 0, function () {
+        var cs;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, getTeamDivisionsCompetitions(game, team, saveId, season)];
+                case 1:
+                    cs = _a.sent();
                     cs.filter(function (c) {
-                        return c.league == true;
+                        return c.competition.league == true;
                     });
                     return [2 /*return*/, cs[0]];
             }
         });
     });
 }
-exports.getTeamCompetition = getTeamCompetition;
+exports.getTeamDivisionCompetition = getTeamDivisionCompetition;
+function getNewTeamsIn(template, team, saveId, game) {
+    return __awaiter(this, void 0, void 0, function () {
+        var season, cs, dc, ts, _a, _b, _i, i, newts, j, i, tobject, t;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    console.log(game);
+                    return [4 /*yield*/, Game.getGameYear(game)];
+                case 1:
+                    season = _c.sent();
+                    return [4 /*yield*/, getTeamCompetitions(game, team, template, season)];
+                case 2:
+                    cs = _c.sent();
+                    return [4 /*yield*/, getTeamDivisionCompetition(game, team, template, season)];
+                case 3:
+                    dc = _c.sent();
+                    console.log(cs);
+                    ts = new Set();
+                    _a = [];
+                    for (_b in cs)
+                        _a.push(_b);
+                    _i = 0;
+                    _c.label = 4;
+                case 4:
+                    if (!(_i < _a.length)) return [3 /*break*/, 7];
+                    i = _a[_i];
+                    return [4 /*yield*/, getCompetitionTeams(game, cs[i].id, template, season)];
+                case 5:
+                    newts = _c.sent();
+                    for (j in newts) {
+                        ts.add(newts[j]);
+                    }
+                    _c.label = 6;
+                case 6:
+                    _i++;
+                    return [3 /*break*/, 4];
+                case 7:
+                    for (i in Array.from(ts.values())) {
+                        tobject = Array.from(ts.values())[i].toObject();
+                        delete tobject._id;
+                        t = new exports.TeamsIn(tobject);
+                        if (t.team == team)
+                            t.player = true;
+                        t.saveId = saveId;
+                        t.save();
+                    }
+                    return [2 /*return*/, dc];
+            }
+        });
+    });
+}
+exports.getNewTeamsIn = getNewTeamsIn;
+function getSavePlayerTeams(saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var ts;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.TeamsIn.find({
+                        saveId: mongoose.Types.ObjectId(saveId),
+                        player: true
+                    })];
+                case 1:
+                    ts = _a.sent();
+                    return [2 /*return*/, ts];
+            }
+        });
+    });
+}
+exports.getSavePlayerTeams = getSavePlayerTeams;

@@ -52,7 +52,8 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var GameSchema = new mongoose.Schema({
-    name: { type: String, required: true }
+    name: { type: String, required: true },
+    year: { type: Number, required: true }
 });
 var Game = mongoose.model("Game", GameSchema);
 function getAllGames() {
@@ -65,10 +66,7 @@ function getAllGames() {
                     games = _a.sent();
                     glist = [];
                     for (i in games) {
-                        glist.push({
-                            name: games[i].name,
-                            id: games[i].id
-                        });
+                        glist.push(games[i]);
                     }
                     return [2 /*return*/, glist];
             }
@@ -76,3 +74,52 @@ function getAllGames() {
     });
 }
 exports.getAllGames = getAllGames;
+function getGameById(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var g;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Game.findById(id)];
+                case 1:
+                    g = _a.sent();
+                    return [2 /*return*/, g];
+            }
+        });
+    });
+}
+exports.getGameById = getGameById;
+function getGameYear(game) {
+    return __awaiter(this, void 0, void 0, function () {
+        var g;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, getGameById(game)];
+                case 1:
+                    g = _a.sent();
+                    if (g)
+                        return [2 /*return*/, g.year];
+                    return [2 /*return*/, 2020];
+            }
+        });
+    });
+}
+exports.getGameYear = getGameYear;
+function getGameByName(name) {
+    return __awaiter(this, void 0, void 0, function () {
+        var g, gs;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Game.findOne({ name: name })];
+                case 1:
+                    g = _a.sent();
+                    if (g)
+                        return [2 /*return*/, g];
+                    return [4 /*yield*/, getAllGames()];
+                case 2:
+                    gs = _a.sent();
+                    return [2 /*return*/, gs[0]];
+            }
+        });
+    });
+}
+exports.getGameByName = getGameByName;

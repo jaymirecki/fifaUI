@@ -59,11 +59,7 @@ export let save = (req: Request, res: Response) => {
 
 export async function getSave(id: string) {
     let save = await Save.findById(id);
-    if (save == null)
-        return { error: "game not found" };
-    let saveObject = save.toObject();
-    saveObject.id = save.id;
-    return saveObject;
+    return save;
 };
 
 export let getSaves = async (user: string) => {
@@ -89,4 +85,9 @@ var validateSave = (save: any) => {
         save.dom = save.doc;
     }
     return save;
+}
+
+export async function getTemplateId() {
+    let temp = await Save.find({ user: "template" });
+    return temp[0].id;
 }

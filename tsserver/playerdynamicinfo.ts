@@ -10,20 +10,16 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
     if (err) {
         console.log(err.message);
     } else {
-        console.log("Player Successfully Connected!");
+        console.log("PlayerDynamicInfo Successfully Connected!");
     }
 });
 
-interface IPlayer extends mongoose.Document {
-    firstName: string;
-    lastName: string;
-    game: string;
-    team: string;
-    position: string[];
+interface IPlayerDynamicInfo extends mongoose.Document {
+    saveId: string;
+    player: string;
     ovr: number;
-    age: Date;
     wage: number;
-    contract: Date;
+    contractExpiration: Date;
     value: number;
     nationality: string;
     gk: number;
@@ -44,17 +40,22 @@ interface IPlayer extends mongoose.Document {
     lw: number;
 };
 
-const PlayerSchema = new mongoose.Schema({
-    firstName: { type: String, required: false },
-    lastName: { type: String, required: true },
-    game: { type: String, required: true },
-    team: { type: String, required: true },
-    ovr: { type: Number, required: false },
-    age: { type: Date, required: false },
-    wage: { type: Number, required: false },
-    contract: { type: Date, required: false },
-    value: { type: Number, required: false },
-    nationality: { type: String, required: false },
+const PlayerDynamicInfoSchema = new mongoose.Schema({
+    saveId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Save",
+        required: true
+    },
+    player: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PlayerStaticInfo",
+        required: true
+    },
+    ovr: { type: Number, required: true },
+    wage: { type: Number, required: true },
+    contractExpiration: { type: Date, required: true },
+    value: { type: Number, required: true },
+    nationality: { type: String, required: true },
     gk: { type: Number, required: true },
     sw: { type: Number, required: true },
     rwb: { type: Number, required: true },
@@ -70,14 +71,14 @@ const PlayerSchema = new mongoose.Schema({
     cf: { type: Number, required: true },
     rw: { type: Number, required: true },
     st: { type: Number, required: true },
-    lw: { type: Number, required: true }
+    lw: { type: Number, required: true },
 });
 
-const Player = 
-    mongoose.model<IPlayer>("Player", PlayerSchema);
+const PlayerDynamicInfo = 
+    mongoose.model<IPlayerDynamicInfo>("PlayerDynamicInfo", PlayerDynamicInfoSchema);
 
 export async function getTeamPlayers(game: string, team: string) {
-    let players = await Player.find({ game: game, team: team });
+    let players = await PlayerDynamicInfo.find({ game: game, team: team });
     let playerObjects: any = [];
     for (let i in players) {
         playerObjects[i] = players[i].toObject();
@@ -104,22 +105,21 @@ export async function getTeamPlayers(game: string, team: string) {
 }
 
 export async function getGamePlayers(game: string) {
-    let players = await Player.find({ game: game });
-    let playerObjects: IPlayer[] = [];
+    let players = await PlayerDynamicInfo.find({ game: game });
+    let playerObjects: IPlayerDynamicInfo[] = [];
     for (let i in players) {
         playerObjects[i] = players[i].toObject();
     }
     return playerObjects;
 }
 
-export async function getNewPlayers(id: string, gameId: string, teamName: string) {
-    let players = await Player.find({ game: id, team: teamName });
+export async function getNewPlayers(id: string, team: string, newId: string) {
+    let players = await PlayerDynamicInfo.find({ saveId: mongoose.Types.ObjectId(id), team: mongoose.Types.ObjectId(team) });
     for (let i in players) {
         let p = players[i];
-        p.game = gameId;
-        p.age = new Date(p.age);
-        p.contract = new Date(p.age);
-        p = new Player(p.toObject());
-        p.save()
+        p.saveId = newId;
+        p.contractExpiration = p.contractExpiration;
+        p = new PlayerDynamicInfo(p.toObject());
+        p.save();
     }
 }

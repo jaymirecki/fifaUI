@@ -47,21 +47,26 @@ mongoose.connect(uri, mongooseOptions, function (err) {
         console.log(err.message);
     }
     else {
-        console.log("Player Successfully Connected!");
+        console.log("PlayerDynamicInfo Successfully Connected!");
     }
 });
 ;
-var PlayerSchema = new mongoose.Schema({
-    firstName: { type: String, required: false },
-    lastName: { type: String, required: true },
-    game: { type: String, required: true },
-    team: { type: String, required: true },
-    ovr: { type: Number, required: false },
-    age: { type: Date, required: false },
-    wage: { type: Number, required: false },
-    contract: { type: Date, required: false },
-    value: { type: Number, required: false },
-    nationality: { type: String, required: false },
+var PlayerDynamicInfoSchema = new mongoose.Schema({
+    saveId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Save",
+        required: true
+    },
+    player: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PlayerStaticInfo",
+        required: true
+    },
+    ovr: { type: Number, required: true },
+    wage: { type: Number, required: true },
+    contractExpiration: { type: Date, required: true },
+    value: { type: Number, required: true },
+    nationality: { type: String, required: true },
     gk: { type: Number, required: true },
     sw: { type: Number, required: true },
     rwb: { type: Number, required: true },
@@ -79,13 +84,13 @@ var PlayerSchema = new mongoose.Schema({
     st: { type: Number, required: true },
     lw: { type: Number, required: true }
 });
-var Player = mongoose.model("Player", PlayerSchema);
+var PlayerDynamicInfo = mongoose.model("PlayerDynamicInfo", PlayerDynamicInfoSchema);
 function getTeamPlayers(game, team) {
     return __awaiter(this, void 0, void 0, function () {
         var players, playerObjects, i, positions, k, p, j, i, i;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Player.find({ game: game, team: team })];
+                case 0: return [4 /*yield*/, PlayerDynamicInfo.find({ game: game, team: team })];
                 case 1:
                     players = _a.sent();
                     playerObjects = [];
@@ -119,7 +124,7 @@ function getGamePlayers(game) {
         var players, playerObjects, i;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Player.find({ game: game })];
+                case 0: return [4 /*yield*/, PlayerDynamicInfo.find({ game: game })];
                 case 1:
                     players = _a.sent();
                     playerObjects = [];
@@ -132,20 +137,19 @@ function getGamePlayers(game) {
     });
 }
 exports.getGamePlayers = getGamePlayers;
-function getNewPlayers(id, gameId, teamName) {
+function getNewPlayers(id, team, newId) {
     return __awaiter(this, void 0, void 0, function () {
         var players, i, p;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Player.find({ game: id, team: teamName })];
+                case 0: return [4 /*yield*/, PlayerDynamicInfo.find({ saveId: mongoose.Types.ObjectId(id), team: mongoose.Types.ObjectId(team) })];
                 case 1:
                     players = _a.sent();
                     for (i in players) {
                         p = players[i];
-                        p.game = gameId;
-                        p.age = new Date(p.age);
-                        p.contract = new Date(p.age);
-                        p = new Player(p.toObject());
+                        p.saveId = newId;
+                        p.contractExpiration = p.contractExpiration;
+                        p = new PlayerDynamicInfo(p.toObject());
                         p.save();
                     }
                     return [2 /*return*/];

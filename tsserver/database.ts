@@ -5,7 +5,7 @@ import * as Competition from './competition';
 import * as Division from './division';
 import * as TeamsIn from './teamsIn';
 import * as Settings from './settings';
-import * as Player from './player';
+import * as PlayerDynamicInfo from './playerdynamicinfo';
 import * as Game from './game';
 
 const uri: string = 
@@ -25,7 +25,9 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 export const save = Save.save;
 
 export async function getSave(id: string) {
-    let save = await Save.getSave(id);
+    let s = await Save.getSave(id);
+    if (!s) return s;
+    let save = s.toObject();
     if (save.error)
         return save;
     let settings = await Settings.getGameSettings(id);
@@ -38,77 +40,87 @@ export async function getSave(id: string) {
 export async function getSaves(user: string) {
     let saves = await Save.getSaves(user);
     for (let i in saves) {
-        saves[i].team = (await Settings.getGameSettings(saves[i].id)).team;
+        // saves[i].team = (await Settings.getGameSettings(saves[i].id)).team;
     }
     return saves;
 }
 
 export async function createNewSave(s: any) {
-    // var id: string = s.game + s.league;
-    // let saveObject: any = {
-    //     user: s.user,
-    //     shared: false,
-    //     name: s.name,
-    //     managerName: s.managerName,
-    //     date: new Date(),
-    //     game: s.game,
-    //     doc: new Date(parseInt(s.doc)),
-    //     dom: new Date(parseInt(s.doc))
-    // };
-    // var save: Save.ISave = new Save.Save(saveObject);
-    // await save.save();
-    // Team.getNewTeams(id, save.id, s.team);
-    // getNewTeamsIn(id, save.id);
-    // Player.getNewPlayers(id, save.id, s.team);
-    // let c = await Competition.getNewCompetitions(id, save.id, s.team);
-    // let d = await Division.getNewDivisions(id, save.id);
-    // Settings.newSettings(save.user, save.id, s.team, c, d);
-    // return save.id;
-    return "not implemented";
+    var id: string = s.game + s.league;
+    let game: string = (await Game.getGameByName(s.game)).id;
+    let saveObject: any = {
+        user: s.user,
+        shared: false,
+        name: s.name,
+        managerName: s.managerName,
+        date: new Date(),
+        game: game,
+        doc: new Date(parseInt(s.doc)),
+        dom: new Date(parseInt(s.doc))
+    };
+    let template = await Save.getTemplateId();
+    console.log(saveObject);
+    let save: Save.ISave = new Save.Save(saveObject);
+    await save.save();
+    PlayerDynamicInfo.getNewPlayers(template, s.team, save.id);
+    let dc = await TeamsIn.getNewTeamsIn(template, s.team, save.id, game);
+    Settings.newSettings(save.user, save.id, s.team, dc.competition.id, dc.division.id);
+    return save.id;
 };
-
-// async function getNewTeamsIn(id: string, gameId: string) {
-//     let teams: ITeamsIn[] = await TeamsIn.find({ game: id }, (err: any, res: any) => {
-//         console.log(err);
-//     });
-//     for (let i in teams) {
-//         let t: ITeamsIn = teams[i];
-//         t.game = gameId;
-//         t = new TeamsIn(t.toObject());
-//         t.save();
-//     }
-// }
 
 export async function getPlayers(game: string, team: string) {
     if (team)
-        return await Player.getTeamPlayers(game, team);
+        return await PlayerDynamicInfo.getTeamPlayers(game, team);
     else
-        return await Player.getGamePlayers(game);
+        return await PlayerDynamicInfo.getGamePlayers(game);
 }
 
-export async function getGamePlayerTeams(game: string) {
+export async function getGamePlayerTeams(saveId: string) {
+    let save = await Save.getSave(saveId);
+    let season = 2019;
+    if (!save) return {};
     let teams: any = new Object();
-    let ts: string[] = await Team.getGamePlayerTeams(game);
+    let ts = await TeamsIn.getSavePlayerTeams(saveId);
+    console.log(ts);
     for (let i in ts) {
-        teams[ts[i]] = new Object();
-        let cs: string[] = await Competition.getTeamCompetitions(game, ts[i]);
+        let t = await Team.getTeamById(ts[i].team);
+        console.log
+        console.log(t);
+        if (!t) return {};
+        teams[t.id] = {
+            name: t.name,
+            competitions: {}
+        };
+        let cs = await TeamsIn.getTeamCompetitions(save.game, t.id, saveId, season);
         for (let j in cs) {
-            teams[ts[i]][cs[j]] = 
-                await Division.getCompetitionDivisions(game, cs[j]);
+            teams[t.id].competitions[cs[j].id] = {
+                name: cs[j].name,
+                divisions: {}
+            };
+            let ds = 
+                await Division.getCompetitionDivisions(save.game, cs[j].id);
+            for (let k in ds) {
+                teams[t.id].competitions[cs[j].id].divisions[ds[k].id] = 
+                    { name: ds[k].name };
+            }
         }
     }
+    console.log("Teams");
+    console.log(teams);
     return teams;
 }
 
 export async function getNewGameTemplates() {
     let games = await Game.getAllGames();
+    let template = await Save.getTemplateId();
     let ret:any = new Object();
     for (let i in games) {
         let g = games[i].name;
+        let s = await Game.getGameYear(games[i].id);
         ret[g] = new Object();
         let teams = await TeamsIn.getTeamByGame(games[i].id);
         for (let j in teams) {
-            let c: Competition.ICompetition = await TeamsIn.getTeamCompetition(games[i].id, teams[j].id);
+            let c: Competition.ICompetition = await TeamsIn.getTeamCompetition(games[i].id, teams[j].id, template, s);
             if (!ret[g][c.name]) {
                 ret[g][c.name] = { teams: new Map<string, any>(), date: c.start };
             }

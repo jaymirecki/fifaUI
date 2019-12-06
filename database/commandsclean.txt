@@ -9,3 +9,4 @@ db.players.remove({});
 db.playerfors.remove({});
 db.playerdynamicinfos.remove({});
 db.playerstaticinfos.remove({});
+db.settings.remove({});

@@ -1,2 +1,2 @@
-mongo < cleancommands.txt
+mongo < commandsclean.txt
 ./updatedb.sh

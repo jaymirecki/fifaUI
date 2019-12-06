@@ -174,6 +174,7 @@ function getSave() {
         if (teams.readyState != 4)
             return;
         let result = JSON.parse(teams.responseText);
+        console.log(result);
         fifaPlaySave.teams = result;
         updateHeader();
         getRoster();
@@ -222,23 +223,23 @@ function updateHeader() {
         if (i == fifaPlaySave.team)
             teams = teams + " selected>";
         else teams = teams + ">";
-        teams = teams + i + "</option>";
+        teams = teams + fifaPlaySave.teams[i].name + "</option>";
     }
     let comps = '';
     for (let i in fifaPlaySave.competitions()) {
-        comps = comps + '<option';
+        comps = comps + '<option value="' + i + '"';
         if (i == fifaPlaySave.competition)
             comps = comps + ' selected>';
         else comps = comps + '>';
-        comps = comps + i + '</option>';
+        comps = comps + fifaPlaySave.competitions()[i].name + '</option>';
     }
     let divs = '';
     for (let i in fifaPlaySave.divisions()) {
         divs = divs + '<option';
-        if (fifaPlaySave.divisions()[i] == fifaPlaySave.division)
+        if (fifaPlaySave.divisions()[i].id == fifaPlaySave.division)
             divs = divs + ' selected>';
         else divs = divs + '>';
-        divs = divs + fifaPlaySave.divisions()[i] + '</option>';
+        divs = divs + fifaPlaySave.divisions()[i].name + '</option>';
     }
     $("#fifaPlayTeam").html(teams);
     $("#fifaPlayCompetition").html(comps);

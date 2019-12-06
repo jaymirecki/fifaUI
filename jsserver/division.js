@@ -87,17 +87,13 @@ function getAllDivisions() {
 exports.getAllDivisions = getAllDivisions;
 function getCompetitionDivisions(game, competition) {
     return __awaiter(this, void 0, void 0, function () {
-        var divs, divStrings, i;
+        var divs;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, Division.find({ competition: competition })];
                 case 1:
                     divs = _a.sent();
-                    divStrings = [];
-                    for (i in divs) {
-                        divStrings[i] = divs[i].name;
-                    }
-                    return [2 /*return*/, divStrings];
+                    return [2 /*return*/, divs];
             }
         });
     });
@@ -121,3 +117,17 @@ function getDivisionCompetition(division) {
     });
 }
 exports.getDivisionCompetition = getDivisionCompetition;
+function getDivisionById(division) {
+    return __awaiter(this, void 0, void 0, function () {
+        var d;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Division.findById(division)];
+                case 1:
+                    d = _a.sent();
+                    return [2 /*return*/, d];
+            }
+        });
+    });
+}
+exports.getDivisionById = getDivisionById;

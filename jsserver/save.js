@@ -79,17 +79,13 @@ exports.save = function (req, res) {
 };
 function getSave(id) {
     return __awaiter(this, void 0, void 0, function () {
-        var save, saveObject;
+        var save;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, exports.Save.findById(id)];
                 case 1:
                     save = _a.sent();
-                    if (save == null)
-                        return [2 /*return*/, { error: "game not found" }];
-                    saveObject = save.toObject();
-                    saveObject.id = save.id;
-                    return [2 /*return*/, saveObject];
+                    return [2 /*return*/, save];
             }
         });
     });
@@ -126,3 +122,17 @@ var validateSave = function (save) {
     }
     return save;
 };
+function getTemplateId() {
+    return __awaiter(this, void 0, void 0, function () {
+        var temp;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.Save.find({ user: "template" })];
+                case 1:
+                    temp = _a.sent();
+                    return [2 /*return*/, temp[0].id];
+            }
+        });
+    });
+}
+exports.getTemplateId = getTemplateId;

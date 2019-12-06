@@ -16,7 +16,7 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
     }
 });
 
-interface IDivision extends mongoose.Document {
+export interface IDivision extends mongoose.Document {
     name: string;
     competition: string;
     tier: number;
@@ -52,11 +52,7 @@ export async function getAllDivisions() {
 
 export async function getCompetitionDivisions(game: string, competition: string) {
     let divs = await Division.find({ competition: competition});
-    let divStrings: string[] = []
-    for (let i in divs) {
-        divStrings[i] = divs[i].name;
-    }
-    return divStrings;
+    return divs;
 }
 
 export async function getDivisionCompetition(division: string) {
@@ -64,4 +60,9 @@ export async function getDivisionCompetition(division: string) {
     let c = await Competition.getCompetitionById(cid[0].competition);
     // let comp = c.toObject();
     return c;
+}
+
+export async function getDivisionById(division: string) {
+    let d = await Division.findById(division);
+    return d;
 }

@@ -10,11 +10,11 @@ class FCSave {
     }
 
     competitions() {
-        return this.teams[this.team];
+        return this.teams[this.team].competitions;
     }
 
     divisions() {
-        return this.teams[this.team][this.competition];
+        return this.teams[this.team].competitions[this.competition].divisions;
     }
 
     changeTeam(team) {
@@ -24,7 +24,8 @@ class FCSave {
 
     changeCompetition(comp) {
         this.competition = comp;
-        this.changeDivision(this.teams[this.team][this.competition][0])
+        let newDiv = Object.keys(this.teams[this.team].competitions[this.competition].divisions)[0];
+        this.changeDivision(newDiv);
     }
 
     changeDivision(div) {

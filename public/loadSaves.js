@@ -132,7 +132,7 @@ function updateTeams(teams) {
         '<option value="" disabled selected>---</option>';
     for (i in teams) {
         form = form + 
-            '<option value="' + teams[i] + '">' + teams[i] + '</option>';
+            '<option value="' + teams[i].id + '">' + teams[i].name + '</option>';
     }
     $("#teamSelect").html(form);
 }
@@ -148,7 +148,6 @@ function createGame(user, results) {
         doc: new Date().getTime(),
         dom: new Date().getTime(),
         date: new Date(results[$("#gameSelect").val()][$("#leagueSelect").val()].date).getTime(),
-        league: $("#leagueSelect").val(),
         team: $("#teamSelect").val(),
     };
     save = objectToPostString(save);
@@ -159,7 +158,7 @@ function createGame(user, results) {
         if (request.readyState != 4)
             return;
         var results = JSON.parse(request.responseText);
-        window.location.href = window.location.href + "?g=" + results.id;
+        // window.location.href = window.location.href + "?g=" + results.id;
     };
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
     request.send(save);

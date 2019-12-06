@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var express = require("express");
+var express = require('express');
 var DB = require("./jsserver/database");
 var app = express();
 var validator = require('validator');
@@ -91,7 +91,6 @@ app.post("/newsave", function (req, res) {
             switch (_a.label) {
                 case 0:
                     res = cors(res);
-                    console.log(req.body);
                     return [4 /*yield*/, DB.createNewSave(req.body)];
                 case 1:
                     id = _a.sent();
@@ -124,11 +123,6 @@ app.get("/newgame", function (req, res) {
             }
         });
     });
-});
-app.get("/createNewSave", function (req, res) {
-    DB.createNewSave(req.query);
-    res = cors(res);
-    res.send("try it\n");
 });
 app.get('/play', function (req, res) {
     res = cors(res);

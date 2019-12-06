@@ -15,23 +15,42 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 });
 
 interface IGame extends mongoose.Document {
-    name: string
+    name: string;
+    year: number;
 };
 
 const GameSchema = new mongoose.Schema({
-    name: { type: String, required: true}
+    name: { type: String, required: true },
+    year: { type: Number, required: true }
 });
 
 const Game = mongoose.model<IGame>("Game", GameSchema);
 
 export async function getAllGames() {
     let games = await Game.find({});
-    let glist: any[] = [];
+    let glist: IGame[] = [];
     for (let i in games) {
-        glist.push({
-            name: games[i].name,
-            id: games[i].id
-        });
+        glist.push(games[i]);
     }
     return glist;
+}
+
+export async function getGameById(id: string) {
+    let g = await Game.findById(id);
+    return g;
+}
+
+export async function getGameYear(game: string) {
+    let g = await getGameById(game);
+    if (g)
+        return g.year;
+    return 2020;
+}
+
+export async function getGameByName(name: string) {
+    let g = await Game.findOne({ name: name });
+    if (g)
+        return g;
+    let gs = await getAllGames();
+    return gs[0];
 }
