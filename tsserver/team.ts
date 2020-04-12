@@ -15,10 +15,12 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 });
 
 export interface ITeam extends mongoose.Document {
+    jid: string;
     name: string;
 };
 
 const TeamSchema = new mongoose.Schema({
+    jid: { type: String, required: true },
     name: { type: String, required: true }
 });
 
@@ -50,6 +52,6 @@ export async function getGamePlayerTeams(game: string) {
 }
 
 export async function getTeamById(id: string) {
-    let t = await Team.findById(id);
-    return t;
+    let t = await Team.find({ jid: id });
+    return t[0];
 }

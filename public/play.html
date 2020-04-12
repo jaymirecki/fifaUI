@@ -3,12 +3,18 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="https://mirecki-auth.herokuapp.com/loadMirecki.js"></script>
-        <script src="../loadFifa.js"></script>
-        <script src="../play.js" onload="loadMirecki()"></script>
+        <style src='fifaSiteMobile.css'></style>
         <title>Play - FIFA Career Companion</title>
     </head>
     <body>
-        <div id='document'></div>
+        <select id="fifaPlayTeam" class="fifaPlayHeader">
+            <option>---</option>
+        </select><br>
+        <select id="fifaPlayCompetition" class="fifaPlayHeader">
+            <option>---</option>
+        </select><br>
+        <select id="fifaPlayDivision" class="fifaPlayHeader">
+            <option>---</option>
+        </select><br>
     </body>
 </html>

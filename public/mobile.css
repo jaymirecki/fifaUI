@@ -1,0 +1,35 @@
+.fifa {
+    font-family: Arial, Helvetica, sans-serif;
+}
+table.fifa {
+    width: 100%;
+    border-collapse: collapse;
+    cursor: default;
+    font-size: 17px;
+}
+tr.fifa {
+    width: 100%;
+    background: linear-gradient(white, rgba(50, 173, 255, 0.37), white);
+    border-collapse: collapse;
+}
+tr.fifa:hover {
+    background-color: rgba(24, 126, 194, 0.37);
+}
+td.fifaCellButton {
+    text-align: center;
+}
+button.fifa {
+    font-size: medium;
+    background: linear-gradient(white, rgba(50, 173, 255, 0.37), white);
+}
+button.fifaHalf {
+    width: 49.3%;
+}
+input.fifa {
+    width: 100%;
+    font-size: medium;
+}
+select.fifa {
+    width: 100%;
+    font-size: medium;
+}

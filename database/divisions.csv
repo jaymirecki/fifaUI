@@ -1,4 +1,4 @@
-name,competition,tier
-Eastern Conference,MLS,1
-U.S. Open Cup,U.S. Open Cup,1
-Western Conference,MLS,1
+jid,name,competition,tier
+Eastern ConferenceMLS,Eastern Conference,MLS,1
+U.S. Open CupU.S. Open Cup,U.S. Open Cup,U.S. Open Cup,1
+Western ConferenceMLS,Western Conference,MLS,1

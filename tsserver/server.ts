@@ -42,17 +42,23 @@ app.post("/newsave", async function(req: e.Request, res: e.Response) {
 app.get("/newgame", async function(req: e.Request, res: e.Response) {
     res = cors(res);
     let games = await DB.getNewGameTemplates();
-    let ret = {
-        FIFA19: {
-            MLS: {
-                teams: [ 'Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia Union', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC' ],
-                date: new Date(2018, 1, 1, 12)
-            }
-        }
-    }
+    res.send(games);
+});
+app.get("/team_selection", async function(req: e.Request, res: e.Response) {
+    res = cors(res);
+    let games = await DB.getNewGameTemplates();
     res.send(games);
 });
 
+
+app.get("/load", async function(req : e.Request, res : e.Response) {
+    res = cors(res);
+    res.sendFile(__dirname + '/public/load.html');
+});
+app.get("/new", async function(req : e.Request, res : e.Response) {
+    res = cors(res);
+    res.sendFile(__dirname + '/public/new.html');
+});
 app.get('/play', function(req: e.Request, res:e.Response) {
     res = cors(res);
     if (req.query.g)

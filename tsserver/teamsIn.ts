@@ -24,34 +24,33 @@ export interface ITeamsIn extends mongoose.Document {
     saveId: string;
     team: string;
     division: string;
-    game: string;
     season: number;
     player: boolean;
 };
 
 const TeamsInSchema = new mongoose.Schema({
     saveId: { 
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Save',
         required: true
     },
     team: { 
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Team',
         required: true
     },
     division: { 
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Division',
         required: true
     },
     game: { 
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Game',
-        required: true
+        required: false
     },
     season: { type: Number, required: true },
-    player: { type: Boolean, required: true }
+    player: { type: Boolean, required: false }
 });
 
 export const TeamsIn = mongoose.model<ITeamsIn>("TeamsIn", TeamsInSchema);
@@ -60,7 +59,6 @@ export async function getAllUniqueTeams() {
     let template = await getTemplateId();
     let teams = await TeamsIn.find({ saveId: template });
     let tlist: any[] = [];
-    console.log(teams);
     for (let i in teams) {
         let team = await Team.getTeamById(teams[i].team);
         if (team) {
@@ -78,28 +76,26 @@ export async function getAllUniqueTeams() {
     return tlist;
 }
 
-export async function getTeamByGame(game: string) {
-    let template = await getTemplateId();
-    let teams = await TeamsIn.find({ game: new mongoose.Types.ObjectId(game) });
+export async function getTeamsByGame(game: string) {
+    let teams = await TeamsIn.find({ saveId: game });
     let tlist: Team.ITeam[] = [];
     for (let i in teams) {
         let t = await Team.getTeamById(teams[i].team);
-        if (t)
+        if (t && !tlist.some(x => x.jid === t.jid))
             tlist.push(t);
     }
     return tlist;
 }
 
-export async function getTeamCompetition(game: string, team: string, saveId: string, season: number) {
-    let dc = await getTeamDivisionCompetition(game, team, saveId, season);
+export async function getTeamCompetition(team: string, saveId: string, season: number) {
+    let dc = await getTeamDivisionCompetition(team, saveId, season);
     return dc.competition;
 }
 
-export async function getTeamDivisionsCompetitions(game: string, team: string, saveId: string, season: number) {
+export async function getTeamDivisionsCompetitions(team: string, saveId: string, season: number) {
     let ds = await TeamsIn.find({
-        game: mongoose.Types.ObjectId(game),
-        team: mongoose.Types.ObjectId(team),
-        saveId: mongoose.Types.ObjectId(saveId),
+        team: team,
+        saveId: saveId,
         season: season
     });
     let cs: { division: Division.IDivision, competition: ICompetition }[] = [];
@@ -112,8 +108,8 @@ export async function getTeamDivisionsCompetitions(game: string, team: string, s
     return cs;
 }
 
-export async function getTeamCompetitions(game: string, team: string, saveId: string, season: number) {
-    let cds = await getTeamDivisionsCompetitions(game, team, saveId, season);
+export async function getTeamCompetitions(team: string, saveId: string, season: number) {
+    let cds = await getTeamDivisionsCompetitions(team, saveId, season);
     let cs: ICompetition[] = [];
     for (let i in cds) {
         cs.push(cds[i].competition);
@@ -121,8 +117,8 @@ export async function getTeamCompetitions(game: string, team: string, saveId: st
     return cs;
 }
 
-export async function getTeamDivision(game: string, team: string, saveId: string, season: number) {
-    let dc = await getTeamDivisionCompetition(game, team, saveId, season);
+export async function getTeamDivision(team: string, saveId: string, season: number) {
+    let dc = await getTeamDivisionCompetition(team, saveId, season);
     return dc.division;
 }
 
@@ -143,8 +139,8 @@ async function getCompetitionTeams(game: string, competition: string, saveId: st
     return Array.from(ts.values());
 }
 
-export async function getTeamDivisionCompetition(game: string, team: string, saveId: string, season: number) {
-    let cs = await getTeamDivisionsCompetitions(game, team, saveId, season);
+export async function getTeamDivisionCompetition(team: string, saveId: string, season: number) {
+    let cs = await getTeamDivisionsCompetitions(team, saveId, season);
     cs.filter(function(c) {
         return c.competition.league == true;
     });
@@ -152,11 +148,9 @@ export async function getTeamDivisionCompetition(game: string, team: string, sav
 }
 
 export async function getNewTeamsIn(template: string, team: string, saveId: string, game: string) {
-    console.log(game);
     let season = await Game.getGameYear(game);
-    let cs = await getTeamCompetitions(game, team, template, season);
-    let dc = await getTeamDivisionCompetition(game, team, template, season);
-    console.log(cs);
+    let cs = await getTeamCompetitions(team, template, season);
+    let dc = await getTeamDivisionCompetition(team, template, season);
     let ts = new Set<ITeamsIn>();
     for (let i in cs) {
         let newts: ITeamsIn[] = await getCompetitionTeams(game, cs[i].id, template, season);

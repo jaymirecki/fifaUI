@@ -91,7 +91,7 @@ export async function getGamePlayerTeams(saveId: string) {
             name: t.name,
             competitions: {}
         };
-        let cs = await TeamsIn.getTeamCompetitions(save.game, t.id, saveId, season);
+        let cs = await TeamsIn.getTeamCompetitions(t.id, saveId, season);
         for (let j in cs) {
             teams[t.id].competitions[cs[j].id] = {
                 name: cs[j].name,
@@ -116,11 +116,11 @@ export async function getNewGameTemplates() {
     let ret:any = new Object();
     for (let i in games) {
         let g = games[i].name;
-        let s = await Game.getGameYear(games[i].id);
+        let s = games[i].year;
         ret[g] = new Object();
-        let teams = await TeamsIn.getTeamByGame(games[i].id);
+        let teams = await TeamsIn.getTeamsByGame(games[i].name);
         for (let j in teams) {
-            let c: Competition.ICompetition = await TeamsIn.getTeamCompetition(games[i].id, teams[j].id, template, s);
+            let c: Competition.ICompetition = await TeamsIn.getTeamCompetition(teams[j].jid, g, s);
             if (!ret[g][c.name]) {
                 ret[g][c.name] = { teams: new Map<string, any>(), date: c.start };
             }
@@ -135,6 +135,5 @@ export async function getNewGameTemplates() {
             ret[g][c].teams = Array.from(ret[g][c].teams.values())
         }
     }
-    console.log(ret);
     return ret;
 } 

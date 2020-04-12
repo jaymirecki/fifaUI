@@ -53,12 +53,10 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var DivisionSchema = new mongoose.Schema({
+    jid: { type: String, required: true },
     name: { type: String, required: true },
-    competition: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Division",
-        required: true
-    }
+    competition: { type: String, required: true },
+    tier: { type: String, required: true }
 });
 var Division = mongoose.model("Division", DivisionSchema);
 // export async function getNewDivisions(id: string, gameId: string) {
@@ -104,7 +102,7 @@ function getDivisionCompetition(division) {
         var cid, c;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Division.find({ _id: mongoose.Types.ObjectId(division) })];
+                case 0: return [4 /*yield*/, Division.find({ jid: division })];
                 case 1:
                     cid = _a.sent();
                     return [4 /*yield*/, Competition.getCompetitionById(cid[0].competition)];
@@ -122,10 +120,10 @@ function getDivisionById(division) {
         var d;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Division.findById(division)];
+                case 0: return [4 /*yield*/, Division.find({ jid: division })];
                 case 1:
                     d = _a.sent();
-                    return [2 /*return*/, d];
+                    return [2 /*return*/, d[0]];
             }
         });
     });

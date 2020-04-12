@@ -102,7 +102,7 @@ app.post("/newsave", function (req, res) {
 });
 app.get("/newgame", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var games, ret;
+        var games;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -110,17 +110,43 @@ app.get("/newgame", function (req, res) {
                     return [4 /*yield*/, DB.getNewGameTemplates()];
                 case 1:
                     games = _a.sent();
-                    ret = {
-                        FIFA19: {
-                            MLS: {
-                                teams: ['Atlanta United', 'Chicago Fire', 'Colorado Rapids', 'Columbus Crew SC', 'D.C. United', 'FC Dallas', 'Houston Dynamo', 'Impact Montreal', 'LA Galaxy', 'Minnesota United', 'New England', 'New York City FC', 'NY Red Bulls', 'Orlando City', 'Philadelphia Union', 'Portland Timbers', 'Real Salt Lake', 'Seattle Sounders', 'SJ Earthquakes', 'Sporting KC', 'Toronto FC', 'Whitecaps FC'],
-                                date: new Date(2018, 1, 1, 12)
-                            }
-                        }
-                    };
                     res.send(games);
                     return [2 /*return*/];
             }
+        });
+    });
+});
+app.get("/team_selection", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var games;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    res = cors(res);
+                    return [4 /*yield*/, DB.getNewGameTemplates()];
+                case 1:
+                    games = _a.sent();
+                    res.send(games);
+                    return [2 /*return*/];
+            }
+        });
+    });
+});
+app.get("/load", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            res = cors(res);
+            res.sendFile(__dirname + '/public/load.html');
+            return [2 /*return*/];
+        });
+    });
+});
+app.get("/new", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            res = cors(res);
+            res.sendFile(__dirname + '/public/new.html');
+            return [2 /*return*/];
         });
     });
 });

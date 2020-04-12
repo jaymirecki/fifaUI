@@ -17,18 +17,17 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 });
 
 export interface IDivision extends mongoose.Document {
+    jid: string;
     name: string;
     competition: string;
     tier: number;
 };
 
 const DivisionSchema = new mongoose.Schema({
+    jid: { type: String, required: true },
     name: { type: String, required: true },
-    competition: { 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Division",
-        required: true
-    }
+    competition: { type: String, required: true },
+    tier: { type: String, required: true }
 });
 
 const Division = 
@@ -56,13 +55,13 @@ export async function getCompetitionDivisions(game: string, competition: string)
 }
 
 export async function getDivisionCompetition(division: string) {
-    let cid = await Division.find({ _id: mongoose.Types.ObjectId(division) });
+    let cid = await Division.find({ jid: division });
     let c = await Competition.getCompetitionById(cid[0].competition);
     // let comp = c.toObject();
     return c;
 }
 
 export async function getDivisionById(division: string) {
-    let d = await Division.findById(division);
-    return d;
+    let d = await Division.find({ jid: division });
+    return d[0];
 }

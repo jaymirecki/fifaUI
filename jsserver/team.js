@@ -52,6 +52,7 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var TeamSchema = new mongoose.Schema({
+    jid: { type: String, required: true },
     name: { type: String, required: true }
 });
 var Team = mongoose.model("Team", TeamSchema);
@@ -93,10 +94,10 @@ function getTeamById(id) {
         var t;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Team.findById(id)];
+                case 0: return [4 /*yield*/, Team.find({ jid: id })];
                 case 1:
                     t = _a.sent();
-                    return [2 /*return*/, t];
+                    return [2 /*return*/, t[0]];
             }
         });
     });

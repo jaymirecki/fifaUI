@@ -52,8 +52,10 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var CompetitionSchema = new mongoose.Schema({
+    jid: { type: String, required: true },
     name: { type: String, required: true },
     league: { type: Boolean, required: true },
+    playoff: { type: Boolean, required: true },
     start: { type: Date, required: true }
 });
 var Competition = mongoose.model("Competition", CompetitionSchema);
@@ -91,10 +93,10 @@ function getCompetitionById(id) {
         var comp;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Competition.findById(id)];
+                case 0: return [4 /*yield*/, Competition.find({ jid: id })];
                 case 1:
                     comp = _a.sent();
-                    return [2 /*return*/, comp];
+                    return [2 /*return*/, comp[0]];
             }
         });
     });

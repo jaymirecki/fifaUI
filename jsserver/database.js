@@ -132,7 +132,6 @@ function createNewSave(s) {
                     return [4 /*yield*/, TeamsIn.getNewTeamsIn(template, s.team, save.id, game)];
                 case 4:
                     dc = _a.sent();
-                    console.log(dc.competition.id);
                     Settings.newSettings(save.user, save.id, s.team, dc.competition.id, dc.division.id);
                     return [2 /*return*/, save.id];
             }
@@ -191,7 +190,7 @@ function getGamePlayerTeams(saveId) {
                         name: t.name,
                         competitions: {}
                     };
-                    return [4 /*yield*/, TeamsIn.getTeamCompetitions(save.game, t.id, saveId, season)];
+                    return [4 /*yield*/, TeamsIn.getTeamCompetitions(t.id, saveId, season)];
                 case 5:
                     cs = _f.sent();
                     _c = [];
@@ -247,26 +246,24 @@ function getNewGameTemplates() {
                     _i = 0;
                     _f.label = 3;
                 case 3:
-                    if (!(_i < _a.length)) return [3 /*break*/, 10];
+                    if (!(_i < _a.length)) return [3 /*break*/, 9];
                     i = _a[_i];
                     g = games[i].name;
-                    return [4 /*yield*/, Game.getGameYear(games[i].id)];
-                case 4:
-                    s = _f.sent();
+                    s = games[i].year;
                     ret[g] = new Object();
-                    return [4 /*yield*/, TeamsIn.getTeamByGame(games[i].id)];
-                case 5:
+                    return [4 /*yield*/, TeamsIn.getTeamsByGame(games[i].name)];
+                case 4:
                     teams = _f.sent();
                     _c = [];
                     for (_d in teams)
                         _c.push(_d);
                     _e = 0;
-                    _f.label = 6;
-                case 6:
-                    if (!(_e < _c.length)) return [3 /*break*/, 9];
+                    _f.label = 5;
+                case 5:
+                    if (!(_e < _c.length)) return [3 /*break*/, 8];
                     j = _c[_e];
-                    return [4 /*yield*/, TeamsIn.getTeamCompetition(games[i].id, teams[j].id, template, s)];
-                case 7:
+                    return [4 /*yield*/, TeamsIn.getTeamCompetition(teams[j].jid, g, s)];
+                case 6:
                     c = _f.sent();
                     if (!ret[g][c.name]) {
                         ret[g][c.name] = { teams: new Map(), date: c.start };
@@ -275,20 +272,19 @@ function getNewGameTemplates() {
                         id: teams[j].id,
                         name: teams[j].name
                     });
-                    _f.label = 8;
-                case 8:
+                    _f.label = 7;
+                case 7:
                     _e++;
-                    return [3 /*break*/, 6];
-                case 9:
+                    return [3 /*break*/, 5];
+                case 8:
                     _i++;
                     return [3 /*break*/, 3];
-                case 10:
+                case 9:
                     for (g in ret) {
                         for (c in ret[g]) {
                             ret[g][c].teams = Array.from(ret[g][c].teams.values());
                         }
                     }
-                    console.log(ret);
                     return [2 /*return*/, ret];
             }
         });

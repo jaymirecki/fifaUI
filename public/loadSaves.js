@@ -158,7 +158,7 @@ function createGame(user, results) {
         if (request.readyState != 4)
             return;
         var results = JSON.parse(request.responseText);
-        // window.location.href = window.location.href + "?g=" + results.id;
+        window.location.href = window.location.href + "?g=" + results.id;
     };
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
     request.send(save);
