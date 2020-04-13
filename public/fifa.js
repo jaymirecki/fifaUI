@@ -1,4 +1,5 @@
 var fifaUser;
+var fifaGame;
 
 function loadScript(filename, callback) {
     var script = document.createElement('script');
@@ -20,7 +21,11 @@ function main() {
     var path = location.pathname
     if (path != "/") {
         fifaUser = "test";
+        var url_string = window.location.href
+        var url = new URL(url_string);
+        fifaGame = url.searchParams.get("g");
         // console.log(fifaUser);
+        console.log(fifaGame);
     }
     loadScript('jquery.js', () => loadScript(path + '.js'));
 }
@@ -37,7 +42,7 @@ function objectToPostString(obj) {
     return postString.slice(1);
 }
 function fifaRequest(get, url, parameters, callback) {
-    var DEBUG = false;
+    var DEBUG = true;
     var request = new XMLHttpRequest();
     var getString = url;
     if (get)

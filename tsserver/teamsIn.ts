@@ -86,7 +86,7 @@ export async function findLeagueDivisionByKey(team: string, saveId: string, seas
     throw "Bad TeamsIn key for LeagueDivision";
 }
 
-async function findAllCompetitionsByTeamSeason(team: string, saveId: string, season: number) {
+export async function findAllCompetitionsByTeamSeason(team: string, saveId: string, season: number) {
     let teamsIns = await findAllByTeamSeason(team, saveId, season);
     let comps = [];
     for (let i in teamsIns) {

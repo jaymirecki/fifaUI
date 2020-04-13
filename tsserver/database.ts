@@ -25,16 +25,31 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 
 export const save = Save.save;
 
-export async function getSave(id: string) {
-    let s = await Save.getSave(id);
+export async function getSave(saveId: string, user: string) {
+    let s = await Save.findByKey(saveId);
     if (!s) return s;
     let save = s.toObject();
     if (save.error)
         return save;
-    let settings = await Settings.getGameSettings(id);
+    let settings = await Settings.getGameSettings(saveId);
     save.team = settings.team;
     save.competition = settings.competition;
     save.division = settings.division;
+    save.teams = {};
+    save.teams[save.team] = {};
+    for (let i in save.teams) {
+        save.teams[i] = (await Team.findByKey(save.team)).toObject();
+        save.teams[i].competitions = {};
+        let comps = await TeamsIn.findAllCompetitionsByTeamSeason(i, save.jid, 2019);
+        for (let j in comps) {
+            save.teams[i].competitions[comps[j].name] = comps[j].toObject();
+            let divs = await Division.findAllByCompetition(comps[j].name);
+            save.teams[i].competitions[comps[j].name].divisions = {};
+            for (let k in divs) {
+                save.teams[i].competitions[comps[j].name].divisions[divs[k].name] = divs[k].toObject();
+            }
+        }
+    }
     return save;
 }
 

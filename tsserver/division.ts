@@ -38,3 +38,8 @@ export async function findByKey(name: string, competition: string) {
     let d = await Division.find({ name: name, competition: competition });
     return Error.CheckKeyResult(d, "Division");
 }
+
+export async function findAllByCompetition(competition: string) {
+    let ds = await Division.find({ competition: competition });
+    return ds;
+}

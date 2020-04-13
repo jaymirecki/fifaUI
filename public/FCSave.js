@@ -7,6 +7,7 @@ class FCSave {
         this.team = saveObject.team;
         this.competition = saveObject.competition;
         this.division = saveObject.division;
+        this.teams = saveObject.teams;
     }
 
     competitions() {

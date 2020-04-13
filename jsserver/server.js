@@ -77,17 +77,30 @@ function catchErrors(res, callback) {
     });
 }
 // api
-app.post("/new_save", function (req, res) {
+app.get("/game", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var _this = this;
         return __generator(this, function (_a) {
             catchErrors(res, function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, DB.createNewSave(req.body)];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [2 /*return*/];
+                    case 0: return [4 /*yield*/, DB.getSave(req.query.game, req.query.user)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            }); }); });
+            return [2 /*return*/];
+        });
+    });
+});
+app.post("/new_save", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _this = this;
+        return __generator(this, function (_a) {
+            catchErrors(res, function () { return __awaiter(_this, void 0, void 0, function () { var _a; return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = {};
+                        return [4 /*yield*/, DB.createNewSave(req.body)];
+                    case 1: return [2 /*return*/, (_a.id = _b.sent(), _a)];
                 }
             }); }); });
             return [2 /*return*/];

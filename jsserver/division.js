@@ -73,3 +73,17 @@ function findByKey(name, competition) {
     });
 }
 exports.findByKey = findByKey;
+function findAllByCompetition(competition) {
+    return __awaiter(this, void 0, void 0, function () {
+        var ds;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Division.find({ competition: competition })];
+                case 1:
+                    ds = _a.sent();
+                    return [2 /*return*/, ds];
+            }
+        });
+    });
+}
+exports.findAllByCompetition = findAllByCompetition;

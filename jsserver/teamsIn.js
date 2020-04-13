@@ -220,6 +220,7 @@ function findAllCompetitionsByTeamSeason(team, saveId, season) {
         });
     });
 }
+exports.findAllCompetitionsByTeamSeason = findAllCompetitionsByTeamSeason;
 function copyTeamsFromSaveTeam(saveId, team, season, newSaveId, game) {
     return __awaiter(this, void 0, void 0, function () {
         var cs, TISet, _a, _b, _i, i, ts, j, TIRay, _c, _d, _e, i, tobject, t;

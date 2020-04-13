@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var mongoose = require("mongoose");
 var validator_1 = require("validator");
+var Error = require("./error");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 var mongooseOptions = {
     useNewUrlParser: true,
@@ -78,20 +79,20 @@ exports.save = function (req, res) {
         }
     });
 };
-function getSave(id) {
+function findByKey(jid) {
     return __awaiter(this, void 0, void 0, function () {
         var save;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.Save.find({ jid: id })];
+                case 0: return [4 /*yield*/, exports.Save.find({ jid: jid })];
                 case 1:
                     save = _a.sent();
-                    return [2 /*return*/, save[0]];
+                    return [2 /*return*/, Error.CheckKeyResult(save, "Save")];
             }
         });
     });
 }
-exports.getSave = getSave;
+exports.findByKey = findByKey;
 ;
 function findAllByUser(user) {
     return __awaiter(this, void 0, void 0, function () {

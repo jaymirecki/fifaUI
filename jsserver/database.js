@@ -38,6 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var mongoose = require("mongoose");
 var Save = require("./save");
+var Team = require("./team");
+var Division = require("./division");
 var TeamsIn = require("./teamsIn");
 var Settings = require("./settings");
 var Game = require("./game");
@@ -56,26 +58,68 @@ mongoose.connect(uri, mongooseOptions, function (err) {
     }
 });
 exports.save = Save.save;
-function getSave(id) {
+function getSave(saveId, user) {
     return __awaiter(this, void 0, void 0, function () {
-        var s, save, settings;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Save.getSave(id)];
+        var s, save, settings, _a, _b, _i, i, _c, _d, comps, _e, _f, _g, j, divs, k;
+        return __generator(this, function (_h) {
+            switch (_h.label) {
+                case 0: return [4 /*yield*/, Save.findByKey(saveId)];
                 case 1:
-                    s = _a.sent();
+                    s = _h.sent();
                     if (!s)
                         return [2 /*return*/, s];
                     save = s.toObject();
                     if (save.error)
                         return [2 /*return*/, save];
-                    return [4 /*yield*/, Settings.getGameSettings(id)];
+                    return [4 /*yield*/, Settings.getGameSettings(saveId)];
                 case 2:
-                    settings = _a.sent();
+                    settings = _h.sent();
                     save.team = settings.team;
                     save.competition = settings.competition;
                     save.division = settings.division;
-                    return [2 /*return*/, save];
+                    save.teams = {};
+                    save.teams[save.team] = {};
+                    _a = [];
+                    for (_b in save.teams)
+                        _a.push(_b);
+                    _i = 0;
+                    _h.label = 3;
+                case 3:
+                    if (!(_i < _a.length)) return [3 /*break*/, 10];
+                    i = _a[_i];
+                    _c = save.teams;
+                    _d = i;
+                    return [4 /*yield*/, Team.findByKey(save.team)];
+                case 4:
+                    _c[_d] = (_h.sent()).toObject();
+                    save.teams[i].competitions = {};
+                    return [4 /*yield*/, TeamsIn.findAllCompetitionsByTeamSeason(i, save.jid, 2019)];
+                case 5:
+                    comps = _h.sent();
+                    _e = [];
+                    for (_f in comps)
+                        _e.push(_f);
+                    _g = 0;
+                    _h.label = 6;
+                case 6:
+                    if (!(_g < _e.length)) return [3 /*break*/, 9];
+                    j = _e[_g];
+                    save.teams[i].competitions[comps[j].name] = comps[j].toObject();
+                    return [4 /*yield*/, Division.findAllByCompetition(comps[j].name)];
+                case 7:
+                    divs = _h.sent();
+                    save.teams[i].competitions[comps[j].name].divisions = {};
+                    for (k in divs) {
+                        save.teams[i].competitions[comps[j].name].divisions[divs[k].name] = divs[k].toObject();
+                    }
+                    _h.label = 8;
+                case 8:
+                    _g++;
+                    return [3 /*break*/, 6];
+                case 9:
+                    _i++;
+                    return [3 /*break*/, 3];
+                case 10: return [2 /*return*/, save];
             }
         });
     });

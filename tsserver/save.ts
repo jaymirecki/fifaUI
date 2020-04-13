@@ -2,6 +2,7 @@ import * as mongoose from "mongoose";
 import { escape } from "validator";
 import { Request } from 'express';
 import { Response } from 'express';
+import * as Error from './error';
 
 const uri: string = 
     process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
@@ -59,9 +60,9 @@ export let save = (req: Request, res: Response) => {
     });
 };
 
-export async function getSave(id: string) {
-    let save = await Save.find( { jid: id });
-    return save[0];
+export async function findByKey(jid: string) {
+    let save = await Save.find( { jid: jid });
+    return Error.CheckKeyResult(save, "Save");
 };
 
 export async function findAllByUser(user: string) {

@@ -29,8 +29,11 @@ async function catchErrors(res: e.Response, callback: CallableFunction) {
     }
 }
 // api
+app.get("/game", async function(req: e.Request, res: e.Response) {
+    catchErrors(res, async () => await DB.getSave(req.query.game, req.query.user) );
+});
 app.post("/new_save", async function(req: e.Request, res: e.Response) {
-    catchErrors(res, async () => { id: await DB.createNewSave(req.body) });
+    catchErrors(res, async () => { return { id: await DB.createNewSave(req.body) } });
 });
 app.get("/saves", async function(req: e.Request, res: e.Response) {
     catchErrors(res, async () => await DB.getSaves(req.query.user) );
