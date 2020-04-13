@@ -48,61 +48,71 @@ function cors(response) {
     response.header("Access-Control-Allow-Origin", "*");
     return response;
 }
+function catchErrors(res, callback) {
+    return __awaiter(this, void 0, void 0, function () {
+        var result, _a, error_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    res = cors(res);
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 3, , 4]);
+                    result = { success: true, content: 1 };
+                    _a = result;
+                    return [4 /*yield*/, callback()];
+                case 2:
+                    _a.content = _b.sent();
+                    result.success = true;
+                    res.send(result);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_1 = _b.sent();
+                    console.log(error_1);
+                    res.send({ success: false, error: error_1 });
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
 // api
 app.post("/new_save", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var id;
+        var _this = this;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    res = cors(res);
-                    return [4 /*yield*/, DB.createNewSave(req.body)];
-                case 1:
-                    id = _a.sent();
-                    res.send({ id: id });
-                    return [2 /*return*/];
-            }
+            catchErrors(res, function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, DB.createNewSave(req.body)];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2: return [2 /*return*/];
+                }
+            }); }); });
+            return [2 /*return*/];
         });
     });
 });
 app.get("/saves", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var saves;
+        var _this = this;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    res = cors(res);
-                    return [4 /*yield*/, DB.getSaves(req.query.user)];
-                case 1:
-                    saves = _a.sent();
-                    res.send(saves);
-                    return [2 /*return*/];
-            }
+            catchErrors(res, function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, DB.getSaves(req.query.user)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            }); }); });
+            return [2 /*return*/];
         });
     });
 });
 app.get("/team_selection", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var games, e_1;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    res = cors(res);
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, DB.getNewGameTemplates()];
-                case 2:
-                    games = _a.sent();
-                    res.send(games);
-                    return [3 /*break*/, 4];
-                case 3:
-                    e_1 = _a.sent();
-                    console.log(e_1);
-                    res.send({ success: false, error: e_1 });
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
-            }
+            catchErrors(res, DB.getNewGameTemplates);
+            return [2 /*return*/];
         });
     });
 });

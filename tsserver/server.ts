@@ -16,26 +16,27 @@ function cors(response : e.Response) {
     return response;
 }
 
-// api
-app.post("/new_save", async function(req: e.Request, res: e.Response) {
-    res = cors(res);
-    let id = await DB.createNewSave(req.body);
-    res.send({ id: id });
-});
-app.get("/saves", async function(req: e.Request, res: e.Response) {
-    res = cors(res);
-    let saves = await DB.getSaves(req.query.user);
-    res.send(saves);
-});
-app.get("/team_selection", async function(req: e.Request, res: e.Response) {
+async function catchErrors(res: e.Response, callback: CallableFunction) {
     res = cors(res);
     try {
-        let games = await DB.getNewGameTemplates();
-        res.send(games);
-    } catch(e) {
-        console.log(e);
-        res.send({ success: false, error: e });
+        let result: { success: boolean, content: any } = { success: true, content: 1 };
+        result.content = await callback();
+        result.success = true;
+        res.send(result);
+    } catch (error) {
+        console.log(error);
+        res.send({ success: false, error: error });
     }
+}
+// api
+app.post("/new_save", async function(req: e.Request, res: e.Response) {
+    catchErrors(res, async () => { id: await DB.createNewSave(req.body) });
+});
+app.get("/saves", async function(req: e.Request, res: e.Response) {
+    catchErrors(res, async () => await DB.getSaves(req.query.user) );
+});
+app.get("/team_selection", async function(req: e.Request, res: e.Response) {
+    catchErrors(res, DB.getNewGameTemplates);
 });
 
 // pages

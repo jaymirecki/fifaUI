@@ -1,5 +1,4 @@
 function loadTeamSelection(teamSelection) {
-    console.log(teamSelection);
     $('#fifaFormSubmit').click(createGame);
     var games = $('#fifaGameSelect');
     games.change(function() { updateLeagues(teamSelection)(this.value)});

@@ -26,18 +26,7 @@ function main() {
 }
 
 function fifaGetRequest(getString, callback) {
-    var request = new XMLHttpRequest();
-    var getString = getString;
-    request.open("GET", getString, true);
-    request.onreadystatechange = function () {
-        if (request.readyState != 4)
-            return;
-        // console.log(request.responseText);
-        var result = JSON.parse(request.responseText);
-        // console.log(result)
-        callback(result);
-    };
-    request.send();
+    fifaRequest(true, getString, {}, callback);
 }
 function objectToPostString(obj) {
     let postString = "";
@@ -47,20 +36,31 @@ function objectToPostString(obj) {
     }
     return postString.slice(1);
 }
-function fifaPostRequest(url, parameters, callback) {
+function fifaRequest(get, url, parameters, callback) {
+    var DEBUG = false;
     var request = new XMLHttpRequest();
     var getString = url;
-    request.open("POST", getString, true);
+    if (get)
+        request.open("GET", getString, true);
+    else
+        request.open("POST", getString, true);
     request.onreadystatechange = function () {
         if (request.readyState != 4)
             return;
-        // console.log(request.responseText);
+        if (DEBUG) console.log(request.responseText);
         var result = JSON.parse(request.responseText);
-        // console.log(result)
-        callback(result);
+        if (DEBUG) console.log(result);
+        if (result.success)
+            callback(result.content);
     };
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
-    request.send(objectToPostString(parameters));
+    if (get)
+        request.send();
+    else
+        request.send(objectToPostString(parameters));
+}
+function fifaPostRequest(url, parameters, callback) {
+    fifaRequest(false, url, parameters, callback);
 }
 
 main();
