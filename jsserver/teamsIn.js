@@ -39,6 +39,7 @@ exports.__esModule = true;
 var mongoose = require("mongoose");
 var Team = require("./team");
 var Division = require("./division");
+var Competition = require("./competition");
 var save_1 = require("./save");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 var mongooseOptions = {
@@ -55,26 +56,10 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var TeamsInSchema = new mongoose.Schema({
-    saveId: {
-        type: String,
-        ref: 'Save',
-        required: true
-    },
-    team: {
-        type: String,
-        ref: 'Team',
-        required: true
-    },
-    division: {
-        type: String,
-        ref: 'Division',
-        required: true
-    },
-    game: {
-        type: String,
-        ref: 'Game',
-        required: false
-    },
+    saveId: { type: String, required: true },
+    team: { type: String, required: true },
+    division: { type: String, required: true },
+    competition: { type: String, required: true },
     season: { type: Number, required: true },
     player: { type: Boolean, required: false }
 });
@@ -195,20 +180,51 @@ function getTeamsByGame(game) {
     });
 }
 exports.getTeamsByGame = getTeamsByGame;
-function getTeamCompetition(team, saveId, season) {
+function findLeagueByKey(team, saveId, season) {
     return __awaiter(this, void 0, void 0, function () {
-        var dc;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, getTeamDivisionCompetition(team, saveId, season)];
+        var teamsIns, _a, _b, _i, i, comp;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0: return [4 /*yield*/, findAllBySeason(team, saveId, season)];
                 case 1:
-                    dc = _a.sent();
-                    return [2 /*return*/, dc.competition];
+                    teamsIns = _c.sent();
+                    _a = [];
+                    for (_b in teamsIns)
+                        _a.push(_b);
+                    _i = 0;
+                    _c.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    i = _a[_i];
+                    return [4 /*yield*/, Competition.findByKey(teamsIns[i].competition)];
+                case 3:
+                    comp = _c.sent();
+                    if (comp.league)
+                        return [2 /*return*/, comp];
+                    _c.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5: throw "Bad TeamsIn key for League";
             }
         });
     });
 }
-exports.getTeamCompetition = getTeamCompetition;
+exports.findLeagueByKey = findLeagueByKey;
+function findAllBySeason(team, saveId, season) {
+    return __awaiter(this, void 0, void 0, function () {
+        var teamIn;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.TeamsIn.find({ team: team, saveId: saveId, season: season })];
+                case 1:
+                    teamIn = _a.sent();
+                    return [2 /*return*/, teamIn];
+            }
+        });
+    });
+}
+exports.findAllBySeason = findAllBySeason;
 function getTeamDivisionsCompetitions(team, saveId, season) {
     return __awaiter(this, void 0, void 0, function () {
         var ds, cs, _a, _b, _i, i, c, d;

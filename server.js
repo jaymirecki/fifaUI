@@ -48,17 +48,17 @@ function cors(response) {
     response.header("Access-Control-Allow-Origin", "*");
     return response;
 }
-app.get("/save", function (req, res) {
+app.post("/new_save", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var save;
+        var id;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     res = cors(res);
-                    return [4 /*yield*/, DB.getSave(req.query.id)];
+                    return [4 /*yield*/, DB.createNewSave(req.body)];
                 case 1:
-                    save = _a.sent();
-                    res.send(save);
+                    id = _a.sent();
+                    res.send({ id: id });
                     return [2 /*return*/];
             }
         });
@@ -80,54 +80,27 @@ app.get("/saves", function (req, res) {
         });
     });
 });
-app.post("/save", function (req, res) {
-    res = cors(res);
-    DB.save(req, res);
-});
-app.post("/new_save", function (req, res) {
-    return __awaiter(this, void 0, void 0, function () {
-        var id;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    res = cors(res);
-                    return [4 /*yield*/, DB.createNewSave(req.body)];
-                case 1:
-                    id = _a.sent();
-                    res.send({ id: id });
-                    return [2 /*return*/];
-            }
-        });
-    });
-});
-app.get("/newgame", function (req, res) {
-    return __awaiter(this, void 0, void 0, function () {
-        var games;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    res = cors(res);
-                    return [4 /*yield*/, DB.getNewGameTemplates()];
-                case 1:
-                    games = _a.sent();
-                    res.send(games);
-                    return [2 /*return*/];
-            }
-        });
-    });
-});
 app.get("/team_selection", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var games;
+        var games, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     res = cors(res);
-                    return [4 /*yield*/, DB.getNewGameTemplates()];
+                    _a.label = 1;
                 case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, DB.getNewGameTemplates()];
+                case 2:
                     games = _a.sent();
                     res.send(games);
-                    return [2 /*return*/];
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_1 = _a.sent();
+                    console.log(e_1);
+                    res.send({ success: false, error: e_1 });
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
             }
         });
     });
@@ -153,37 +126,5 @@ app.get("/new", function (req, res) {
 app.get('/play', function (req, res) {
     res = cors(res);
     res.sendFile(__dirname + '/public/play.html');
-});
-app.get('/players', function (req, res) {
-    return __awaiter(this, void 0, void 0, function () {
-        var p;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    res = cors(res);
-                    return [4 /*yield*/, DB.getPlayers(req.query.game, req.query.team)];
-                case 1:
-                    p = _a.sent();
-                    res.send(p);
-                    return [2 /*return*/];
-            }
-        });
-    });
-});
-app.get('/playerteams', function (req, res) {
-    return __awaiter(this, void 0, void 0, function () {
-        var teams;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    res = cors(res);
-                    return [4 /*yield*/, DB.getGamePlayerTeams(req.query.id)];
-                case 1:
-                    teams = _a.sent();
-                    res.send(teams);
-                    return [2 /*return*/];
-            }
-        });
-    });
 });
 app.listen(process.env.PORT || 8888);

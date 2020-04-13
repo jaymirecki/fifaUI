@@ -43,6 +43,15 @@ const Competition =
 //     return comps[0].competition;
 // }
 
+export async function findByKey(name: string) {
+    let key = { name: name };
+    let comps = await Competition.find(key);
+    if (comps.length > 0)
+        return comps[0];
+    else
+        throw "Bad Competition key: " + JSON.stringify(key);
+}
+
 export async function getTeamCompetitions(game: string, team: string) {
     let comps = await Competition.find({ game: game, team: team });
     let compStrings: string[] = [];

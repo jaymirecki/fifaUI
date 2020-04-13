@@ -2,9 +2,9 @@ import * as mongoose from "mongoose";
 import { ObjectID, ObjectId } from "bson";
 import * as Team from "./team";
 import * as Division from "./division";
-import { ICompetition } from "./competition";
+import * as Competition from "./competition";
 import * as Game from "./game";
-import { Save, getTemplateId, getSaveGame } from "./save";
+import { Save, getTemplateId, getSaveGame, save } from "./save";
 
 const uri: string = 
     process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
@@ -24,31 +24,16 @@ export interface ITeamsIn extends mongoose.Document {
     saveId: string;
     team: string;
     division: string;
+    competition: string;
     season: number;
     player: boolean;
 };
 
 const TeamsInSchema = new mongoose.Schema({
-    saveId: { 
-        type: String,
-        ref: 'Save',
-        required: true
-    },
-    team: { 
-        type: String,
-        ref: 'Team',
-        required: true
-    },
-    division: { 
-        type: String,
-        ref: 'Division',
-        required: true
-    },
-    game: { 
-        type: String,
-        ref: 'Game',
-        required: false
-    },
+    saveId: { type: String, required: true },
+    team: { type: String, required: true },
+    division: { type: String, required: true },
+    competition: { type: String, required: true },
     season: { type: Number, required: true },
     player: { type: Boolean, required: false }
 });
@@ -97,9 +82,20 @@ export async function getTeamsByGame(game: string) {
     return tlist;
 }
 
-export async function getTeamCompetition(team: string, saveId: string, season: number) {
-    let dc = await getTeamDivisionCompetition(team, saveId, season);
-    return dc.competition;
+export async function findLeagueByKey(team: string, saveId: string, season: number) {
+    let teamsIns = await findAllBySeason(team, saveId, season);
+    for (let i in teamsIns) {
+        let comp = await Competition.findByKey(teamsIns[i].competition);
+        if (comp.league)
+            return comp;
+    }
+    throw "Bad TeamsIn key for League";
+}
+
+export async function findAllBySeason(team: string, saveId: string, season: number) {
+    let teamIn =  
+        await TeamsIn.find({ team: team, saveId: saveId, season: season });
+    return teamIn;
 }
 
 export async function getTeamDivisionsCompetitions(team: string, saveId: string, season: number) {
@@ -108,7 +104,7 @@ export async function getTeamDivisionsCompetitions(team: string, saveId: string,
         saveId: saveId,
         season: season
     });
-    let cs: { division: Division.IDivision, competition: ICompetition }[] = [];
+    let cs: { division: Division.IDivision, competition: Competition.ICompetition }[] = [];
     for (let i in ds) {
         let c = await Division.getDivisionCompetition(ds[i].division);
         let d = await Division.getDivisionById(ds[i].division);
@@ -120,7 +116,7 @@ export async function getTeamDivisionsCompetitions(team: string, saveId: string,
 
 export async function getTeamCompetitions(team: string, saveId: string, season: number) {
     let cds = await getTeamDivisionsCompetitions(team, saveId, season);
-    let cs: ICompetition[] = [];
+    let cs: Competition.ICompetition[] = [];
     for (let i in cds) {
         cs.push(cds[i].competition);
     }

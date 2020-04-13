@@ -1,6 +1,10 @@
 .fifa {
     font-family: Arial, Helvetica, sans-serif;
 }
+
+
+
+
 table.fifa {
     width: 100%;
     border-collapse: collapse;
@@ -18,6 +22,11 @@ tr.fifa:hover {
 td.fifaCellButton {
     text-align: center;
 }
+
+
+
+
+
 button.fifa {
     font-size: medium;
     background: linear-gradient(white, rgba(50, 173, 255, 0.37), white);
@@ -32,4 +41,10 @@ input.fifa {
 select.fifa {
     width: 100%;
     font-size: medium;
+}
+
+
+select.fifaHeader {
+    width: 100%;
+    font-size: x-large;
 }

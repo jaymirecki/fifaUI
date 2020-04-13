@@ -1,4 +1,5 @@
 function loadTeamSelection(teamSelection) {
+    console.log(teamSelection);
     $('#fifaFormSubmit').click(createGame);
     var games = $('#fifaGameSelect');
     games.change(function() { updateLeagues(teamSelection)(this.value)});
@@ -19,9 +20,9 @@ function updateLeagues(teamSelection) {
             var league = document.createElement('option');
             league.innerText = l;
             leagues.append(league);
-            updateTeams(teamSelection)(game, l);
         }
         leagues.change(function() { updateTeams(teamSelection)(game, this.value)});
+        updateTeams(teamSelection)(game, leagues.val());
     };
 }
 
@@ -29,10 +30,11 @@ function updateTeams(teamSelection) {
     return function(game, league) {
         var teams = $('#fifaTeamSelect');
         teams.html('');
-        var availableTeams = teamSelection[game][league].teams;
+        var availableTeams = teamSelection[game][league];
         for (let t in availableTeams) {
             var team = document.createElement('option');
             team.innerText = availableTeams[t].name;
+            team.id = availableTeams[t].jid;
             teams.append(team);
         }
     }

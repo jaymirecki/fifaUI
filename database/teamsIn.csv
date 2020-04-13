@@ -1,47 +1,67 @@
-saveId,team,division,season
-FIFA 20,Atlanta United FC,Eastern ConferenceMLS Cup,2019
-FIFA 20,Chicago Fire,Eastern ConferenceMLS Cup,2019
-FIFA 20,Columbus Crew SC,Eastern ConferenceMLS Cup,2019
-FIFA 20,D.C. United,Eastern ConferenceMLS Cup,2019
-FIFA 20,Montreal Impact,Eastern ConferenceMLS Cup,2019
-FIFA 20,New England Revolution,Eastern ConferenceMLS Cup,2019
-FIFA 20,New York City FC,Eastern ConferenceMLS Cup,2019
-FIFA 20,New York Red Bulls,Eastern ConferenceMLS Cup,2019
-FIFA 20,Orlando City SC,Eastern ConferenceMLS Cup,2019
-FIFA 20,Philadelphia Union,Eastern ConferenceMLS Cup,2019
-FIFA 20,Toronto FC,Eastern ConferenceMLS Cup,2019
-FIFA 20,Colorado Rapids,Western ConferenceMLS Cup,2019
-FIFA 20,FC Dallas,Western ConferenceMLS Cup,2019
-FIFA 20,Houston Dynamo,Western ConferenceMLS Cup,2019
-FIFA 20,LA Galaxy,Western ConferenceMLS Cup,2019
-FIFA 20,Los Angeles FC,Western ConferenceMLS Cup,2019
-FIFA 20,Minnesota United FC,Western ConferenceMLS Cup,2019
-FIFA 20,Portland Timbers,Western ConferenceMLS Cup,2019
-FIFA 20,Real Salt Lake,Western ConferenceMLS Cup,2019
-FIFA 20,San Jose Earthquakes,Western ConferenceMLS Cup,2019
-FIFA 20,Seattle Sounders FC,Western ConferenceMLS Cup,2019
-FIFA 20,Sporting Kansas City,Western ConferenceMLS Cup,2019
-FIFA 20,Vancouver Whitecaps FC,Western ConferenceMLS Cup,2019
-FIFA 20,Atlanta United FC,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Chicago Fire,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Columbus Crew SC,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,D.C. United,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Montreal Impact,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,New England Revolution,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,New York City FC,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,New York Red Bulls,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Orlando City SC,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Philadelphia Union,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Toronto FC,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Colorado Rapids,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,FC Dallas,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Houston Dynamo,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,LA Galaxy,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Los Angeles FC,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Minnesota United FC,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Portland Timbers,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Real Salt Lake,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,San Jose Earthquakes,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Seattle Sounders FC,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Sporting Kansas City,U.S. Open CupU.S. Open Cup,2019
-FIFA 20,Vancouver Whitecaps FC,U.S. Open CupU.S. Open Cup,2019
+saveId,team,division,competition,season
+FIFA 20,Atlanta United FC,Eastern Conference,MLS Cup,2019
+FIFA 20,Chicago Fire,Eastern Conference,MLS Cup,2019
+FIFA 20,Columbus Crew SC,Eastern Conference,MLS Cup,2019
+FIFA 20,D.C. United,Eastern Conference,MLS Cup,2019
+FIFA 20,Montreal Impact,Eastern Conference,MLS Cup,2019
+FIFA 20,New England Revolution,Eastern Conference,MLS Cup,2019
+FIFA 20,New York City FC,Eastern Conference,MLS Cup,2019
+FIFA 20,New York Red Bulls,Eastern Conference,MLS Cup,2019
+FIFA 20,Orlando City SC,Eastern Conference,MLS Cup,2019
+FIFA 20,Philadelphia Union,Eastern Conference,MLS Cup,2019
+FIFA 20,Toronto FC,Eastern Conference,MLS Cup,2019
+FIFA 20,Colorado Rapids,Western Conference,MLS Cup,2019
+FIFA 20,FC Dallas,Western Conference,MLS Cup,2019
+FIFA 20,Houston Dynamo,Western Conference,MLS Cup,2019
+FIFA 20,LA Galaxy,Western Conference,MLS Cup,2019
+FIFA 20,Los Angeles FC,Western Conference,MLS Cup,2019
+FIFA 20,Minnesota United FC,Western Conference,MLS Cup,2019
+FIFA 20,Portland Timbers,Western Conference,MLS Cup,2019
+FIFA 20,Real Salt Lake,Western Conference,MLS Cup,2019
+FIFA 20,San Jose Earthquakes,Western Conference,MLS Cup,2019
+FIFA 20,Seattle Sounders FC,Western Conference,MLS Cup,2019
+FIFA 20,Sporting Kansas City,Western Conference,MLS Cup,2019
+FIFA 20,Vancouver Whitecaps FC,Western Conference,MLS Cup,2019
+FIFA 20,Atlanta United FC,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Chicago Fire,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Columbus Crew SC,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,D.C. United,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Montreal Impact,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,New England Revolution,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,New York City FC,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,New York Red Bulls,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Orlando City SC,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Philadelphia Union,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Toronto FC,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Colorado Rapids,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,FC Dallas,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Houston Dynamo,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,LA Galaxy,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Los Angeles FC,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Minnesota United FC,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Portland Timbers,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Real Salt Lake,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,San Jose Earthquakes,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Seattle Sounders FC,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Sporting Kansas City,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Vancouver Whitecaps FC,U.S. Open Cup,U.S. Open Cup,2019
+FIFA 20,Arsenal,Premier League,Premier League,2019
+FIFA 20,Aston Villa,Premier League,Premier League,2019
+FIFA 20,Bournemouth,Premier League,Premier League,2019
+FIFA 20,Brighton & Hove Albion,Premier League,Premier League,2019
+FIFA 20,Burnley,Premier League,Premier League,2019
+FIFA 20,Chelsea,Premier League,Premier League,2019
+FIFA 20,Crystal Palace,Premier League,Premier League,2019
+FIFA 20,Everton,Premier League,Premier League,2019
+FIFA 20,Leicester City,Premier League,Premier League,2019
+FIFA 20,Liverpool,Premier League,Premier League,2019
+FIFA 20,Manchester City,Premier League,Premier League,2019
+FIFA 20,Manchester United,Premier League,Premier League,2019
+FIFA 20,Newcastle United,Premier League,Premier League,2019
+FIFA 20,Norwich City,Premier League,Premier League,2019
+FIFA 20,Sheffield United,Premier League,Premier League,2019
+FIFA 20,Southampton,Premier League,Premier League,2019
+FIFA 20,Tottenham Hotspur,Premier League,Premier League,2019
+FIFA 20,Watford,Premier League,Premier League,2019
+FIFA 20,West Ham United,Premier League,Premier League,2019
+FIFA 20,Wolverhampton Wanderers,Premier League,Premier League,2019

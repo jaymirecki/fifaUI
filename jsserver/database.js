@@ -236,62 +236,67 @@ function getGamePlayerTeams(saveId) {
 exports.getGamePlayerTeams = getGamePlayerTeams;
 function getNewGameTemplates() {
     return __awaiter(this, void 0, void 0, function () {
-        var games, template, ret, _a, _b, _i, i, g, s, teams, _c, _d, _e, j, c, g, c;
+        var games, ret, _a, _b, _i, i, g, s, teams, _c, _d, _e, j, c;
         return __generator(this, function (_f) {
             switch (_f.label) {
                 case 0: return [4 /*yield*/, Game.getAllGames()];
                 case 1:
                     games = _f.sent();
-                    return [4 /*yield*/, Save.getTemplateId()];
-                case 2:
-                    template = _f.sent();
                     ret = new Object();
                     _a = [];
                     for (_b in games)
                         _a.push(_b);
                     _i = 0;
-                    _f.label = 3;
-                case 3:
-                    if (!(_i < _a.length)) return [3 /*break*/, 9];
+                    _f.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 8];
                     i = _a[_i];
                     g = games[i].name;
                     s = games[i].year;
                     ret[g] = new Object();
                     return [4 /*yield*/, TeamsIn.getTeamsByGame(games[i].name)];
-                case 4:
+                case 3:
                     teams = _f.sent();
+                    teams.sort(function (a, b) {
+                        if (a.name < b.name)
+                            return -1;
+                        else if (a.name > b.name)
+                            return 1;
+                        else
+                            return 0;
+                    });
                     _c = [];
                     for (_d in teams)
                         _c.push(_d);
                     _e = 0;
-                    _f.label = 5;
-                case 5:
-                    if (!(_e < _c.length)) return [3 /*break*/, 8];
+                    _f.label = 4;
+                case 4:
+                    if (!(_e < _c.length)) return [3 /*break*/, 7];
                     j = _c[_e];
-                    return [4 /*yield*/, TeamsIn.getTeamCompetition(teams[j].jid, g, s)];
-                case 6:
+                    return [4 /*yield*/, TeamsIn.findLeagueByKey(teams[j].jid, g, s)];
+                case 5:
                     c = _f.sent();
                     if (!ret[g][c.name]) {
-                        ret[g][c.name] = { teams: new Map(), date: c.start };
+                        ret[g][c.name] = [];
                     }
-                    ret[g][c.name].teams.set(teams[j].id, {
-                        id: teams[j].id,
+                    ret[g][c.name].push({
+                        jid: teams[j].jid,
                         name: teams[j].name
                     });
-                    _f.label = 7;
-                case 7:
+                    _f.label = 6;
+                case 6:
                     _e++;
-                    return [3 /*break*/, 5];
-                case 8:
+                    return [3 /*break*/, 4];
+                case 7:
                     _i++;
-                    return [3 /*break*/, 3];
-                case 9:
-                    for (g in ret) {
-                        for (c in ret[g]) {
-                            ret[g][c].teams = Array.from(ret[g][c].teams.values());
-                        }
-                    }
-                    return [2 /*return*/, ret];
+                    return [3 /*break*/, 2];
+                case 8: 
+                // for (let g in ret) {
+                //     for (let c in ret[g]) {
+                //         ret[g][c].teams = Array.from(ret[g][c].teams.values())
+                //     }
+                // }
+                return [2 /*return*/, ret];
             }
         });
     });

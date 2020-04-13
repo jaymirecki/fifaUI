@@ -118,28 +118,30 @@ export async function getGamePlayerTeams(saveId: string) {
 
 export async function getNewGameTemplates() {
     let games = await Game.getAllGames();
-    let template = await Save.getTemplateId();
     let ret:any = new Object();
     for (let i in games) {
         let g = games[i].name;
         let s = games[i].year;
         ret[g] = new Object();
         let teams = await TeamsIn.getTeamsByGame(games[i].name);
+        teams.sort(function(a, b) { if (a.name < b.name) return -1;
+                                    else if (a.name > b.name) return 1;
+                                    else return 0; });
         for (let j in teams) {
-            let c: Competition.ICompetition = await TeamsIn.getTeamCompetition(teams[j].jid, g, s);
+            let c: Competition.ICompetition = await TeamsIn.findLeagueByKey(teams[j].jid, g, s);
             if (!ret[g][c.name]) {
-                ret[g][c.name] = { teams: new Map<string, any>(), date: c.start };
+                ret[g][c.name] = [];
             }
-            ret[g][c.name].teams.set(teams[j].id, {
-                id: teams[j].id,
+            ret[g][c.name].push({
+                jid: teams[j].jid,
                 name: teams[j].name
             });
         }
     }
-    for (let g in ret) {
-        for (let c in ret[g]) {
-            ret[g][c].teams = Array.from(ret[g][c].teams.values())
-        }
-    }
+    // for (let g in ret) {
+    //     for (let c in ret[g]) {
+    //         ret[g][c].teams = Array.from(ret[g][c].teams.values())
+    //     }
+    // }
     return ret;
 } 

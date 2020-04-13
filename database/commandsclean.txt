@@ -1,4 +1,3 @@
-use fifa
 db.games.remove({});
 db.saves.remove({});
 db.teams.remove({});

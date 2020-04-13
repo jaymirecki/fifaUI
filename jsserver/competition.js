@@ -69,6 +69,26 @@ var Competition = mongoose.model("Competition", CompetitionSchema);
 //     }
 //     return comps[0].competition;
 // }
+function findByKey(name) {
+    return __awaiter(this, void 0, void 0, function () {
+        var key, comps;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    key = { name: name };
+                    return [4 /*yield*/, Competition.find(key)];
+                case 1:
+                    comps = _a.sent();
+                    if (comps.length > 0)
+                        return [2 /*return*/, comps[0]];
+                    else
+                        throw "Bad Competition key: " + JSON.stringify(key);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.findByKey = findByKey;
 function getTeamCompetitions(game, team) {
     return __awaiter(this, void 0, void 0, function () {
         var comps, compStrings, i;

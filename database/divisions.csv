@@ -1,5 +1,6 @@
-jid,name,competition,tier
-Eastern ConferenceMLS Cup,Eastern Conference,MLS Cup,1
-U.S. Open CupU.S. Open Cup,U.S. Open Cup,U.S. Open Cup,1
-Western ConferenceMLS Cup,Western Conference,MLS Cup,1
-MLS Cup PlayoffsMLS Cup Playoffs,MLS Cup Playoffs,MLS Cup Playoffs,1
+name,competition,tier
+Eastern Conference,MLS Cup,1
+U.S. Open Cup,U.S. Open Cup,1
+Western Conference,MLS Cup,1
+MLS Cup Playoffs,MLS Cup Playoffs,1
+Premier League,Premier League,1
