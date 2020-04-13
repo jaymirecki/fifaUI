@@ -10,6 +10,9 @@ function loadSelections() {
     loadTeams();
     loadCompetitions();
     loadDivisions();
+    $('#fifaTeam').change(changeTeam);
+    $('#fifaCompetition').change(changeCompetition);
+    $('#fifaDivision').change(changeDivision);
 }
 
 function loadTeams() {
@@ -19,6 +22,10 @@ function loadTeams() {
                  'name', 
                  fifaSave.team);
 }
+function changeTeam() {
+    fifaSave.team = $('#fifaTeam').val();
+    loadCompetitions();
+}
 
 function loadCompetitions() {
     loadDropdown('fifaCompetition', 
@@ -27,13 +34,25 @@ function loadCompetitions() {
                  'name', 
                  fifaSave.competition);
 }
+function changeCompetition() {
+    fifaSave.competition = $('#fifaCompetition').val();
+    loadDivisions();
+}
 
 function loadDivisions() {
-    loadDropdown('fifaDivision', 
-                 fifaSave.divisions(), 
-                 'name', 
-                 'name', 
-                 fifaSave.division);
+    if (Object.keys(fifaSave.divisions()).length == 1)
+        $('#fifaDivision').hide();
+    else {
+        $('#fifaDivision').show()
+        loadDropdown('fifaDivision', 
+                    fifaSave.divisions(), 
+                    'name', 
+                    'name', 
+                    fifaSave.division);
+    }
+}
+function changeDivision() {
+    fifaSave.division = $('#fifaDivision').val();
 }
 
 function loadDropdown(id, values, ids, names, selected) {
@@ -42,7 +61,7 @@ function loadDropdown(id, values, ids, names, selected) {
         let option = document.createElement('option');
         option.value = values[i][ids];
         option.innerHTML = values[i][names];
-        console.log(option);
+        // console.log(option);
         $('#' + id).append(option);
     }
     $('#' + id).val(selected);
