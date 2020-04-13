@@ -9,6 +9,9 @@ function loadSaves() {
 function insertSaves(saves) {
     var savesTable = $('#savesTable');
     // saves.push({ id: 0, name: 'Test Game', team: 'Seattle Sounders', dom: new Date()});
+    console.log(saves);
+    saves.sort((a, b) => new Date(b.dom) - new Date(a.dom));
+    console.log(saves);
     saves.forEach(s => {
         createSaveRow(s);
     });
