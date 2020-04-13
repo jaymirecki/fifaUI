@@ -16,6 +16,7 @@ function cors(response : e.Response) {
     return response;
 }
 
+// api
 app.post("/new_save", async function(req: e.Request, res: e.Response) {
     res = cors(res);
     let id = await DB.createNewSave(req.body);
@@ -37,7 +38,7 @@ app.get("/team_selection", async function(req: e.Request, res: e.Response) {
     }
 });
 
-
+// pages
 app.get("/load", async function(req : e.Request, res : e.Response) {
     res = cors(res);
     res.sendFile(__dirname + '/public/load.html');

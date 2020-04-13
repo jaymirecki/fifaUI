@@ -48,6 +48,7 @@ function cors(response) {
     response.header("Access-Control-Allow-Origin", "*");
     return response;
 }
+// api
 app.post("/new_save", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var id;
@@ -105,6 +106,7 @@ app.get("/team_selection", function (req, res) {
         });
     });
 });
+// pages
 app.get("/load", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {

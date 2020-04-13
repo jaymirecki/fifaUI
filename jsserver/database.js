@@ -38,11 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var mongoose = require("mongoose");
 var Save = require("./save");
-var Team = require("./team");
-var Division = require("./division");
 var TeamsIn = require("./teamsIn");
 var Settings = require("./settings");
-var PlayerDynamicInfo = require("./playerdynamicinfo");
 var Game = require("./game");
 var uuid_1 = require("uuid");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
@@ -86,16 +83,17 @@ function getSave(id) {
 exports.getSave = getSave;
 function getSaves(user) {
     return __awaiter(this, void 0, void 0, function () {
-        var saves, i;
+        var saves, saveObjects, i;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Save.getSaves(user)];
+                case 0: return [4 /*yield*/, Save.findAllByUser(user)];
                 case 1:
                     saves = _a.sent();
+                    saveObjects = [];
                     for (i in saves) {
-                        // saves[i].team = (await Settings.getGameSettings(saves[i].id)).team;
+                        saveObjects.push(saves[i].toObject());
                     }
-                    return [2 /*return*/, saves];
+                    return [2 /*return*/, saveObjects];
             }
         });
     });
@@ -118,9 +116,9 @@ function createNewSave(s) {
                         doc: new Date(),
                         dom: new Date()
                     };
-                    return [4 /*yield*/, Game.getGameYear(s.game)];
+                    return [4 /*yield*/, Game.findByKey(s.game)];
                 case 1:
-                    season = _a.sent();
+                    season = (_a.sent()).year;
                     save = new Save.Save(saveObject);
                     return [4 /*yield*/, save.save()];
                 case 2:
@@ -128,17 +126,17 @@ function createNewSave(s) {
                     return [4 /*yield*/, TeamsIn.copyTeamsFromSaveTeam(save.game, s.team, season, save.jid, save.game)];
                 case 3:
                     _a.sent();
-                    return [4 /*yield*/, TeamsIn.getTeamsByIDSeason(s.team, season, save.jid)];
+                    return [4 /*yield*/, TeamsIn.findAllByTeamSeason(s.team, save.jid, season)];
                 case 4:
                     teams = _a.sent();
                     for (i in teams) {
                         teams[i].player = true;
                         teams[i].save();
                     }
-                    return [4 /*yield*/, TeamsIn.getTeamDivisionCompetition(s.team, save.jid, season)];
+                    return [4 /*yield*/, TeamsIn.findLeagueDivisionByKey(s.team, save.jid, season)];
                 case 5:
                     dc = _a.sent();
-                    Settings.newSettings(save.user, save.jid, s.team, dc.competition.id, dc.division.id);
+                    Settings.newSettings(save.user, save.jid, s.team, dc.league.name, dc.division.name);
                     return [2 /*return*/, save.jid];
             }
         });
@@ -146,94 +144,6 @@ function createNewSave(s) {
 }
 exports.createNewSave = createNewSave;
 ;
-function getPlayers(game, team) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!team) return [3 /*break*/, 2];
-                    return [4 /*yield*/, PlayerDynamicInfo.getTeamPlayers(game, team)];
-                case 1: return [2 /*return*/, _a.sent()];
-                case 2: return [4 /*yield*/, PlayerDynamicInfo.getGamePlayers(game)];
-                case 3: return [2 /*return*/, _a.sent()];
-            }
-        });
-    });
-}
-exports.getPlayers = getPlayers;
-function getGamePlayerTeams(saveId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var save, season, teams, ts, _a, _b, _i, i, t, cs, _c, _d, _e, j, ds, k;
-        return __generator(this, function (_f) {
-            switch (_f.label) {
-                case 0: return [4 /*yield*/, Save.getSave(saveId)];
-                case 1:
-                    save = _f.sent();
-                    season = 2019;
-                    if (!save)
-                        return [2 /*return*/, {}];
-                    teams = new Object();
-                    return [4 /*yield*/, TeamsIn.getSavePlayerTeams(saveId)];
-                case 2:
-                    ts = _f.sent();
-                    console.log(ts);
-                    _a = [];
-                    for (_b in ts)
-                        _a.push(_b);
-                    _i = 0;
-                    _f.label = 3;
-                case 3:
-                    if (!(_i < _a.length)) return [3 /*break*/, 10];
-                    i = _a[_i];
-                    return [4 /*yield*/, Team.getTeamById(ts[i].team)];
-                case 4:
-                    t = _f.sent();
-                    console.log;
-                    console.log(t);
-                    if (!t)
-                        return [2 /*return*/, {}];
-                    teams[t.id] = {
-                        name: t.name,
-                        competitions: {}
-                    };
-                    return [4 /*yield*/, TeamsIn.getTeamCompetitions(t.id, saveId, season)];
-                case 5:
-                    cs = _f.sent();
-                    _c = [];
-                    for (_d in cs)
-                        _c.push(_d);
-                    _e = 0;
-                    _f.label = 6;
-                case 6:
-                    if (!(_e < _c.length)) return [3 /*break*/, 9];
-                    j = _c[_e];
-                    teams[t.id].competitions[cs[j].id] = {
-                        name: cs[j].name,
-                        divisions: {}
-                    };
-                    return [4 /*yield*/, Division.getCompetitionDivisions(save.game, cs[j].id)];
-                case 7:
-                    ds = _f.sent();
-                    for (k in ds) {
-                        teams[t.id].competitions[cs[j].id].divisions[ds[k].id] =
-                            { name: ds[k].name };
-                    }
-                    _f.label = 8;
-                case 8:
-                    _e++;
-                    return [3 /*break*/, 6];
-                case 9:
-                    _i++;
-                    return [3 /*break*/, 3];
-                case 10:
-                    console.log("Teams");
-                    console.log(teams);
-                    return [2 /*return*/, teams];
-            }
-        });
-    });
-}
-exports.getGamePlayerTeams = getGamePlayerTeams;
 function getNewGameTemplates() {
     return __awaiter(this, void 0, void 0, function () {
         var games, ret, _a, _b, _i, i, g, s, teams, _c, _d, _e, j, c;
@@ -254,7 +164,7 @@ function getNewGameTemplates() {
                     g = games[i].name;
                     s = games[i].year;
                     ret[g] = new Object();
-                    return [4 /*yield*/, TeamsIn.getTeamsByGame(games[i].name)];
+                    return [4 /*yield*/, TeamsIn.findAllTeamsByGame(games[i].name)];
                 case 3:
                     teams = _f.sent();
                     teams.sort(function (a, b) {
@@ -290,13 +200,7 @@ function getNewGameTemplates() {
                 case 7:
                     _i++;
                     return [3 /*break*/, 2];
-                case 8: 
-                // for (let g in ret) {
-                //     for (let c in ret[g]) {
-                //         ret[g][c].teams = Array.from(ret[g][c].teams.values())
-                //     }
-                // }
-                return [2 /*return*/, ret];
+                case 8: return [2 /*return*/, ret];
             }
         });
     });

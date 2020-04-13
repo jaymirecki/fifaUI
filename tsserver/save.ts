@@ -64,15 +64,9 @@ export async function getSave(id: string) {
     return save[0];
 };
 
-export let getSaves = async (user: string) => {
-    let saves = await Save.find({ user: user });
-    let saveObjects: any = [];
-    for (let i in saves) {
-        saveObjects[i] = saves[i].toObject();
-        saveObjects[i].id = saves[i].id;
-    }
-    return saveObjects;
-};
+export async function findAllByUser(user: string) {
+    return await Save.find({ user: user });
+}
 
 var validateSave = (save: any) => {
     save.user = escape(save.user);
@@ -87,14 +81,4 @@ var validateSave = (save: any) => {
         save.dom = save.doc;
     }
     return save;
-}
-
-export async function getTemplateId() {
-    let temp = await Save.find({ user: "template" });
-    return temp[0].id;
-}
-
-export async function getSaveGame(saveId: string) {
-    let s = await getSave(saveId);
-    return s.game;
 }

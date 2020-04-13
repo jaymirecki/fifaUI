@@ -74,52 +74,21 @@ function getAllGames() {
     });
 }
 exports.getAllGames = getAllGames;
-function getGameById(id) {
+function findByKey(name) {
     return __awaiter(this, void 0, void 0, function () {
         var g;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Game.find({ name: id })];
+                case 0: return [4 /*yield*/, Game.find({ name: name })];
                 case 1:
                     g = _a.sent();
-                    return [2 /*return*/, g[0]];
+                    if (g.length > 0)
+                        return [2 /*return*/, g[0]];
+                    else
+                        throw "Bad Game key";
+                    return [2 /*return*/];
             }
         });
     });
 }
-exports.getGameById = getGameById;
-function getGameYear(game) {
-    return __awaiter(this, void 0, void 0, function () {
-        var g;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, getGameById(game)];
-                case 1:
-                    g = _a.sent();
-                    if (g)
-                        return [2 /*return*/, g.year];
-                    return [2 /*return*/, 2020];
-            }
-        });
-    });
-}
-exports.getGameYear = getGameYear;
-function getGameByName(name) {
-    return __awaiter(this, void 0, void 0, function () {
-        var g, gs;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Game.findOne({ name: name })];
-                case 1:
-                    g = _a.sent();
-                    if (g)
-                        return [2 /*return*/, g];
-                    return [4 /*yield*/, getAllGames()];
-                case 2:
-                    gs = _a.sent();
-                    return [2 /*return*/, gs[0]];
-            }
-        });
-    });
-}
-exports.getGameByName = getGameByName;
+exports.findByKey = findByKey;

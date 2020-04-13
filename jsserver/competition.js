@@ -58,17 +58,6 @@ var CompetitionSchema = new mongoose.Schema({
     start: { type: Date, required: true }
 });
 var Competition = mongoose.model("Competition", CompetitionSchema);
-// export async function getNewCompetitions(id: string, gameId: string, teamName: string) {
-//     let comps: ICompetition[] = await Competition.find({ game: id });
-//     for (let i in comps) {
-//         let c: ICompetition = comps[i];
-//         c.team = teamName;
-//         c.game = gameId;
-//         c = new Competition(c.toObject());
-//         await c.save();
-//     }
-//     return comps[0].competition;
-// }
 function findByKey(name) {
     return __awaiter(this, void 0, void 0, function () {
         var key, comps;
@@ -89,49 +78,3 @@ function findByKey(name) {
     });
 }
 exports.findByKey = findByKey;
-function getTeamCompetitions(game, team) {
-    return __awaiter(this, void 0, void 0, function () {
-        var comps, compStrings, i;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Competition.find({ game: game, team: team })];
-                case 1:
-                    comps = _a.sent();
-                    compStrings = [];
-                    for (i in comps) {
-                        compStrings[i] = comps[i].name;
-                    }
-                    return [2 /*return*/, compStrings];
-            }
-        });
-    });
-}
-exports.getTeamCompetitions = getTeamCompetitions;
-function getCompetitionByKey(key) {
-    return __awaiter(this, void 0, void 0, function () {
-        var comp;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Competition.find({ name: key })];
-                case 1:
-                    comp = _a.sent();
-                    return [2 /*return*/, comp[0]];
-            }
-        });
-    });
-}
-exports.getCompetitionByKey = getCompetitionByKey;
-function getTeamCompetition(team) {
-    return __awaiter(this, void 0, void 0, function () {
-        var c;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Competition.find({ team: team, league: true })];
-                case 1:
-                    c = _a.sent();
-                    return [2 /*return*/, c[0]];
-            }
-        });
-    });
-}
-exports.getTeamCompetition = getTeamCompetition;

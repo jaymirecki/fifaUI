@@ -36,37 +36,50 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var mongoose = require("mongoose");
-var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
-var mongooseOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-};
-mongoose.connect(uri, mongooseOptions, function (err) {
-    if (err) {
-        console.log(err.message);
-    }
-    else {
-        console.log("Team Successfully Connected!");
-    }
-});
-;
-var TeamSchema = new mongoose.Schema({
-    jid: { type: String, required: true },
-    name: { type: String, required: true }
-});
-var Team = mongoose.model("Team", TeamSchema);
-function findByKey(jid) {
+function BadKey(model) {
     return __awaiter(this, void 0, void 0, function () {
-        var t;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Team.find({ jid: jid })];
-                case 1:
-                    t = _a.sent();
-                    return [2 /*return*/, t[0]];
-            }
+            throw "Bad " + model + "key";
         });
     });
 }
-exports.findByKey = findByKey;
+exports.BadKey = BadKey;
+function BadKeyFor(model, submodel) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            throw "Bad " + model + "key for " + submodel;
+        });
+    });
+}
+exports.BadKeyFor = BadKeyFor;
+function SingleKeyResult(result) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, result.length > 0];
+        });
+    });
+}
+function CheckKeyResult(result, model) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            if (result.length > 0)
+                return [2 /*return*/, result[0]];
+            else
+                BadKey(model);
+            return [2 /*return*/];
+        });
+    });
+}
+exports.CheckKeyResult = CheckKeyResult;
+function CheckKeyResultFor(result, model, submodel) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            if (result.length > 0)
+                return [2 /*return*/, result[0]];
+            else
+                BadKeyFor(model, submodel);
+            return [2 /*return*/];
+        });
+    });
+}
+exports.CheckKeyResultFor = CheckKeyResultFor;

@@ -93,22 +93,17 @@ function getSave(id) {
 }
 exports.getSave = getSave;
 ;
-exports.getSaves = function (user) { return __awaiter(void 0, void 0, void 0, function () {
-    var saves, saveObjects, i;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, exports.Save.find({ user: user })];
-            case 1:
-                saves = _a.sent();
-                saveObjects = [];
-                for (i in saves) {
-                    saveObjects[i] = saves[i].toObject();
-                    saveObjects[i].id = saves[i].id;
-                }
-                return [2 /*return*/, saveObjects];
-        }
+function findAllByUser(user) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.Save.find({ user: user })];
+                case 1: return [2 /*return*/, _a.sent()];
+            }
+        });
     });
-}); };
+}
+exports.findAllByUser = findAllByUser;
 var validateSave = function (save) {
     save.user = validator_1.escape(save.user);
     save.name = validator_1.escape(save.name);
@@ -123,31 +118,3 @@ var validateSave = function (save) {
     }
     return save;
 };
-function getTemplateId() {
-    return __awaiter(this, void 0, void 0, function () {
-        var temp;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.Save.find({ user: "template" })];
-                case 1:
-                    temp = _a.sent();
-                    return [2 /*return*/, temp[0].id];
-            }
-        });
-    });
-}
-exports.getTemplateId = getTemplateId;
-function getSaveGame(saveId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var s;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, getSave(saveId)];
-                case 1:
-                    s = _a.sent();
-                    return [2 /*return*/, s.game];
-            }
-        });
-    });
-}
-exports.getSaveGame = getSaveGame;

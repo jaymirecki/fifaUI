@@ -35,22 +35,10 @@ export async function getAllGames() {
     return glist;
 }
 
-export async function getGameById(id: string) {
-    let g = await Game.find({ name: id });
-    return g[0];
-}
-
-export async function getGameYear(game: string) {
-    let g = await getGameById(game);
-    if (g)
-        return g.year;
-    return 2020;
-}
-
-export async function getGameByName(name: string) {
-    let g = await Game.findOne({ name: name });
-    if (g)
-        return g;
-    let gs = await getAllGames();
-    return gs[0];
+export async function findByKey(name: string) {
+    let g = await Game.find({ name: name });
+    if (g.length > 0)
+        return g[0];
+    else
+        throw "Bad Game key";
 }

@@ -39,11 +39,12 @@ export async function getSave(id: string) {
 }
 
 export async function getSaves(user: string) {
-    let saves = await Save.getSaves(user);
+    let saves = await Save.findAllByUser(user);
+    let saveObjects: any[] = [];
     for (let i in saves) {
-        // saves[i].team = (await Settings.getGameSettings(saves[i].id)).team;
+        saveObjects.push(saves[i].toObject());
     }
-    return saves;
+    return saveObjects;
 }
 
 export async function createNewSave(s: any) {
@@ -58,63 +59,21 @@ export async function createNewSave(s: any) {
         doc: new Date(),
         dom: new Date()
     };
-    let season = await Game.getGameYear(s.game);
+    let season = (await Game.findByKey(s.game)).year;
     let save: Save.ISave = new Save.Save(saveObject);
     await save.save();
 
     await TeamsIn.copyTeamsFromSaveTeam(save.game, s.team, season, save.jid, save.game);
-    let teams = await TeamsIn.getTeamsByIDSeason(s.team, season, save.jid);
+    let teams = await TeamsIn.findAllByTeamSeason(s.team, save.jid, season);
     for (let i in teams) {
         teams[i].player = true;
         teams[i].save();
     }
 
-    let dc = await TeamsIn.getTeamDivisionCompetition(s.team, save.jid, season);
-    Settings.newSettings(save.user, save.jid, s.team, dc.competition.id, dc.division.id);
+    let dc = await TeamsIn.findLeagueDivisionByKey(s.team, save.jid, season);
+    Settings.newSettings(save.user, save.jid, s.team, dc.league.name, dc.division.name);
     return save.jid;
 };
-
-export async function getPlayers(game: string, team: string) {
-    if (team)
-        return await PlayerDynamicInfo.getTeamPlayers(game, team);
-    else
-        return await PlayerDynamicInfo.getGamePlayers(game);
-}
-
-export async function getGamePlayerTeams(saveId: string) {
-    let save = await Save.getSave(saveId);
-    let season = 2019;
-    if (!save) return {};
-    let teams: any = new Object();
-    let ts = await TeamsIn.getSavePlayerTeams(saveId);
-    console.log(ts);
-    for (let i in ts) {
-        let t = await Team.getTeamById(ts[i].team);
-        console.log
-        console.log(t);
-        if (!t) return {};
-        teams[t.id] = {
-            name: t.name,
-            competitions: {}
-        };
-        let cs = await TeamsIn.getTeamCompetitions(t.id, saveId, season);
-        for (let j in cs) {
-            teams[t.id].competitions[cs[j].id] = {
-                name: cs[j].name,
-                divisions: {}
-            };
-            let ds = 
-                await Division.getCompetitionDivisions(save.game, cs[j].id);
-            for (let k in ds) {
-                teams[t.id].competitions[cs[j].id].divisions[ds[k].id] = 
-                    { name: ds[k].name };
-            }
-        }
-    }
-    console.log("Teams");
-    console.log(teams);
-    return teams;
-}
 
 export async function getNewGameTemplates() {
     let games = await Game.getAllGames();
@@ -123,7 +82,7 @@ export async function getNewGameTemplates() {
         let g = games[i].name;
         let s = games[i].year;
         ret[g] = new Object();
-        let teams = await TeamsIn.getTeamsByGame(games[i].name);
+        let teams = await TeamsIn.findAllTeamsByGame(games[i].name);
         teams.sort(function(a, b) { if (a.name < b.name) return -1;
                                     else if (a.name > b.name) return 1;
                                     else return 0; });
@@ -138,10 +97,5 @@ export async function getNewGameTemplates() {
             });
         }
     }
-    // for (let g in ret) {
-    //     for (let c in ret[g]) {
-    //         ret[g][c].teams = Array.from(ret[g][c].teams.values())
-    //     }
-    // }
     return ret;
 } 
