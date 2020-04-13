@@ -292,3 +292,16 @@ function getSavePlayerTeams(saveId) {
     });
 }
 exports.getSavePlayerTeams = getSavePlayerTeams;
+function deleteAllBySave(saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.TeamsIn.deleteMany({ saveId: saveId })];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.deleteAllBySave = deleteAllBySave;

@@ -57,7 +57,10 @@ export async function getSaves(user: string) {
     let saves = await Save.findAllByUser(user);
     let saveObjects: any[] = [];
     for (let i in saves) {
-        saveObjects.push(saves[i].toObject());
+        let sObject = saves[i].toObject();
+        sObject.team = (await Settings.getGameSettings(sObject.jid)).team;
+        sObject.teamName = (await Team.findByKey(sObject.team)).name;
+        saveObjects.push(sObject);
     }
     return saveObjects;
 }
@@ -114,3 +117,9 @@ export async function getNewGameTemplates() {
     }
     return ret;
 } 
+
+export async function deleteSave(body: any) {
+    if (await Save.deleteByKey(body.user, body.game))
+        await TeamsIn.deleteAllBySave(body.game);
+    return true;
+}

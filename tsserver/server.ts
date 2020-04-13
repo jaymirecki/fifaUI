@@ -2,6 +2,7 @@ import * as e from 'express';
 var express = require('express');
 import * as DB from './database';
 import { create } from 'domain';
+import { Save } from './save';
 const app = express();
 var validator = require('validator');
 
@@ -29,6 +30,9 @@ async function catchErrors(res: e.Response, callback: CallableFunction) {
     }
 }
 // api
+app.post("/delete", async function(req: e.Request, res: e.Response) {
+    catchErrors(res, async () => DB.deleteSave(req.body) );
+});
 app.get("/game", async function(req: e.Request, res: e.Response) {
     catchErrors(res, async () => await DB.getSave(req.query.game, req.query.user) );
 });

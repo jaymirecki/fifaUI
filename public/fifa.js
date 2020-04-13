@@ -52,11 +52,14 @@ function fifaRequest(get, url, parameters, callback) {
     request.onreadystatechange = function () {
         if (request.readyState != 4)
             return;
-        if (DEBUG) console.log(request.responseText);
-        var result = JSON.parse(request.responseText);
-        if (DEBUG) console.log(result);
-        if (result.success)
-            callback(result.content);
+        try {
+            var result = JSON.parse(request.responseText);
+            if (DEBUG) console.log(result);
+            if (result.success)
+                callback(result.content);
+        } catch(e) {
+            if (DEBUG) console.log(request.responseText);
+        }
     };
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
     if (get)

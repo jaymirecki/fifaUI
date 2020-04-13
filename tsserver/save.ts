@@ -69,6 +69,15 @@ export async function findAllByUser(user: string) {
     return await Save.find({ user: user });
 }
 
+export async function deleteByKey(user: string, jid: string) {
+    let save:ISave = await findByKey(jid);
+    if (user == save.user) {
+        await Save.deleteOne({ jid: jid });
+        return true;
+    } else
+        throw "Cannot delete game for different user";
+}
+
 var validateSave = (save: any) => {
     save.user = escape(save.user);
     save.name = escape(save.name);

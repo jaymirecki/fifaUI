@@ -122,3 +122,7 @@ export async function getSavePlayerTeams(saveId: string) {
     });
     return ts;
 }
+
+export async function deleteAllBySave(saveId: string) {
+    await TeamsIn.deleteMany({ saveId: saveId });
+}

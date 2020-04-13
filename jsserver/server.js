@@ -77,6 +77,17 @@ function catchErrors(res, callback) {
     });
 }
 // api
+app.post("/delete", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _this = this;
+        return __generator(this, function (_a) {
+            catchErrors(res, function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                return [2 /*return*/, DB.deleteSave(req.body)];
+            }); }); });
+            return [2 /*return*/];
+        });
+    });
+});
 app.get("/game", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var _this = this;

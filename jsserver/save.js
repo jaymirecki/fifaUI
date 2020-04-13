@@ -105,6 +105,25 @@ function findAllByUser(user) {
     });
 }
 exports.findAllByUser = findAllByUser;
+function deleteByKey(user, jid) {
+    return __awaiter(this, void 0, void 0, function () {
+        var save;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, findByKey(jid)];
+                case 1:
+                    save = _a.sent();
+                    if (!(user == save.user)) return [3 /*break*/, 3];
+                    return [4 /*yield*/, exports.Save.deleteOne({ jid: jid })];
+                case 2:
+                    _a.sent();
+                    return [2 /*return*/, true];
+                case 3: throw "Cannot delete game for different user";
+            }
+        });
+    });
+}
+exports.deleteByKey = deleteByKey;
 var validateSave = function (save) {
     save.user = validator_1.escape(save.user);
     save.name = validator_1.escape(save.name);

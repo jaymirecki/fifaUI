@@ -127,17 +127,36 @@ function getSave(saveId, user) {
 exports.getSave = getSave;
 function getSaves(user) {
     return __awaiter(this, void 0, void 0, function () {
-        var saves, saveObjects, i;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var saves, saveObjects, _a, _b, _i, i, sObject, _c, _d;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
                 case 0: return [4 /*yield*/, Save.findAllByUser(user)];
                 case 1:
-                    saves = _a.sent();
+                    saves = _e.sent();
                     saveObjects = [];
-                    for (i in saves) {
-                        saveObjects.push(saves[i].toObject());
-                    }
-                    return [2 /*return*/, saveObjects];
+                    _a = [];
+                    for (_b in saves)
+                        _a.push(_b);
+                    _i = 0;
+                    _e.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 6];
+                    i = _a[_i];
+                    sObject = saves[i].toObject();
+                    _c = sObject;
+                    return [4 /*yield*/, Settings.getGameSettings(sObject.jid)];
+                case 3:
+                    _c.team = (_e.sent()).team;
+                    _d = sObject;
+                    return [4 /*yield*/, Team.findByKey(sObject.team)];
+                case 4:
+                    _d.teamName = (_e.sent()).name;
+                    saveObjects.push(sObject);
+                    _e.label = 5;
+                case 5:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 6: return [2 /*return*/, saveObjects];
             }
         });
     });
@@ -250,3 +269,20 @@ function getNewGameTemplates() {
     });
 }
 exports.getNewGameTemplates = getNewGameTemplates;
+function deleteSave(body) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Save.deleteByKey(body.user, body.game)];
+                case 1:
+                    if (!_a.sent()) return [3 /*break*/, 3];
+                    return [4 /*yield*/, TeamsIn.deleteAllBySave(body.game)];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3: return [2 /*return*/, true];
+            }
+        });
+    });
+}
+exports.deleteSave = deleteSave;
