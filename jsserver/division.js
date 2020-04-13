@@ -105,7 +105,7 @@ function getDivisionCompetition(division) {
                 case 0: return [4 /*yield*/, Division.find({ jid: division })];
                 case 1:
                     cid = _a.sent();
-                    return [4 /*yield*/, Competition.getCompetitionById(cid[0].competition)];
+                    return [4 /*yield*/, Competition.getCompetitionByKey(cid[0].competition)];
                 case 2:
                     c = _a.sent();
                     // let comp = c.toObject();

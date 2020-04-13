@@ -53,6 +53,7 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var SaveSchema = new mongoose.Schema({
+    jid: { type: String, required: true },
     user: { type: String, required: true },
     shared: { type: Boolean, required: true },
     name: { type: String, required: true },
@@ -82,10 +83,10 @@ function getSave(id) {
         var save;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.Save.findById(id)];
+                case 0: return [4 /*yield*/, exports.Save.find({ jid: id })];
                 case 1:
                     save = _a.sent();
-                    return [2 /*return*/, save];
+                    return [2 /*return*/, save[0]];
             }
         });
     });
@@ -136,3 +137,17 @@ function getTemplateId() {
     });
 }
 exports.getTemplateId = getTemplateId;
+function getSaveGame(saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var s;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, getSave(saveId)];
+                case 1:
+                    s = _a.sent();
+                    return [2 /*return*/, s.game];
+            }
+        });
+    });
+}
+exports.getSaveGame = getSaveGame;

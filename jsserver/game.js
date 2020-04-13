@@ -79,10 +79,10 @@ function getGameById(id) {
         var g;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Game.findById(id)];
+                case 0: return [4 /*yield*/, Game.find({ name: id })];
                 case 1:
                     g = _a.sent();
-                    return [2 /*return*/, g];
+                    return [2 /*return*/, g[0]];
             }
         });
     });

@@ -39,7 +39,6 @@ exports.__esModule = true;
 var mongoose = require("mongoose");
 var Team = require("./team");
 var Division = require("./division");
-var Game = require("./game");
 var save_1 = require("./save");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 var mongooseOptions = {
@@ -125,6 +124,34 @@ function getAllUniqueTeams() {
     });
 }
 exports.getAllUniqueTeams = getAllUniqueTeams;
+function getTeamBySeason(team, season, saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var t;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.TeamsIn.find({ team: team, season: season, saveId: saveId })];
+                case 1:
+                    t = _a.sent();
+                    return [2 /*return*/, t[0]];
+            }
+        });
+    });
+}
+exports.getTeamBySeason = getTeamBySeason;
+function getTeamsByIDSeason(team, season, saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var t;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.TeamsIn.find({ team: team, season: season, saveId: saveId })];
+                case 1:
+                    t = _a.sent();
+                    return [2 /*return*/, t];
+            }
+        });
+    });
+}
+exports.getTeamsByIDSeason = getTeamsByIDSeason;
 function getTeamsByGame(game) {
     return __awaiter(this, void 0, void 0, function () {
         var teams, tlist, _loop_1, _a, _b, _i, i;
@@ -253,7 +280,25 @@ function getTeamDivision(team, saveId, season) {
     });
 }
 exports.getTeamDivision = getTeamDivision;
-function getCompetitionTeams(game, competition, saveId, season) {
+function getTeamDivisions(team, saveId, season) {
+    return __awaiter(this, void 0, void 0, function () {
+        var cds, cs, i;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, getTeamDivisionsCompetitions(team, saveId, season)];
+                case 1:
+                    cds = _a.sent();
+                    cs = [];
+                    for (i in cds) {
+                        cs.push(cds[i].division);
+                    }
+                    return [2 /*return*/, cs];
+            }
+        });
+    });
+}
+exports.getTeamDivisions = getTeamDivisions;
+function getCompetitionTeams(competition, saveId, season, game) {
     return __awaiter(this, void 0, void 0, function () {
         var ds, ts, _a, _b, _i, i, newts, j;
         return __generator(this, function (_c) {
@@ -271,10 +316,9 @@ function getCompetitionTeams(game, competition, saveId, season) {
                     if (!(_i < _a.length)) return [3 /*break*/, 5];
                     i = _a[_i];
                     return [4 /*yield*/, exports.TeamsIn.find({
-                            game: game,
                             saveId: saveId,
                             season: season,
-                            division: ds[i].id
+                            division: ds[i].jid
                         })];
                 case 3:
                     newts = _c.sent();
@@ -307,55 +351,64 @@ function getTeamDivisionCompetition(team, saveId, season) {
     });
 }
 exports.getTeamDivisionCompetition = getTeamDivisionCompetition;
-function getNewTeamsIn(template, team, saveId, game) {
+function copyTeamsFromSaveTeam(saveId, team, season, newSaveId, game) {
     return __awaiter(this, void 0, void 0, function () {
-        var season, cs, dc, ts, _a, _b, _i, i, newts, j, i, tobject, t;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0: return [4 /*yield*/, Game.getGameYear(game)];
+        var cs, TISet, _a, _b, _i, i, ts, j, TIRay, _c, _d, _e, i, tobject, t;
+        return __generator(this, function (_f) {
+            switch (_f.label) {
+                case 0: return [4 /*yield*/, getTeamCompetitions(team, saveId, season)];
                 case 1:
-                    season = _c.sent();
-                    return [4 /*yield*/, getTeamCompetitions(team, template, season)];
-                case 2:
-                    cs = _c.sent();
-                    return [4 /*yield*/, getTeamDivisionCompetition(team, template, season)];
-                case 3:
-                    dc = _c.sent();
-                    ts = new Set();
+                    cs = _f.sent();
+                    TISet = new Set();
                     _a = [];
                     for (_b in cs)
                         _a.push(_b);
                     _i = 0;
-                    _c.label = 4;
-                case 4:
-                    if (!(_i < _a.length)) return [3 /*break*/, 7];
+                    _f.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
                     i = _a[_i];
-                    return [4 /*yield*/, getCompetitionTeams(game, cs[i].id, template, season)];
-                case 5:
-                    newts = _c.sent();
-                    for (j in newts) {
-                        ts.add(newts[j]);
+                    return [4 /*yield*/, getCompetitionTeams(cs[i].name, saveId, season, game)];
+                case 3:
+                    ts = _f.sent();
+                    for (j in ts) {
+                        TISet.add(ts[j]);
                     }
-                    _c.label = 6;
-                case 6:
+                    _f.label = 4;
+                case 4:
                     _i++;
-                    return [3 /*break*/, 4];
+                    return [3 /*break*/, 2];
+                case 5:
+                    TIRay = Array.from(TISet.values());
+                    _c = [];
+                    for (_d in TIRay)
+                        _c.push(_d);
+                    _e = 0;
+                    _f.label = 6;
+                case 6:
+                    if (!(_e < _c.length)) return [3 /*break*/, 9];
+                    i = _c[_e];
+                    tobject = TIRay[i].toObject();
+                    delete tobject._id;
+                    t = new exports.TeamsIn(tobject);
+                    // if (t.team == team)
+                    //     t.player = true;
+                    // else
+                    //     t.player = false;
+                    t.saveId = newSaveId;
+                    return [4 /*yield*/, t.save()];
                 case 7:
-                    for (i in Array.from(ts.values())) {
-                        tobject = Array.from(ts.values())[i].toObject();
-                        delete tobject._id;
-                        t = new exports.TeamsIn(tobject);
-                        if (t.team == team)
-                            t.player = true;
-                        t.saveId = saveId;
-                        t.save();
-                    }
-                    return [2 /*return*/, dc];
+                    _f.sent();
+                    _f.label = 8;
+                case 8:
+                    _e++;
+                    return [3 /*break*/, 6];
+                case 9: return [2 /*return*/];
             }
         });
     });
 }
-exports.getNewTeamsIn = getNewTeamsIn;
+exports.copyTeamsFromSaveTeam = copyTeamsFromSaveTeam;
 function getSavePlayerTeams(saveId) {
     return __awaiter(this, void 0, void 0, function () {
         var ts;

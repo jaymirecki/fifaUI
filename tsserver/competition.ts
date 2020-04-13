@@ -15,7 +15,6 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 });
 
 export interface ICompetition extends mongoose.Document {
-    jid: string;
     name: string;
     league: boolean;
     playoff: boolean;
@@ -23,7 +22,6 @@ export interface ICompetition extends mongoose.Document {
 };
 
 const CompetitionSchema = new mongoose.Schema({
-    jid: { type: String, required: true },
     name: { type: String, required: true },
     league: {type: Boolean, required: true },
     playoff: {type: Boolean, required: true },
@@ -54,8 +52,8 @@ export async function getTeamCompetitions(game: string, team: string) {
     return compStrings;
 }
 
-export async function getCompetitionById(id: string) {
-    let comp = await Competition.find({ jid: id });
+export async function getCompetitionByKey(key: string) {
+    let comp = await Competition.find({ name: key });
     return comp[0];
 }
 

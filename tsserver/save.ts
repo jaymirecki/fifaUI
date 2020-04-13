@@ -18,6 +18,7 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
 });
 
 export interface ISave extends mongoose.Document {
+    jid: string;
     user: string;
     shared: boolean;
     name: string;
@@ -29,6 +30,7 @@ export interface ISave extends mongoose.Document {
 };
 
 const SaveSchema = new mongoose.Schema({
+    jid: { type: String, required: true },
     user: { type: String, required: true },
     shared: { type: Boolean, required: true },
     name: { type: String, required: true },
@@ -58,8 +60,8 @@ export let save = (req: Request, res: Response) => {
 };
 
 export async function getSave(id: string) {
-    let save = await Save.findById(id);
-    return save;
+    let save = await Save.find( { jid: id });
+    return save[0];
 };
 
 export let getSaves = async (user: string) => {
@@ -90,4 +92,9 @@ var validateSave = (save: any) => {
 export async function getTemplateId() {
     let temp = await Save.find({ user: "template" });
     return temp[0].id;
+}
+
+export async function getSaveGame(saveId: string) {
+    let s = await getSave(saveId);
+    return s.game;
 }

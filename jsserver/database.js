@@ -44,6 +44,7 @@ var TeamsIn = require("./teamsIn");
 var Settings = require("./settings");
 var PlayerDynamicInfo = require("./playerdynamicinfo");
 var Game = require("./game");
+var uuid_1 = require("uuid");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 var mongooseOptions = {
     useNewUrlParser: true,
@@ -102,38 +103,43 @@ function getSaves(user) {
 exports.getSaves = getSaves;
 function createNewSave(s) {
     return __awaiter(this, void 0, void 0, function () {
-        var id, game, saveObject, template, save, dc;
+        var saveObject, season, save, teams, i, dc;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    id = s.game + s.league;
-                    return [4 /*yield*/, Game.getGameByName(s.game)];
-                case 1:
-                    game = (_a.sent()).id;
                     saveObject = {
+                        jid: uuid_1.v4(),
                         user: s.user,
                         shared: false,
                         name: s.name,
                         managerName: s.managerName,
                         date: new Date(),
-                        game: game,
-                        doc: new Date(parseInt(s.doc)),
-                        dom: new Date(parseInt(s.doc))
+                        game: s.game,
+                        doc: new Date(),
+                        dom: new Date()
                     };
-                    return [4 /*yield*/, Save.getTemplateId()];
-                case 2:
-                    template = _a.sent();
-                    console.log(saveObject);
+                    return [4 /*yield*/, Game.getGameYear(s.game)];
+                case 1:
+                    season = _a.sent();
                     save = new Save.Save(saveObject);
                     return [4 /*yield*/, save.save()];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, TeamsIn.copyTeamsFromSaveTeam(save.game, s.team, season, save.jid, save.game)];
                 case 3:
                     _a.sent();
-                    PlayerDynamicInfo.getNewPlayers(template, s.team, save.id);
-                    return [4 /*yield*/, TeamsIn.getNewTeamsIn(template, s.team, save.id, game)];
+                    return [4 /*yield*/, TeamsIn.getTeamsByIDSeason(s.team, season, save.jid)];
                 case 4:
+                    teams = _a.sent();
+                    for (i in teams) {
+                        teams[i].player = true;
+                        teams[i].save();
+                    }
+                    return [4 /*yield*/, TeamsIn.getTeamDivisionCompetition(s.team, save.jid, season)];
+                case 5:
                     dc = _a.sent();
-                    Settings.newSettings(save.user, save.id, s.team, dc.competition.id, dc.division.id);
-                    return [2 /*return*/, save.id];
+                    Settings.newSettings(save.user, save.jid, s.team, dc.competition.id, dc.division.id);
+                    return [2 /*return*/, save.jid];
             }
         });
     });

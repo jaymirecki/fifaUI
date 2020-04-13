@@ -1,5 +1,6 @@
 function loadTeamSelection(teamSelection) {
-    var games = $('#gameSelect');
+    $('#fifaFormSubmit').click(createGame);
+    var games = $('#fifaGameSelect');
     games.change(function() { updateLeagues(teamSelection)(this.value)});
     games.html('');
     for (let g in teamSelection) {
@@ -12,7 +13,7 @@ function loadTeamSelection(teamSelection) {
 
 function updateLeagues(teamSelection) {
     return function(game) {
-        var leagues = $('#leagueSelect');
+        var leagues = $('#fifaLeagueSelect');
         leagues.html('');
         for (let l in teamSelection[game]) {
             var league = document.createElement('option');
@@ -26,7 +27,7 @@ function updateLeagues(teamSelection) {
 
 function updateTeams(teamSelection) {
     return function(game, league) {
-        var teams = $('#teamSelect');
+        var teams = $('#fifaTeamSelect');
         teams.html('');
         var availableTeams = teamSelection[game][league].teams;
         for (let t in availableTeams) {
@@ -35,6 +36,18 @@ function updateTeams(teamSelection) {
             teams.append(team);
         }
     }
+}
+
+function createGame() {
+    var game = {
+        game: $('#fifaGameSelect').val(),
+        team: $('#fifaTeamSelect').val(),
+        user: fifaUser,
+        name: $('#fifaSaveName').val(),
+        managerName: $('#fifaManName').val()
+    };
+    console.log(game);
+    fifaPostRequest('/new_save', game, x => location.href = '/play?g=' + x.id);
 }
 
 fifaGetRequest("/team_selection", loadTeamSelection)

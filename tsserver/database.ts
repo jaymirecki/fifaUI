@@ -7,6 +7,7 @@ import * as TeamsIn from './teamsIn';
 import * as Settings from './settings';
 import * as PlayerDynamicInfo from './playerdynamicinfo';
 import * as Game from './game';
+import { v4 as uuid4 } from 'uuid';
 
 const uri: string = 
     process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
@@ -46,26 +47,31 @@ export async function getSaves(user: string) {
 }
 
 export async function createNewSave(s: any) {
-    var id: string = s.game + s.league;
-    let game: string = (await Game.getGameByName(s.game)).id;
     let saveObject: any = {
+        jid: uuid4(),
         user: s.user,
         shared: false,
         name: s.name,
         managerName: s.managerName,
         date: new Date(),
-        game: game,
-        doc: new Date(parseInt(s.doc)),
-        dom: new Date(parseInt(s.doc))
+        game: s.game,
+        doc: new Date(),
+        dom: new Date()
     };
-    let template = await Save.getTemplateId();
-    console.log(saveObject);
+    let season = await Game.getGameYear(s.game);
     let save: Save.ISave = new Save.Save(saveObject);
     await save.save();
-    PlayerDynamicInfo.getNewPlayers(template, s.team, save.id);
-    let dc = await TeamsIn.getNewTeamsIn(template, s.team, save.id, game);
-    Settings.newSettings(save.user, save.id, s.team, dc.competition.id, dc.division.id);
-    return save.id;
+
+    await TeamsIn.copyTeamsFromSaveTeam(save.game, s.team, season, save.jid, save.game);
+    let teams = await TeamsIn.getTeamsByIDSeason(s.team, season, save.jid);
+    for (let i in teams) {
+        teams[i].player = true;
+        teams[i].save();
+    }
+
+    let dc = await TeamsIn.getTeamDivisionCompetition(s.team, save.jid, season);
+    Settings.newSettings(save.user, save.jid, s.team, dc.competition.id, dc.division.id);
+    return save.jid;
 };
 
 export async function getPlayers(game: string, team: string) {

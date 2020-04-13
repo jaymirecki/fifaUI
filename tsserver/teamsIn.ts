@@ -4,7 +4,7 @@ import * as Team from "./team";
 import * as Division from "./division";
 import { ICompetition } from "./competition";
 import * as Game from "./game";
-import { Save, getTemplateId } from "./save";
+import { Save, getTemplateId, getSaveGame } from "./save";
 
 const uri: string = 
     process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
@@ -76,6 +76,16 @@ export async function getAllUniqueTeams() {
     return tlist;
 }
 
+export async function getTeamBySeason(team: string, season: number, saveId: string) {
+    let t = await TeamsIn.find({ team: team, season: season, saveId: saveId });
+    return t[0];
+}
+
+export async function getTeamsByIDSeason(team: string, season: number, saveId: string) {
+    let t = await TeamsIn.find({ team: team, season: season, saveId: saveId });
+    return t;
+}
+
 export async function getTeamsByGame(game: string) {
     let teams = await TeamsIn.find({ saveId: game });
     let tlist: Team.ITeam[] = [];
@@ -122,15 +132,23 @@ export async function getTeamDivision(team: string, saveId: string, season: numb
     return dc.division;
 }
 
-async function getCompetitionTeams(game: string, competition: string, saveId: string, season: number) {
+export async function getTeamDivisions(team: string, saveId: string, season: number) {
+    let cds = await getTeamDivisionsCompetitions(team, saveId, season);
+    let cs: Division.IDivision[] = [];
+    for (let i in cds) {
+        cs.push(cds[i].division);
+    }
+    return cs;
+}
+
+async function getCompetitionTeams(competition: string, saveId: string, season: number, game: string) {
     let ds = await Division.getCompetitionDivisions(game, competition);
     let ts = new Set<ITeamsIn>();
     for (let i in ds) {
         let newts = await TeamsIn.find({
-            game: game,
             saveId: saveId,
             season: season,
-            division: ds[i].id
+            division: ds[i].jid
         });
         for (let j in newts) {
             ts.add(newts[j]);
@@ -147,28 +165,29 @@ export async function getTeamDivisionCompetition(team: string, saveId: string, s
     return cs[0];
 }
 
-export async function getNewTeamsIn(template: string, team: string, saveId: string, game: string) {
-    let season = await Game.getGameYear(game);
-    let cs = await getTeamCompetitions(team, template, season);
-    let dc = await getTeamDivisionCompetition(team, template, season);
-    let ts = new Set<ITeamsIn>();
+export async function copyTeamsFromSaveTeam(saveId: string, team: string, season: number, newSaveId: string, game: string) {
+    let cs = await getTeamCompetitions(team, saveId, season);
+    let TISet = new Set<ITeamsIn>();
     for (let i in cs) {
-        let newts: ITeamsIn[] = await getCompetitionTeams(game, cs[i].id, template, season);
-        for (let j in newts) {
-            ts.add(newts[j]);
+        let ts: ITeamsIn[] = await getCompetitionTeams(cs[i].name, saveId, season, game);
+        for (let j in ts) {
+            TISet.add(ts[j]);
         }
     }
-    for (let i in Array.from(ts.values())) {
-        let tobject = Array.from(ts.values())[i].toObject();
+    let TIRay = Array.from(TISet.values());
+    for (let i in TIRay) {
+        let tobject = TIRay[i].toObject();
         delete tobject._id;
         let t = new TeamsIn(tobject);
 
-        if (t.team == team)
-            t.player = true;
-        t.saveId = saveId;
-        t.save();
+        // if (t.team == team)
+        //     t.player = true;
+        // else
+        //     t.player = false;
+
+        t.saveId = newSaveId;
+        await t.save();
     }
-    return dc;
 }
 
 export async function getSavePlayerTeams(saveId: string) {

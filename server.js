@@ -84,7 +84,7 @@ app.post("/save", function (req, res) {
     res = cors(res);
     DB.save(req, res);
 });
-app.post("/newsave", function (req, res) {
+app.post("/new_save", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var id;
         return __generator(this, function (_a) {
@@ -152,10 +152,7 @@ app.get("/new", function (req, res) {
 });
 app.get('/play', function (req, res) {
     res = cors(res);
-    if (req.query.g)
-        res.sendFile(__dirname + '/public/play.html');
-    else
-        res.sendFile(__dirname + '/public/choose_save.html');
+    res.sendFile(__dirname + '/public/play.html');
 });
 app.get('/players', function (req, res) {
     return __awaiter(this, void 0, void 0, function () {

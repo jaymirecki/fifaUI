@@ -56,7 +56,7 @@ export async function getCompetitionDivisions(game: string, competition: string)
 
 export async function getDivisionCompetition(division: string) {
     let cid = await Division.find({ jid: division });
-    let c = await Competition.getCompetitionById(cid[0].competition);
+    let c = await Competition.getCompetitionByKey(cid[0].competition);
     // let comp = c.toObject();
     return c;
 }

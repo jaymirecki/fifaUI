@@ -1,4 +1,4 @@
-jid,name,league,playoff,start
-MLS,MLS Cup,true,false,2018-01-01T00:00:00.000Z
-U.S. Open Cup,U.S. Open Cup,false,false,2018-01-01T00:00:00.000Z
-MLS Playoffs,MLS Cup Playoffs,false,true,2019-10-10T00:00:00.000Z
+name,league,playoff,start
+MLS Cup,true,false,2018-01-01T00:00:00.000Z
+U.S. Open Cup,false,false,2018-01-01T00:00:00.000Z
+MLS Cup Playoffs,false,true,2019-10-10T00:00:00.000Z

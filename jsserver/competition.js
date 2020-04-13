@@ -52,7 +52,6 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 });
 ;
 var CompetitionSchema = new mongoose.Schema({
-    jid: { type: String, required: true },
     name: { type: String, required: true },
     league: { type: Boolean, required: true },
     playoff: { type: Boolean, required: true },
@@ -88,12 +87,12 @@ function getTeamCompetitions(game, team) {
     });
 }
 exports.getTeamCompetitions = getTeamCompetitions;
-function getCompetitionById(id) {
+function getCompetitionByKey(key) {
     return __awaiter(this, void 0, void 0, function () {
         var comp;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Competition.find({ jid: id })];
+                case 0: return [4 /*yield*/, Competition.find({ name: key })];
                 case 1:
                     comp = _a.sent();
                     return [2 /*return*/, comp[0]];
@@ -101,7 +100,7 @@ function getCompetitionById(id) {
         });
     });
 }
-exports.getCompetitionById = getCompetitionById;
+exports.getCompetitionByKey = getCompetitionByKey;
 function getTeamCompetition(team) {
     return __awaiter(this, void 0, void 0, function () {
         var c;

@@ -33,7 +33,7 @@ app.post("/save", function(req: e.Request, res: e.Response) {
     DB.save(req, res);
 });
 
-app.post("/newsave", async function(req: e.Request, res: e.Response) {
+app.post("/new_save", async function(req: e.Request, res: e.Response) {
     res = cors(res);
     let id = await DB.createNewSave(req.body);
     res.send({ id: id });
@@ -61,10 +61,7 @@ app.get("/new", async function(req : e.Request, res : e.Response) {
 });
 app.get('/play', function(req: e.Request, res:e.Response) {
     res = cors(res);
-    if (req.query.g)
-        res.sendFile(__dirname + '/public/play.html');
-    else
-        res.sendFile(__dirname + '/public/choose_save.html');
+    res.sendFile(__dirname + '/public/play.html');
 });
 
 app.get('/players', async function(req: e.Request, res: e.Response) {

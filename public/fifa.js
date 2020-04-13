@@ -33,11 +33,34 @@ function fifaGetRequest(getString, callback) {
         if (request.readyState != 4)
             return;
         // console.log(request.responseText);
-        var response = JSON.parse(request.responseText);
-        // console.log(response)
-        callback(response);
+        var result = JSON.parse(request.responseText);
+        // console.log(result)
+        callback(result);
     };
     request.send();
+}
+function objectToPostString(obj) {
+    let postString = "";
+    for (key in obj) {
+        postString = postString +
+            "&" + key + "=" + obj[key];
+    }
+    return postString.slice(1);
+}
+function fifaPostRequest(url, parameters, callback) {
+    var request = new XMLHttpRequest();
+    var getString = url;
+    request.open("POST", getString, true);
+    request.onreadystatechange = function () {
+        if (request.readyState != 4)
+            return;
+        // console.log(request.responseText);
+        var result = JSON.parse(request.responseText);
+        // console.log(result)
+        callback(result);
+    };
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+    request.send(objectToPostString(parameters));
 }
 
 main();

@@ -36,8 +36,8 @@ export async function getAllGames() {
 }
 
 export async function getGameById(id: string) {
-    let g = await Game.findById(id);
-    return g;
+    let g = await Game.find({ name: id });
+    return g[0];
 }
 
 export async function getGameYear(game: string) {
