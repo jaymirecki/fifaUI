@@ -10,6 +10,7 @@ table.fifa {
     border-collapse: collapse;
     cursor: default;
     font-size: 17px;
+    background-color: white;
 }
 tr.fifa {
     width: 100%;
@@ -28,11 +29,23 @@ td.fifaCellButton {
 
 
 button.fifa {
-    font-size: medium;
+    width: 100%;
+    font-size: larger;
     background: linear-gradient(white, rgba(50, 173, 255, 0.37), white);
+}
+button.fifaBack {
+    width: max-content;
+}
+button.fifaTable {
+    width: initial;
+    font-size: medium;
 }
 button.fifaHalf {
     width: 49.3%;
+    height: 100%;
+}
+button.fifaSelected {
+    background-color: rgba(24, 126, 194, 0.37);
 }
 input.fifa {
     width: 100%;
@@ -43,8 +56,22 @@ select.fifa {
     font-size: medium;
 }
 
-
+.fifaFixed {
+    position: fixed;
+    background-color: white;
+    width: 96%;
+}
 select.fifaHeader {
     width: 100%;
     font-size: x-large;
+}
+option.fifaHeader {
+    font-size: large;
+}
+th.fifaHeader {
+    width: 100%;
+}
+
+#fifaPlayTables, #fifaPlayFixtures {
+    display: none;
 }

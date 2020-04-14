@@ -8,6 +8,8 @@ class FCSave {
         this.competition = saveObject.competition;
         this.division = saveObject.division;
         this.teams = saveObject.teams;
+        this.name = saveObject.name;
+        this.managerName = saveObject.managerName
     }
 
     competitions() {
@@ -31,5 +33,9 @@ class FCSave {
 
     changeDivision(div) {
         this.division = div;
+    }
+
+    save() {
+        fifaPostRequest("save", { user: fifaUser, game: fifaGame }, x => location.href='game?g=' + x);
     }
 }

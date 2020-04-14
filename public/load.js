@@ -30,7 +30,7 @@ function createSaveRow(save) {
     saveRow.appendChild(domCell);
     var delCell = d.createElement('td');
     var delButton = d.createElement('button');
-    delButton.className = "fifa";
+    delButton.className = "fifa fifaTable";
     delButton.innerHTML = "Delete";
     delButton.onclick = () => deleteSave(save.jid);
     saveRow.onclick = () => location.href = 'play?g=' + save.jid;

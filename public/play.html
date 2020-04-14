@@ -5,16 +5,75 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Play - FIFA Career Companion</title>
     </head>
-    <body>
-        <select id="fifaTeam" class="fifaHeader">
-            <option disabled>---</option>
-        </select><br>
-        <select id="fifaCompetition" class="fifaHeader">
-            <option disabled>---</option>
-        </select><br>
-        <select id="fifaDivision" class="fifaHeader">
-            <option disabled>---</option>
-        </select><br>
+    <body><div class="fifa">
+        <div class="fifaFixed">
+            <table class="fifa"><tr class="fifa">
+                <th id="fifaManagerName">blah</th>
+                <th id="fifaName"></th>
+                <th id="fifaDate"></th>
+                <th><button id="fifaSave" class="fifa fifaTable">Save</button></th>
+            </tr></table>
+        </div>
+        <div>
+            <table><tr class="fifa"><th>blah</th>
+                <!-- <th><button class="fifa fifaTable">Save</button></th> -->
+            </tr></table>
+        </div>
+        <div id="fifaHeader" class="fifaFixed">
+            <select id="fifaTeam" class="fifaHeader">
+                <option disabled>---</option>
+            </select>
+            <select id="fifaCompetition" class="fifaHeader">
+                <option disabled>---</option>
+            </select>
+            <select id="fifaDivision" class="fifaHeader">
+                <option disabled>---</option>
+            </select>
+        </div>
+        <div style="visibility: hidden;">
+            <select id="fifaTeam" class="fifaHeader">
+                <option disabled>---</option>
+            </select>
+            <select id="fifaCompetition" class="fifaHeader">
+                <option disabled>---</option>
+            </select>
+            <select id="fifaDivision" class="fifaHeader">
+                <option disabled>---</option>
+            </select>
+        </div>
+        <div id="fifaPlayHome">
+            <button class="fifa" id="fifaTablesButton">Tables</button>
+            <button class="fifa" id="fifaFixturesButton">Fixtures</button>
+        </div>
+        <div id="fifaPlayTables">
+            <table class="fifa"><tr class="fifa"><th>
+                <button class="fifa fifaBack" id="fifaBack">Back</button>
+                </th><th><th class="fifa fifaHeader">TABLES</th></tr></table>
+            <button class="fifa fifaHalf fifaSelected" id="fifaStandingsButton">Standings</button>
+            <button class="fifa fifaHalf" id="fifaPowerButton">Power Rankings</button>
+        </div>
+        <div id="fifaPlayFixtures">
+            <div  class="fifaFixed">
+                <table class="fifa"><tr class="fifa"><th>
+                    <button class="fifa fifaBack" id="fifaBack">Back</button>
+                    </th><th><th class="fifa fifaHeader">FIXTURES</th><th>
+                    <button class="fifa fifaBack" id="fifaPlayAddFixture">Add Fixture</button>
+                </th></tr></table>
+                <button class="fifa fifaHalf fifaSelected" id="fifaMyFixturesButton">My Team</button>
+                <button class="fifa fifaHalf" id="fifaCompFixturesButton">Competition</button>
+            </div>
+            <div style="visibility: hidden;">
+                <table><tr class="fifa"><th>
+                    <button class="fifa fifaBack" id="fifaBack">Back</button>
+                </th></tr></table>
+                <button class="fifa fifaHalf fifaSelected">My Team</button>
+                <button class="fifa fifaHalf">Competition</button>
+            </div>
+            <table class='fifa' id='fifaFixtures'>
+                <tr class='fifa'><th>Home</th><th></th><th>Away</th></tr>
+                <tr class='fifa'><td>Example Home Team<br>5</td><td>Example Date</td><td>Example Away Team<br>3</td></tr>
+            </table>
+        </div>
         <script src='fifa.js'></script>
-    </body>
+    </div></body>
 </html>

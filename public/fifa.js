@@ -42,7 +42,7 @@ function objectToPostString(obj) {
     return postString.slice(1);
 }
 function fifaRequest(get, url, parameters, callback) {
-    var DEBUG = false;
+    var DEBUG = true;
     var request = new XMLHttpRequest();
     var getString = url;
     if (get)
