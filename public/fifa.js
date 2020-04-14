@@ -25,7 +25,7 @@ function main() {
         var url = new URL(url_string);
         fifaGame = url.searchParams.get("g");
         // console.log(fifaUser);
-        console.log(fifaGame);
+        // console.log(fifaGame);
     }
     loadScript('jquery.js', () => loadScript(path + '.js'));
 }
@@ -42,7 +42,7 @@ function objectToPostString(obj) {
     return postString.slice(1);
 }
 function fifaRequest(get, url, parameters, callback) {
-    var DEBUG = true;
+    var DEBUG = false;
     var request = new XMLHttpRequest();
     var getString = url;
     if (get)

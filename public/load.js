@@ -18,7 +18,7 @@ function createSaveRow(save) {
     var d = document
     var saveRow = d.createElement('tr');
     saveRow.className = 'fifa';
-    saveRow.id = 'l';
+    saveRow.id = save.jid;
     var nameCell = d.createElement('td');
     nameCell.innerHTML = save.name;
     saveRow.appendChild(nameCell);
@@ -33,6 +33,7 @@ function createSaveRow(save) {
     delButton.className = "fifa";
     delButton.innerHTML = "Delete";
     delButton.onclick = () => deleteSave(save.jid);
+    saveRow.onclick = () => location.href = 'play?g=' + save.jid;
 
     delCell.appendChild(delButton);
     saveRow.appendChild(delCell);
