@@ -56,7 +56,7 @@ mongoose.connect(uri, mongooseOptions, function (err) {
 var SaveSchema = new mongoose.Schema({
     jid: { type: String, required: true },
     user: { type: String, required: true },
-    shared: { type: Boolean, required: true },
+    shared: { type: Boolean, required: false },
     name: { type: String, required: true },
     managerName: { type: String, required: true },
     date: { type: Date, required: true },

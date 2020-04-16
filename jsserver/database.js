@@ -286,3 +286,107 @@ function deleteSave(body) {
     });
 }
 exports.deleteSave = deleteSave;
+function getSaveTeams(body) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, TeamsIn.findAllTeamsBySave(body.game)];
+                case 1: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+exports.getSaveTeams = getSaveTeams;
+function getSaveTeamsByComp(body) {
+    return __awaiter(this, void 0, void 0, function () {
+        var teamsIns, ret, _a, _b, _i, i, season, comp, team;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0: return [4 /*yield*/, TeamsIn.findAllBySave(body.game)];
+                case 1:
+                    teamsIns = _c.sent();
+                    ret = new Object();
+                    _a = [];
+                    for (_b in teamsIns)
+                        _a.push(_b);
+                    _i = 0;
+                    _c.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    i = _a[_i];
+                    season = teamsIns[i].season;
+                    comp = teamsIns[i].competition;
+                    return [4 /*yield*/, Team.findByKey(teamsIns[i].team)];
+                case 3:
+                    team = _c.sent();
+                    if (!ret[season])
+                        ret[season] = new Object();
+                    if (!ret[season][comp])
+                        ret[season][comp] = [];
+                    ret[season][comp].push(team.toObject());
+                    _c.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5: return [2 /*return*/, ret];
+            }
+        });
+    });
+}
+exports.getSaveTeamsByComp = getSaveTeamsByComp;
+function autosaveFixtures(body) {
+    return __awaiter(this, void 0, void 0, function () {
+        var jid, oldSave, save, teamsIns, _a, _b, _i, i, oldTeam, newTeam, settings, dc;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    jid = uuid_1.v4();
+                    return [4 /*yield*/, Save.findByKey(body.game)];
+                case 1:
+                    oldSave = (_c.sent()).toObject();
+                    delete oldSave.id;
+                    delete oldSave._id;
+                    console.log(oldSave);
+                    save = new Save.Save(oldSave);
+                    save.jid = jid;
+                    save.user = body.user;
+                    save.name = "Autosave";
+                    save.save();
+                    return [4 /*yield*/, TeamsIn.findAllBySave(oldSave.jid)];
+                case 2:
+                    teamsIns = _c.sent();
+                    _a = [];
+                    for (_b in teamsIns)
+                        _a.push(_b);
+                    _i = 0;
+                    _c.label = 3;
+                case 3:
+                    if (!(_i < _a.length)) return [3 /*break*/, 6];
+                    i = _a[_i];
+                    oldTeam = teamsIns[i].toObject();
+                    delete oldTeam.id;
+                    delete oldTeam._id;
+                    newTeam = new TeamsIn.TeamsIn(oldTeam);
+                    newTeam.saveId = jid;
+                    return [4 /*yield*/, newTeam.save()];
+                case 4:
+                    _c.sent();
+                    _c.label = 5;
+                case 5:
+                    _i++;
+                    return [3 /*break*/, 3];
+                case 6: return [4 /*yield*/, Settings.getGameSettings(oldSave.jid)];
+                case 7:
+                    settings = _c.sent();
+                    return [4 /*yield*/, TeamsIn.findLeagueDivisionByKey(settings.team, save.jid, 2019)];
+                case 8:
+                    dc = _c.sent();
+                    return [4 /*yield*/, Settings.newSettings(save.user, save.jid, settings.team, dc.league.name, dc.division.name)];
+                case 9:
+                    _c.sent();
+                    return [2 /*return*/, jid];
+            }
+        });
+    });
+}
+exports.autosaveFixtures = autosaveFixtures;

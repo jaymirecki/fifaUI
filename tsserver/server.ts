@@ -30,8 +30,11 @@ async function catchErrors(res: e.Response, callback: CallableFunction) {
     }
 }
 // api
+app.post("/autosave_fixtures", async function(req: e.Request, res: e.Response) {
+    catchErrors(res, async () => await DB.autosaveFixtures(req.body) );
+});
 app.post("/delete", async function(req: e.Request, res: e.Response) {
-    catchErrors(res, async () => DB.deleteSave(req.body) );
+    catchErrors(res, async () => await DB.deleteSave(req.body) );
 });
 app.get("/game", async function(req: e.Request, res: e.Response) {
     catchErrors(res, async () => await DB.getSave(req.query.game, req.query.user) );
@@ -45,8 +48,15 @@ app.get("/saves", async function(req: e.Request, res: e.Response) {
 app.get("/team_selection", async function(req: e.Request, res: e.Response) {
     catchErrors(res, DB.getNewGameTemplates);
 });
+app.get("/teams_by_competition", async function(req: e.Request, res: e.Response) {
+    catchErrors(res, async () => await DB.getSaveTeamsByComp(req.query) );
+});
 
 // pages
+app.get("/add_fixture", async function(req : e.Request, res : e.Response) {
+    res = cors(res);
+    res.sendFile(__dirname + '/public/add_fixture.html');
+});
 app.get("/load", async function(req : e.Request, res : e.Response) {
     res = cors(res);
     res.sendFile(__dirname + '/public/load.html');

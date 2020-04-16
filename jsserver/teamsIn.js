@@ -305,3 +305,77 @@ function deleteAllBySave(saveId) {
     });
 }
 exports.deleteAllBySave = deleteAllBySave;
+function findAllTeamsBySave(saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var teamsIns, teams, _a, _b, _i, i, _c, _d;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
+                case 0: return [4 /*yield*/, exports.TeamsIn.find({ saveId: saveId })];
+                case 1:
+                    teamsIns = _e.sent();
+                    teams = new Set();
+                    _a = [];
+                    for (_b in teamsIns)
+                        _a.push(_b);
+                    _i = 0;
+                    _e.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    i = _a[_i];
+                    _d = (_c = teams).add;
+                    return [4 /*yield*/, Team.findByKey(teamsIns[i].team)];
+                case 3:
+                    _d.apply(_c, [_e.sent()]);
+                    _e.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5: return [2 /*return*/, Array.from(teams)];
+            }
+        });
+    });
+}
+exports.findAllTeamsBySave = findAllTeamsBySave;
+function findAllBySave(saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.TeamsIn.find({ saveId: saveId })];
+                case 1: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+exports.findAllBySave = findAllBySave;
+function findAllTeamsByComp(saveId, competition) {
+    return __awaiter(this, void 0, void 0, function () {
+        var teamsIns;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.TeamsIn.find({ saveId: saveId, competition: competition })];
+                case 1:
+                    teamsIns = _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.findAllTeamsByComp = findAllTeamsByComp;
+function findAllCompsBySave(saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var teamsIns, comps, i;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, findAllBySave(saveId)];
+                case 1:
+                    teamsIns = _a.sent();
+                    comps = new Set();
+                    for (i in teamsIns) {
+                        // if ()
+                    }
+                    return [2 /*return*/, Array.from(comps)];
+            }
+        });
+    });
+}
+exports.findAllCompsBySave = findAllCompsBySave;

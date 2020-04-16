@@ -123,3 +123,60 @@ export async function deleteSave(body: any) {
         await TeamsIn.deleteAllBySave(body.game);
     return true;
 }
+
+export async function getSaveTeams(body: any) {
+    return await TeamsIn.findAllTeamsBySave(body.game);
+}
+
+export async function getSaveTeamsByComp(body: any) {
+    let teamsIns = await TeamsIn.findAllBySave(body.game);
+    let ret: any = new Object();
+    for (let i in teamsIns) {
+        let season = teamsIns[i].season;
+        let comp = teamsIns[i].competition;
+        let team = await Team.findByKey(teamsIns[i].team);
+        if (!ret[season])
+            ret[season] = new Object();
+        if (!ret[season][comp])
+            ret[season][comp] = [];
+        ret[season][comp].push(team.toObject());
+    }
+    return ret;
+}
+
+export async function autosaveFixtures(body: any) {
+    let jid = await autosave(body.user, body.game);
+
+    
+
+    return jid;
+}
+
+async function autosave(userId: string, saveId: string) {
+    let jid = uuid4();
+    let oldSave = (await Save.findByKey(saveId)).toObject();
+    delete oldSave.id;
+    delete oldSave._id;
+    console.log(oldSave);
+    let save = new Save.Save(oldSave);
+    save.jid = jid;
+    save.user = userId;
+    save.name = "Autosave";
+    save.save();
+
+    let teamsIns = await TeamsIn.findAllBySave(oldSave.jid);
+    for (let i in teamsIns) {
+        let oldTeam = teamsIns[i].toObject();
+        delete oldTeam.id;
+        delete oldTeam._id;
+        let newTeam = new TeamsIn.TeamsIn(oldTeam);
+        newTeam.saveId = jid;
+        await newTeam.save();
+    }
+
+    let settings = await Settings.getGameSettings(oldSave.jid);
+    let dc = await TeamsIn.findLeagueDivisionByKey(settings.team, save.jid, 2019);
+    await Settings.newSettings(save.user, save.jid, settings.team, dc.league.name, dc.division.name);
+
+    return jid;
+}

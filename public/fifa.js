@@ -70,5 +70,12 @@ function fifaRequest(get, url, parameters, callback) {
 function fifaPostRequest(url, parameters, callback) {
     fifaRequest(false, url, parameters, callback);
 }
+function convertDate(date) {
+    newDate = new Date();
+    newDate.setDate(date.getUTCDate());
+    newDate.setMonth(date.getUTCMonth());
+    newDate.setYear(date.getUTCFullYear());
+    return newDate;
+}
 
 main();

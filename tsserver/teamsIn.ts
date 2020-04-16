@@ -126,3 +126,29 @@ export async function getSavePlayerTeams(saveId: string) {
 export async function deleteAllBySave(saveId: string) {
     await TeamsIn.deleteMany({ saveId: saveId });
 }
+
+export async function findAllTeamsBySave(saveId: string) {
+    let teamsIns = await TeamsIn.find({ saveId: saveId });
+    let teams = new Set<Team.ITeam>();
+    for (let i in teamsIns) {
+        teams.add(await Team.findByKey(teamsIns[i].team));
+    }
+    return Array.from(teams);
+}
+
+export async function findAllBySave(saveId: string) {
+    return await TeamsIn.find({ saveId: saveId });
+}
+
+export async function findAllTeamsByComp(saveId: string, competition: string) {
+    let teamsIns = await TeamsIn.find({ saveId: saveId, competition: competition });
+}
+
+export async function findAllCompsBySave(saveId: string) {
+    let teamsIns = await findAllBySave(saveId);
+    let comps = new Set<Competition.ICompetition>();
+    for (let i in teamsIns) {
+        // if ()
+    }
+    return Array.from(comps);
+}

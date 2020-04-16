@@ -12,6 +12,14 @@
                 <th>ADD FIXTURE</th>
             </tr></table>
             <form>
+                <label for="fifaSeason">Season:</label>
+                <select class="fifa" id="fifaSeason">
+                    <option disabled selected>---</option>
+                </select>
+                <label for="fifaComp">Competition:</label>
+                <select class="fifa" id="fifaComp">
+                    <option disabled selected>---</option>
+                </select>
                 <label for="fifaDate">Date:</label>
                 <input type="date" class="fifa" id="fifaDate">
                 <label for="fifaHome">Home Team:</label>
@@ -30,22 +38,21 @@
             </tr></table>
         </div>
         <div>
-            <table class="fifa"><tr class="fifa">
-                <!-- <th><button class="fifa fifaBack">Back</button></th> -->
-                <th>ADD FIXTURE</th>
-            </tr></table>
+            <table class="fifa"><tr class="fifa"><th>ADD FIXTURE</th></tr></table>
             <form>
-                <label for="fifaDate">1</label>
-                <input type="date" class="fifa">
-                <label for="fifaHome">1</label>
-                <select class="fifa"></select>
-                <label for="fifaAway"></label>
-                <select class="fifa"></select>
+                <label>1</label><select class="fifa"></select>
+                <label>1</label><select class="fifa"></select>
+                <label>1</label><input type="date" class="fifa">
+                <label>1</label><select class="fifa"></select>
+                <label>1</label><select class="fifa"></select>
             </form>
-            <table class="fifa"><tr class="fifa">
+            <!-- <table class="fifa"><tr class="fifa">
                 <th><button class="fifa fifaTable">Cancel</button></th>
-            </tr></table>
+            </tr></table> --><br>
         </div>
+        <table class="fifa" id="fifaFixtures">
+            <tr class="fifa"><th>Home</th><th>Date</th><th>Away</th></tr>
+            <tr><td>Example Home</td><td>Example Date</td><td>Example Away</td></tr></table>
         <script src='fifa.js'></script>
     </div></body>
 </html>

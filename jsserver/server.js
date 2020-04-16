@@ -77,12 +77,29 @@ function catchErrors(res, callback) {
     });
 }
 // api
+app.post("/autosave_fixtures", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _this = this;
+        return __generator(this, function (_a) {
+            catchErrors(res, function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, DB.autosaveFixtures(req.body)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            }); }); });
+            return [2 /*return*/];
+        });
+    });
+});
 app.post("/delete", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var _this = this;
         return __generator(this, function (_a) {
             catchErrors(res, function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-                return [2 /*return*/, DB.deleteSave(req.body)];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, DB.deleteSave(req.body)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
             }); }); });
             return [2 /*return*/];
         });
@@ -140,7 +157,30 @@ app.get("/team_selection", function (req, res) {
         });
     });
 });
+app.get("/teams_by_competition", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _this = this;
+        return __generator(this, function (_a) {
+            catchErrors(res, function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, DB.getSaveTeamsByComp(req.query)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            }); }); });
+            return [2 /*return*/];
+        });
+    });
+});
 // pages
+app.get("/add_fixture", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            res = cors(res);
+            res.sendFile(__dirname + '/public/add_fixture.html');
+            return [2 /*return*/];
+        });
+    });
+});
 app.get("/load", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
