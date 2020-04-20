@@ -105,6 +105,20 @@ app.post("/delete", function (req, res) {
         });
     });
 });
+app.get("/fixtures", function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _this = this;
+        return __generator(this, function (_a) {
+            catchErrors(res, function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, DB.getSaveFixtures(req.query.game)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            }); }); });
+            return [2 /*return*/];
+        });
+    });
+});
 app.get("/game", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var _this = this;

@@ -92,3 +92,8 @@ var validateSave = (save: any) => {
     }
     return save;
 }
+
+export async function findAllByUserName(user: string, name: string) {
+    let saves = await Save.find({ user: user, name: name });
+    return saves;
+}

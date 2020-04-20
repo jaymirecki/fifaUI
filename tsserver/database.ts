@@ -7,6 +7,7 @@ import * as TeamsIn from './teamsIn';
 import * as Settings from './settings';
 import * as PlayerDynamicInfo from './playerdynamicinfo';
 import * as Game from './game';
+import * as Fixture from './fixture';
 import { v4 as uuid4 } from 'uuid';
 
 const uri: string = 
@@ -147,12 +148,27 @@ export async function getSaveTeamsByComp(body: any) {
 export async function autosaveFixtures(body: any) {
     let jid = await autosave(body.user, body.game);
 
-    
+    let fixtures = JSON.parse(body.fixtures);
+
+    for (let i in fixtures) {
+        console.log(fixtures[i]);
+        let fix = new Fixture.Fixture(fixtures[i]);
+        fix.jid = uuid4();
+        fix.saveId = jid;
+        await fix.save();
+    }
 
     return jid;
 }
 
 async function autosave(userId: string, saveId: string) {
+    return await saveAs(userId, saveId, "Autosave");
+}
+
+export async function saveAs(userId: string, saveId: string, saveName: string) {
+    let overwriteSave: Save.ISave[] = await Save.findAllByUserName(userId, saveName);
+    if (overwriteSave.length > 0)
+        await deleteSave({ user: userId, game: overwriteSave[0].jid });
     let jid = uuid4();
     let oldSave = (await Save.findByKey(saveId)).toObject();
     delete oldSave.id;
@@ -161,7 +177,7 @@ async function autosave(userId: string, saveId: string) {
     let save = new Save.Save(oldSave);
     save.jid = jid;
     save.user = userId;
-    save.name = "Autosave";
+    save.name = saveName;
     save.save();
 
     let teamsIns = await TeamsIn.findAllBySave(oldSave.jid);
@@ -179,4 +195,18 @@ async function autosave(userId: string, saveId: string) {
     await Settings.newSettings(save.user, save.jid, settings.team, dc.league.name, dc.division.name);
 
     return jid;
+}
+
+export async function getSaveFixtures(saveId: string) {
+    let fixtures = await Fixture.Fixture.find({ saveId: saveId });
+    let ret: any = {};
+    for (let i in fixtures) {
+        let fix = fixtures[i]
+        if (!ret[fix.season])
+            ret[fix.season] = {};
+        if (!ret[fix.season][fix.competition])
+            ret[fix.season][fix.competition] = []
+        ret[fix.season][fix.competition].push(fix);
+    }
+    return ret;
 }

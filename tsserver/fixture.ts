@@ -14,28 +14,32 @@ mongoose.connect(uri, mongooseOptions, (err: any) => {
     }
 });
 
-interface IGame extends mongoose.Document {
+export interface IFixture extends mongoose.Document {
+    jid: string;
+    saveId: string;
     date: Date;
+    competition: string;
+    season: number;
     homeTeam: string;
     awayTeam: string;
     homeScore: number;
     awayScore: number;
-    length: string;
+    homePen: number;
+    awayPen: number;
 };
 
-const GameSchema = new mongoose.Schema({
+const FixtureSchema = new mongoose.Schema({
+    jid: { type: String, required: true},
+    saveId: { type: String, required: true },
     date: { type: Date, required: true},
-    homeTeam: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Team",
-        required: true},
-    awayTeam: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Team",
-        required: true},
-    homeScore: { type: Number, required: true},
-    awayScore: { type: Number, required: true},
-    length: { type: String, required: true}
+    competition: { type: String, required: true },
+    season: { type: Number, required: true },
+    homeTeam: { type: String, required: true},
+    awayTeam: { type: String, required: true},
+    homeScore: { type: Number, required: false},
+    awayScore: { type: Number, required: false},
+    homePen: { type: Number, required: false},
+    awayPen: { type: Number, required: false}
 });
 
-const Game = mongoose.model<IGame>("Game", GameSchema);
+export const Fixture = mongoose.model<IFixture>("Fixture", FixtureSchema);

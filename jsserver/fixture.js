@@ -15,20 +15,17 @@ mongoose.connect(uri, mongooseOptions, function (err) {
     }
 });
 ;
-var GameSchema = new mongoose.Schema({
+var FixtureSchema = new mongoose.Schema({
+    jid: { type: String, required: true },
+    saveId: { type: String, required: true },
     date: { type: Date, required: true },
-    homeTeam: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Team",
-        required: true
-    },
-    awayTeam: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Team",
-        required: true
-    },
-    homeScore: { type: Number, required: true },
-    awayScore: { type: Number, required: true },
-    length: { type: String, required: true }
+    competition: { type: String, required: true },
+    season: { type: Number, required: true },
+    homeTeam: { type: String, required: true },
+    awayTeam: { type: String, required: true },
+    homeScore: { type: Number, required: false },
+    awayScore: { type: Number, required: false },
+    homePen: { type: Number, required: false },
+    awayPen: { type: Number, required: false }
 });
-var Game = mongoose.model("Game", GameSchema);
+exports.Fixture = mongoose.model("Fixture", FixtureSchema);

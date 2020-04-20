@@ -138,3 +138,17 @@ var validateSave = function (save) {
     }
     return save;
 };
+function findAllByUserName(user, name) {
+    return __awaiter(this, void 0, void 0, function () {
+        var saves;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.Save.find({ user: user, name: name })];
+                case 1:
+                    saves = _a.sent();
+                    return [2 /*return*/, saves];
+            }
+        });
+    });
+}
+exports.findAllByUserName = findAllByUserName;

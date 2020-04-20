@@ -36,6 +36,9 @@ app.post("/autosave_fixtures", async function(req: e.Request, res: e.Response) {
 app.post("/delete", async function(req: e.Request, res: e.Response) {
     catchErrors(res, async () => await DB.deleteSave(req.body) );
 });
+app.get("/fixtures", async function(req: e.Request, res: e.Response) {
+    catchErrors(res, async () => await DB.getSaveFixtures(req.query.game) );
+});
 app.get("/game", async function(req: e.Request, res: e.Response) {
     catchErrors(res, async () => await DB.getSave(req.query.game, req.query.user) );
 });

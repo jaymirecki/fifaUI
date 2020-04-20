@@ -43,6 +43,7 @@ var Division = require("./division");
 var TeamsIn = require("./teamsIn");
 var Settings = require("./settings");
 var Game = require("./game");
+var Fixture = require("./fixture");
 var uuid_1 = require("uuid");
 var uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fifa';
 var mongooseOptions = {
@@ -336,32 +337,84 @@ function getSaveTeamsByComp(body) {
 exports.getSaveTeamsByComp = getSaveTeamsByComp;
 function autosaveFixtures(body) {
     return __awaiter(this, void 0, void 0, function () {
-        var jid, oldSave, save, teamsIns, _a, _b, _i, i, oldTeam, newTeam, settings, dc;
+        var jid, fixtures, _a, _b, _i, i, fix;
         return __generator(this, function (_c) {
             switch (_c.label) {
-                case 0:
-                    jid = uuid_1.v4();
-                    return [4 /*yield*/, Save.findByKey(body.game)];
+                case 0: return [4 /*yield*/, autosave(body.user, body.game)];
                 case 1:
+                    jid = _c.sent();
+                    fixtures = JSON.parse(body.fixtures);
+                    _a = [];
+                    for (_b in fixtures)
+                        _a.push(_b);
+                    _i = 0;
+                    _c.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    i = _a[_i];
+                    console.log(fixtures[i]);
+                    fix = new Fixture.Fixture(fixtures[i]);
+                    fix.jid = uuid_1.v4();
+                    fix.saveId = jid;
+                    return [4 /*yield*/, fix.save()];
+                case 3:
+                    _c.sent();
+                    _c.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5: return [2 /*return*/, jid];
+            }
+        });
+    });
+}
+exports.autosaveFixtures = autosaveFixtures;
+function autosave(userId, saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, saveAs(userId, saveId, "Autosave")];
+                case 1: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+function saveAs(userId, saveId, saveName) {
+    return __awaiter(this, void 0, void 0, function () {
+        var overwriteSave, jid, oldSave, save, teamsIns, _a, _b, _i, i, oldTeam, newTeam, settings, dc;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0: return [4 /*yield*/, Save.findAllByUserName(userId, saveName)];
+                case 1:
+                    overwriteSave = _c.sent();
+                    if (!(overwriteSave.length > 0)) return [3 /*break*/, 3];
+                    return [4 /*yield*/, deleteSave({ user: userId, game: overwriteSave[0].jid })];
+                case 2:
+                    _c.sent();
+                    _c.label = 3;
+                case 3:
+                    jid = uuid_1.v4();
+                    return [4 /*yield*/, Save.findByKey(saveId)];
+                case 4:
                     oldSave = (_c.sent()).toObject();
                     delete oldSave.id;
                     delete oldSave._id;
                     console.log(oldSave);
                     save = new Save.Save(oldSave);
                     save.jid = jid;
-                    save.user = body.user;
-                    save.name = "Autosave";
+                    save.user = userId;
+                    save.name = saveName;
                     save.save();
                     return [4 /*yield*/, TeamsIn.findAllBySave(oldSave.jid)];
-                case 2:
+                case 5:
                     teamsIns = _c.sent();
                     _a = [];
                     for (_b in teamsIns)
                         _a.push(_b);
                     _i = 0;
-                    _c.label = 3;
-                case 3:
-                    if (!(_i < _a.length)) return [3 /*break*/, 6];
+                    _c.label = 6;
+                case 6:
+                    if (!(_i < _a.length)) return [3 /*break*/, 9];
                     i = _a[_i];
                     oldTeam = teamsIns[i].toObject();
                     delete oldTeam.id;
@@ -369,24 +422,47 @@ function autosaveFixtures(body) {
                     newTeam = new TeamsIn.TeamsIn(oldTeam);
                     newTeam.saveId = jid;
                     return [4 /*yield*/, newTeam.save()];
-                case 4:
-                    _c.sent();
-                    _c.label = 5;
-                case 5:
-                    _i++;
-                    return [3 /*break*/, 3];
-                case 6: return [4 /*yield*/, Settings.getGameSettings(oldSave.jid)];
                 case 7:
+                    _c.sent();
+                    _c.label = 8;
+                case 8:
+                    _i++;
+                    return [3 /*break*/, 6];
+                case 9: return [4 /*yield*/, Settings.getGameSettings(oldSave.jid)];
+                case 10:
                     settings = _c.sent();
                     return [4 /*yield*/, TeamsIn.findLeagueDivisionByKey(settings.team, save.jid, 2019)];
-                case 8:
+                case 11:
                     dc = _c.sent();
                     return [4 /*yield*/, Settings.newSettings(save.user, save.jid, settings.team, dc.league.name, dc.division.name)];
-                case 9:
+                case 12:
                     _c.sent();
                     return [2 /*return*/, jid];
             }
         });
     });
 }
-exports.autosaveFixtures = autosaveFixtures;
+exports.saveAs = saveAs;
+function getSaveFixtures(saveId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var fixtures, ret, i, fix;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Fixture.Fixture.find({ saveId: saveId })];
+                case 1:
+                    fixtures = _a.sent();
+                    ret = {};
+                    for (i in fixtures) {
+                        fix = fixtures[i];
+                        if (!ret[fix.season])
+                            ret[fix.season] = {};
+                        if (!ret[fix.season][fix.competition])
+                            ret[fix.season][fix.competition] = [];
+                        ret[fix.season][fix.competition].push(fix);
+                    }
+                    return [2 /*return*/, ret];
+            }
+        });
+    });
+}
+exports.getSaveFixtures = getSaveFixtures;
