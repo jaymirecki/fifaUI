@@ -58,7 +58,7 @@ function fifaRequest(get, url, parameters, callback) {
             if (result.success)
                 callback(result.content);
         } catch(e) {
-            if (DEBUG) console.log(request.responseText);
+            if (DEBUG) console.log(e);
         }
     };
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")

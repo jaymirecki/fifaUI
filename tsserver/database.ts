@@ -198,7 +198,9 @@ export async function saveAs(userId: string, saveId: string, saveName: string) {
 }
 
 export async function getSaveFixtures(saveId: string) {
+    console.log(saveId);
     let fixtures = await Fixture.Fixture.find({ saveId: saveId });
+    console.log(fixtures);
     let ret: any = {};
     for (let i in fixtures) {
         let fix = fixtures[i]
@@ -208,5 +210,6 @@ export async function getSaveFixtures(saveId: string) {
             ret[fix.season][fix.competition] = []
         ret[fix.season][fix.competition].push(fix);
     }
+    console.log(ret);
     return ret;
 }

@@ -448,9 +448,12 @@ function getSaveFixtures(saveId) {
         var fixtures, ret, i, fix;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Fixture.Fixture.find({ saveId: saveId })];
+                case 0:
+                    console.log(saveId);
+                    return [4 /*yield*/, Fixture.Fixture.find({ saveId: saveId })];
                 case 1:
                     fixtures = _a.sent();
+                    console.log(fixtures);
                     ret = {};
                     for (i in fixtures) {
                         fix = fixtures[i];
@@ -460,6 +463,7 @@ function getSaveFixtures(saveId) {
                             ret[fix.season][fix.competition] = [];
                         ret[fix.season][fix.competition].push(fix);
                     }
+                    console.log(ret);
                     return [2 /*return*/, ret];
             }
         });

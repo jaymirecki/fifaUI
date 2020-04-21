@@ -7,7 +7,7 @@ function loadObjects(game) {
     });
     // $('#fifaPlayHome').hide();
     // $('#fifaPlayTables').hide();
-    // $('#fifaPlayFixtures').hide();
+    $('#fifaPlayFixtures').show();
 
     $('.fifaBack').click(() => {
         $('#fifaPlayHome').show();
@@ -33,6 +33,8 @@ function loadObjects(game) {
     $('#fifaMyFixturesButton').click(selectMyFixtures);
     $('#fifaCompFixturesButton').click(selectCompFixtures);
     $('#fifaPlayAddFixture').click(() => location.href = 'add_fixture?g=' + fifaGame);
+
+    fifaGetRequest('/fixtures?game=' + fifaGame, loadFixtures);
 }
 
 function loadSelections() {
@@ -121,6 +123,33 @@ function selectMyFixtures() {
 function selectCompFixtures() {
     $('#fifaMyFixturesButton').removeClass('fifaSelected');
     $('#fifaCompFixturesButton').addClass('fifaSelected');
+}
+
+function loadFixtures(fixtures) {
+    console.log(fixtures);
+    var fixTable = $('#fifaFixtures');
+    var fixHeader = fixTable.find('tr')[0];
+    fixTable.html('');
+    fixTable.append(fixHeader);
+    for (let i in fixtures['2019'][fifaSave.competition]) {
+        let fix = fixtures['2019'][fifaSave.competition][i];
+        console.log(fix);
+        let fixRow = document.createElement('tr');
+        fixRow.className = 'fifa';
+        let homeCell = document.createElement('td');
+        homeCell.innerHTML = fix.homeTeam;
+        console.log(homeCell);
+        let dateCell = document.createElement('td');
+        dateCell.innerText = new Date(fix.date).toLocaleDateString();
+        let awayCell = document.createElement('td');
+        awayCell.innerText = fix.awayTeam;
+
+        fixRow.appendChild(homeCell);
+        fixRow.appendChild(dateCell);
+        fixRow.appendChild(awayCell);
+        console.log(fixRow);
+        fixTable.append(fixRow);
+    }
 }
 
 fifaGetRequest("/game?game=" + fifaGame, loadObjects);
