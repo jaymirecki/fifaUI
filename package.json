@@ -19,7 +19,7 @@
     "homepage": "https://github.com/jaymirecki/echobrigade-server#readme",
     "dependencies": {
       "express": "^4.16.4",
-      "mongodb": "^2.2.33",
+      "mongodb": "^3.6.1",
       "validator": "latest"
     }
   }
